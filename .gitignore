@@ -1,6 +1,9 @@
+### Project Files ###
+*.properties
+*.yml
+
 # Created by https://www.toptal.com/developers/gitignore/api/java,intellij,eclipse,windows,macos,linux,gradle
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,intellij,eclipse,windows,macos,linux,gradle
-
 ### Eclipse ###
 .metadata
 bin/
@@ -281,8 +284,8 @@ $RECYCLE.BIN/
 *.lnk
 
 ### Gradle ###
-.gradle
-**/build/
+gusto/.gradle
+build/
 !src/**/build/
 
 # Ignore Gradle GUI config
