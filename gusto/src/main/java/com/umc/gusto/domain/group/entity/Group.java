@@ -7,6 +7,8 @@ import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -33,5 +35,11 @@ public class Group extends BaseEntity {
 
     @Column(columnDefinition = "VARCHAR(50)")
     private String notice;
+
+    @OneToMany(mappedBy = "group")
+    private List<GroupMember> groupMembers;
+
+    @OneToMany(mappedBy = "group")
+    private List<GroupList> groupLists;
 
 }
