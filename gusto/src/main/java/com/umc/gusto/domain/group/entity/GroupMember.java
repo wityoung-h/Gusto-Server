@@ -3,13 +3,11 @@ package com.umc.gusto.domain.group.entity;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseTime;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Getter
 @Builder

@@ -1,11 +1,9 @@
 package com.umc.gusto.domain.store.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
+@EqualsAndHashCode
 @Entity
 @Getter
 @Builder
