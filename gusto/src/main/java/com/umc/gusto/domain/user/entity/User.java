@@ -60,16 +60,5 @@ public class User extends BaseTime {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR DEFAULT 'ACTIVE")
     private MemberStatus memberStatus;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Social> socialList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Follow> followList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Review> reviewList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<MyCategory> myCategoryList = new ArrayList<>();
+    
 }
