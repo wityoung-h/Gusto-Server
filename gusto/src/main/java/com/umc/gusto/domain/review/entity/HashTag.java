@@ -19,7 +19,4 @@ public class HashTag {
 
     private String hashTagName;
 
-    @OneToMany(mappedBy = "hashTag", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Tagging> taggingSet = new HashSet<>();
-
 }

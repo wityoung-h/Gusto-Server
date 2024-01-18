@@ -60,5 +60,5 @@ public class User extends BaseTime {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR DEFAULT 'ACTIVE")
     private MemberStatus memberStatus;
-    
+
 }
