@@ -25,7 +25,7 @@ public class Group extends BaseEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(10)")
     private String groupName;
 
-    @Column(columnDefinition = "VARCHAR(30)")
+    @Column(columnDefinition = "VARCHAR(20)")
     private String groupScript;
 
     @ManyToOne(fetch = FetchType.LAZY)
