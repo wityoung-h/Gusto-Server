@@ -22,9 +22,10 @@ public class Group extends BaseEntity {
     @Column(name = "groupId", nullable = false, updatable = false)
     private Long groupId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(10)")
     private String groupName;
 
+    @Column(columnDefinition = "VARCHAR(30)")
     private String groupScript;
 
     @ManyToOne(fetch = FetchType.LAZY)
