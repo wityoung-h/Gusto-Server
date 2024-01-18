@@ -4,6 +4,7 @@ import com.umc.gusto.domain.myCategory.entity.MyCategory;
 import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.user.enums.*;
 import com.umc.gusto.global.common.BaseTime;
+import com.umc.gusto.global.common.PublishStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -40,12 +41,12 @@ public class User extends BaseTime {
     private String profileImage;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR DEFAULT 'PUBLIC'")
-    private PublishReview publishReview;
+    @Column(name = "publishReview", nullable = false, columnDefinition = "VARCHAR DEFAULT 'PUBLIC'")
+    private PublishStatus publishReview;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR DEFAULT 'PUBLIC'")
-    private PublishPin publishPin;
+    @Column(name = "publishPin", nullable = false, columnDefinition = "VARCHAR DEFAULT 'PUBLIC'")
+    private PublishStatus publishPin;
 
     @Column(nullable = false)
     private Long follower;

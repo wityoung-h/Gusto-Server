@@ -1,15 +1,13 @@
 package com.umc.gusto.domain.review.entity;
 
-import com.umc.gusto.domain.review.enums.PublishReview;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.user.entity.User;
-import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.common.BaseTime;
+import com.umc.gusto.global.common.PublishStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,8 +46,8 @@ public class Review extends BaseTime {
     private String comment;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR DEFAULT 'PUBLIC'")
-    private PublishReview publishReview;
+    @Column(name = "publishReview", nullable = false, columnDefinition = "VARCHAR DEFAULT 'PUBLIC'")
+    private PublishStatus publishReview;
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer liked;
@@ -58,9 +56,9 @@ public class Review extends BaseTime {
     @JoinColumn(name = "userId")
     private User user;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "storeId")
-//    private Store store;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "storeId")
+    private Store store;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Tagging> taggingSet = new HashSet<>();          // 중복 허용x

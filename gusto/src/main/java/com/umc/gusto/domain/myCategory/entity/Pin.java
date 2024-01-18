@@ -26,7 +26,7 @@ public class Pin extends BaseTime {
     @JoinColumn(name = "myCategoryId")
     private MyCategory myCategory;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "storeId")
-//    private Store store;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "storeId")
+    private Store store;
 }

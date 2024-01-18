@@ -1,9 +1,8 @@
 package com.umc.gusto.domain.myCategory.entity;
 
-import com.umc.gusto.domain.myCategory.enums.PublishCategory;
 import com.umc.gusto.domain.user.entity.User;
-import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.common.BaseTime;
+import com.umc.gusto.global.common.PublishStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,8 +29,8 @@ public class MyCategory extends BaseTime{
     private String myCategoryScript;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR DEFAULT 'PUBLIC'")
-    private PublishCategory publishCategory;
+    @Column(name = "publishCategory", nullable = false, columnDefinition = "VARCHAR DEFAULT 'PUBLIC'")
+    private PublishStatus publishCategory;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
