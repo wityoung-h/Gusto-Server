@@ -8,8 +8,6 @@ import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.util.List;
-
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Getter
@@ -35,8 +33,5 @@ public class Route extends BaseEntity {
 
     @Column(nullable = false, columnDefinition = "VARCHAR(10)")
     private String routeName;
-
-    @OneToMany(mappedBy = "route")
-    private List<RouteList> routeLists;
 
 }
