@@ -9,7 +9,6 @@ import org.hibernate.annotations.GenericGenerator;
 
 import java.util.UUID;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Getter
 @Builder
