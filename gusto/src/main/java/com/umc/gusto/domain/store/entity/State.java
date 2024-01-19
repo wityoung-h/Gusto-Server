@@ -15,7 +15,7 @@ public class State {
     @Column(nullable = false, updatable = false)
     private Long stateId;
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(15)")
+    @Column(nullable = false, columnDefinition = "VARCHAR(2)")
     private String stateCode;
 
     @Column(nullable = false, columnDefinition = "VARCHAR(10)")

@@ -14,7 +14,7 @@ public class Town {
     @Column(nullable = false, updatable = false)
     private Long townId;
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(15)")
+    @Column(nullable = false, columnDefinition = "VARCHAR(3)")
     private String townCode;
 
     @Column(nullable = false, columnDefinition = "VARCHAR(15)")
