@@ -11,10 +11,5 @@
         <module name="gusto.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="gusto" target="17" />
-      <module name="gusto.main" target="17" />
-      <module name="gusto.test" target="17" />
-    </bytecodeTargetLevel>
   </component>
 </project>
