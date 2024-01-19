@@ -1,7 +1,5 @@
 package com.umc.gusto.domain.user.entity;
 
-import com.umc.gusto.domain.user.enums.SocialStatus;
-import com.umc.gusto.domain.user.enums.SocialType;
 import com.umc.gusto.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,5 +27,11 @@ public class Social extends BaseEntity {
     @JoinColumn(name = "userId")
     private User user;
 
+    public enum SocialType {
+        KAKAO, NAVER, GOOGLE
+    }
 
+    public enum SocialStatus {
+        ACTIVE, INACTIVE, PAUSE
+    }
 }

@@ -61,4 +61,17 @@ public class User extends BaseTime {
     @Column(columnDefinition = "VARCHAR DEFAULT 'ACTIVE")
     private MemberStatus memberStatus;
 
+    public enum Gender {
+        FEMALE, MALE, NONE
+    }
+
+    public enum Age {
+        TEEN, TWENTIES, THIRTIES, FOURTIES, FIFTIES, OLDER, NONE
+    }
+
+    public enum MemberStatus {
+        ACTIVE, INACTIVE, PAUSE
+    }
+
+
 }
