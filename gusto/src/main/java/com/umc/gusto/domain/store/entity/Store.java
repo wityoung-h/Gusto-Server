@@ -13,6 +13,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @RequiredArgsConstructor
 @DynamicInsert
 @DynamicUpdate
+@Table(name = "User")
 public class Store extends BaseTime {
 
     @Id
@@ -59,5 +60,5 @@ public class Store extends BaseTime {
     public enum StoreStatus {
         ACTIVE, INACTIVE, CLOSED
     }
-
 }
+

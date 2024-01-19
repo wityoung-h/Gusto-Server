@@ -2,6 +2,7 @@ package com.umc.gusto.domain.user.entity;
 
 import com.umc.gusto.global.common.BaseTime;
 import com.umc.gusto.global.common.PublishStatus;
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -12,14 +13,13 @@ import java.util.UUID;
 
 @Entity
 @Getter
-@DynamicUpdate
-@DynamicInsert
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@RequiredArgsConstructor
+@DynamicInsert
+@DynamicUpdate
 @Table(name = "User")
 public class User extends BaseTime {
-
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name="uuid2", strategy = "uuid2")
@@ -72,6 +72,5 @@ public class User extends BaseTime {
     public enum MemberStatus {
         ACTIVE, INACTIVE, PAUSE
     }
-
 
 }
