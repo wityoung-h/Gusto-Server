@@ -26,7 +26,7 @@ public class User extends BaseTime {
     @Id
     private UUID userId = UUID.randomUUID();
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 15)
     private String nickname;
 
     @Enumerated(EnumType.STRING)

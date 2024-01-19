@@ -22,6 +22,9 @@ public class Review extends BaseTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;
 
+    @Column(nullable = false, length = 105)
+    private String menuName;
+
     @Column(nullable = false)
     private Integer taste;
 
@@ -43,6 +46,7 @@ public class Review extends BaseTime {
 
     private String img4;
 
+    @Column(length = 200)
     private String comment;
 
     @Enumerated(EnumType.STRING)
