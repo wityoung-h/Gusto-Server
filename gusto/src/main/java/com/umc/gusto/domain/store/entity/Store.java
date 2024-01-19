@@ -6,7 +6,6 @@ import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Getter
 @Builder
@@ -56,7 +55,6 @@ public class Store extends BaseTime {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 10)
     private StoreStatus storeStatus = StoreStatus.ACTIVE;
-
 
     public enum StoreStatus {
         ACTIVE, INACTIVE, CLOSED

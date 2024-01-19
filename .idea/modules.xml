@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Gusto-Server.iml" filepath="$PROJECT_DIR$/.idea/Gusto-Server.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/gusto.main.iml" filepath="$PROJECT_DIR$/.idea/modules/gusto.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gusto.test.iml" filepath="$PROJECT_DIR$/.idea/modules/gusto.test.iml" />
     </modules>
   </component>
 </project>

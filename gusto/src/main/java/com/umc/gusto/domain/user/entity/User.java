@@ -1,17 +1,13 @@
 package com.umc.gusto.domain.user.entity;
 
-import com.umc.gusto.domain.myCategory.entity.MyCategory;
-import com.umc.gusto.domain.review.entity.Review;
-import com.umc.gusto.domain.user.enums.*;
 import com.umc.gusto.global.common.BaseTime;
 import com.umc.gusto.global.common.PublishStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.GenericGenerator;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -21,10 +17,14 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Table(name = "User")
 public class User extends BaseTime {
 
     @Id
-    private UUID userId = UUID.randomUUID();
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name="uuid2", strategy = "uuid2")
+    @Column(columnDefinition = "BINARY(16)")
+    private UUID userid;
 
     @Column(nullable = false, length = 15)
     private String nickname;
