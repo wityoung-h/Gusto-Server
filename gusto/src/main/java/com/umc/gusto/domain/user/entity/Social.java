@@ -20,7 +20,7 @@ public class Social extends BaseEntity {
     private SocialType socialType;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR DEFAULT 'ACTIVE'")
+    @Column(nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'ACTIVE'")
     private SocialStatus socialStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
