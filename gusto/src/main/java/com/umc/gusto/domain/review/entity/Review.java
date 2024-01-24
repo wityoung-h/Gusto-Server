@@ -50,7 +50,7 @@ public class Review extends BaseTime {
     private String comment;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "publishReview", nullable = false, columnDefinition = "VARCHAR DEFAULT 'PUBLIC'")
+    @Column(name = "publishReview", nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'PUBLIC'")
     private PublishStatus publishReview;
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
@@ -65,5 +65,5 @@ public class Review extends BaseTime {
     private Store store;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Tagging> taggingSet = new HashSet<>();          // 중복 허용x
+    private final Set<Tagging> taggingSet = new HashSet<>();          // 중복 허용x
 }
