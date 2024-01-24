@@ -29,7 +29,7 @@ public class MyCategory extends BaseTime{
     private String myCategoryScript;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "publishCategory", nullable = false, columnDefinition = "VARCHAR DEFAULT 'PUBLIC'")
+    @Column(name = "publishCategory", nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'PUBLIC'")
     private PublishStatus publishCategory;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,6 +37,6 @@ public class MyCategory extends BaseTime{
     private User user;
 
     @OneToMany(mappedBy = "myCategory", cascade = CascadeType.ALL)
-    private final List<Pin> pinList = new ArrayList<>();
+    private List<Pin> pinList = new ArrayList<>();
 
 }

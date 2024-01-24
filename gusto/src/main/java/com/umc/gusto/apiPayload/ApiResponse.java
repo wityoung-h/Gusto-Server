@@ -7,6 +7,7 @@ import com.umc.gusto.apiPayload.code.BaseCode;
 import com.umc.gusto.apiPayload.code.status.SuccessStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
 @Getter
 @AllArgsConstructor
 @JsonPropertyOrder({"isSuccess", "code", "message", "result"})

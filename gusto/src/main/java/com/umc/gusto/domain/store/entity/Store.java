@@ -13,7 +13,6 @@ import org.hibernate.annotations.DynamicUpdate;
 @RequiredArgsConstructor
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "User")
 public class Store extends BaseTime {
 
     @Id
