@@ -18,10 +18,14 @@ public class MyCategoryController {
     private final MyCategoryCommandService myCategoryCommandService;
 
     @GetMapping("/")
-    public ApiResponse<MyCategoryResponse.MyCategory> allMyCategory() {
-        List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryCommandService.getAllMyCategory();
-
-        return ApiResponse.onSuccess((MyCategoryResponse.MyCategory) myCategoryList);
+    public ApiResponse<List<MyCategoryResponse.MyCategory>> allMyCategory() {
+        try {
+            List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryCommandService.getAllMyCategory();
+            return ApiResponse.onSuccess(myCategoryList);
+        } catch (Exception e) {
+            // Handle the exception and return a failure response
+            return ApiResponse.onFailure("ERROR_CODE", "An error occurred", null);
+        }
     }
 
 }

@@ -15,7 +15,7 @@ public class MyCategoryResponse {
         Long myCategoryId;
         String myCategoryName;
         Integer myCategoryIcon;
-        Integer myStoresCnt;
+//        Integer myStoresCnt;
 
     }
 }
