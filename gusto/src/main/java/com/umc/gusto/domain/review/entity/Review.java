@@ -65,5 +65,5 @@ public class Review extends BaseTime {
     private Store store;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Tagging> taggingSet = new HashSet<>();          // 중복 허용x
+    private final Set<Tagging> taggingSet = new HashSet<>();          // 중복 허용x
 }

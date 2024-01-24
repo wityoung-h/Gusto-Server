@@ -37,6 +37,6 @@ public class MyCategory extends BaseTime{
     private User user;
 
     @OneToMany(mappedBy = "myCategory", cascade = CascadeType.ALL)
-    private List<Pin> pinList = new ArrayList<>();
+    private final List<Pin> pinList = new ArrayList<>();
 
 }
