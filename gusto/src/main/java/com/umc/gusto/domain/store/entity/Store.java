@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.store.entity;
 
+import com.umc.gusto.domain.myCategory.entity.MyCategory;
 import com.umc.gusto.global.common.BaseTime;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,6 +33,10 @@ public class Store extends BaseTime {
     private Category category;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "myCategoryId")
+    private MyCategory myCategory;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "stateId", nullable = false)
     private State state;
 
@@ -54,7 +59,7 @@ public class Store extends BaseTime {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 10)
-    private StoreStatus storeStatus = StoreStatus.ACTIVE;
+    private final StoreStatus storeStatus = StoreStatus.ACTIVE;
 
     public enum StoreStatus {
         ACTIVE, INACTIVE, CLOSED

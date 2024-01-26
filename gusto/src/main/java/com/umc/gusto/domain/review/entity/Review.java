@@ -49,8 +49,13 @@ public class Review extends BaseTime {
     private String comment;
 
     @Enumerated(EnumType.STRING)
+<<<<<<< HEAD
+    @Column(name = "publishReview", nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'PUBLIC'")
+    private PublishStatus publishReview;
+=======
     @Column(name = "publishReview", nullable = false, length = 10)
     private PublishStatus publishReview = PublishStatus.PUBLIC;
+>>>>>>> e1efffad80468f8d543451dfb16a1bada55beb12
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer liked;

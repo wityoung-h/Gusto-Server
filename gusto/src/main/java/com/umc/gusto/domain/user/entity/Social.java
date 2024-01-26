@@ -20,8 +20,13 @@ public class Social extends BaseEntity {
     private SocialType socialType;
 
     @Enumerated(EnumType.STRING)
+<<<<<<< HEAD
+    @Column(nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'ACTIVE'")
+    private SocialStatus socialStatus;
+=======
     @Column(nullable = false, length = 10)
     private SocialStatus socialStatus = SocialStatus.ACTIVE;
+>>>>>>> e1efffad80468f8d543451dfb16a1bada55beb12
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
