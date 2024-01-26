@@ -39,22 +39,15 @@ public class User extends BaseTime {
     @Column(nullable = false)
     private String profileImage;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
-<<<<<<< HEAD
-    @Column(name = "publishReview", nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'PUBLIC'")
-    private PublishStatus publishReview;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "publishPin", nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'PUBLIC'")
-    private PublishStatus publishPin;
-=======
     @Column(name = "publishReview", nullable = false, length = 10)
     private PublishStatus publishReview = PublishStatus.PUBLIC;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "publishPin", nullable = false, length = 10)
-    private PublishStatus publishPin = PublishStatus.PUBLIC;;
->>>>>>> e1efffad80468f8d543451dfb16a1bada55beb12
+    private PublishStatus publishPin = PublishStatus.PUBLIC;
 
     @Column(nullable = false)
     private Long follower;
@@ -65,14 +58,10 @@ public class User extends BaseTime {
     @Column(nullable = false)
     private Integer reviewCnt;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
-<<<<<<< HEAD
-    @Column(columnDefinition = "VARCHAR(10) DEFAULT 'ACTIVE'")
-    private MemberStatus memberStatus;
-=======
     @Column(nullable = false, length = 10)
     private MemberStatus memberStatus = MemberStatus.ACTIVE;
->>>>>>> e1efffad80468f8d543451dfb16a1bada55beb12
 
     public enum Gender {
         FEMALE, MALE, NONE

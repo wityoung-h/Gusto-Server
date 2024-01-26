@@ -1,6 +1,5 @@
 package com.umc.gusto.domain.myCategory.controller;
 
-import com.umc.gusto.domain.myCategory.entity.MyCategory;
 import com.umc.gusto.domain.myCategory.model.request.MyCategoryRequest;
 import com.umc.gusto.domain.myCategory.model.response.MyCategoryResponse;
 import com.umc.gusto.domain.myCategory.service.MyCategoryCommandService;
@@ -61,18 +60,19 @@ public class MyCategoryController {
 
 
     @PatchMapping("/{myCategoryId}/update")
-    public ResponseEntity<MyCategory> modifyMyCategory(
+    public ResponseEntity<String> modifyMyCategory(
             @PathVariable Long myCategoryId,
             @RequestBody MyCategoryRequest.updateMyCategoryDTO request
     ) {
         try {
             myCategoryCommandService.modifyMyCategory(myCategoryId, request);
+
+            return ResponseEntity.ok("success");
         } catch (Exception e) {
             // 수정 중 에러가 발생한 경우, 실패 응답을 반환
             throw new RuntimeException("error");
         }
 
-        return null;
     }
 
     @PatchMapping("/{myCategoryId}/delete")

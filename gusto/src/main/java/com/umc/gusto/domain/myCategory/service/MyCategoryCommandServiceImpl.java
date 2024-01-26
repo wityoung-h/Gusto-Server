@@ -73,15 +73,10 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
                     .myCategoryIcon(createMyCategoryDTO.getMyCategoryIcon())
                     .myCategoryScript(createMyCategoryDTO.getMyCategoryScript())
                     .publishCategory(createMyCategoryDTO.getPublishCategory())
-                    .status(createMyCategoryDTO.getStatus())
                     .build();
 
             myCategoryRepository.save(myCategory);
         }
-
-
-
-//        myCategory.setStatus(BaseEntity.Status.ACTIVE);
 
 
     }
@@ -89,24 +84,29 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
     public void modifyMyCategory(Long myCategoryId, MyCategoryRequest.updateMyCategoryDTO request) {
         MyCategory existingMyCategory = myCategoryRepository.findById(myCategoryId)
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + myCategoryId));
-        // 변경하려는 필드만 업데이트
-        if (request.getMyCategoryName() != null) {
-            existingMyCategory.setMyCategoryName(request.getMyCategoryName());
-        }
+            // status가 INACTIVE일 때 수정하는 경우 -> 프론트 상 그럴 경우 없어 보여 주석 처리
+//        if (existingMyCategory.getStatus() != BaseEntity.Status.INACTIVE) {
+            // 변경하려는 필드만 업데이트
+            if (request.getMyCategoryName() != null) {
+                existingMyCategory.setMyCategoryName(request.getMyCategoryName());
+            }
 
-        if (request.getMyCategoryIcon() != null) {
-            existingMyCategory.setMyCategoryIcon(request.getMyCategoryIcon());
-        }
+            if (request.getMyCategoryIcon() != null) {
+                existingMyCategory.setMyCategoryIcon(request.getMyCategoryIcon());
+            }
 
-        if (request.getMyCategoryScript() != null) {
-            existingMyCategory.setMyCategoryScript(request.getMyCategoryScript());
-        }
+            if (request.getMyCategoryScript() != null) {
+                existingMyCategory.setMyCategoryScript(request.getMyCategoryScript());
+            }
 
-        if (request.getPublishCategory() != null) {
-            existingMyCategory.setPublishCategory(request.getPublishCategory());
-        }
+            if (request.getPublishCategory() != null) {
+                existingMyCategory.setPublishCategory(request.getPublishCategory());
+            }
 
-        myCategoryRepository.save(existingMyCategory);
+            myCategoryRepository.save(existingMyCategory);
+//        } else {
+//            throw new RuntimeException("dont' update delete myCategory");
+//        }
     }
 
     @Override
