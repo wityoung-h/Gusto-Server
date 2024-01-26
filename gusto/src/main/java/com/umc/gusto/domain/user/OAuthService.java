@@ -1,0 +1,25 @@
+package com.umc.gusto.domain.user;
+
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Service;
+
+@Service
+public class OAuthService extends DefaultOAuth2UserService {
+
+    // 유저 불러오기 - 해당 유저의 security context가 저장됨
+    @Override
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        OAuth2User oAuth2User = super.loadUser(userRequest);
+
+        String provider = userRequest.getClientRegistration().getRegistrationId();
+        String userNameAttribute = userRequest.getClientRegistration()
+                .getProviderDetails().getUserInfoEndpoint()
+                .getUserNameAttributeName();
+
+
+        return oAuth2User;
+    }
+}
