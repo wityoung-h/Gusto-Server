@@ -17,7 +17,6 @@ public class MyCategoryResponse {
         String myCategoryName;
         Integer myCategoryIcon;
         PublishStatus publishCategory;
-        BaseEntity.Status status;
         Integer myStoresCnt;
     }
 
