@@ -21,12 +21,13 @@ public class MyCategory extends BaseTime{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long myCategoryId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String myCategoryName;
 
     @Column(nullable = false)
     private Integer myCategoryIcon;
 
+    @Column(length = 20)
     private String myCategoryScript;
 
     @Enumerated(EnumType.STRING)
