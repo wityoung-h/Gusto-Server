@@ -9,6 +9,12 @@ import java.util.List;
 public interface MyCategoryCommandService {
 
     List<MyCategoryResponse.MyCategoryDTO> getAllMyCategory();
-    MyCategory createMyCategory(MyCategoryRequest.createMyCategoryDTO createMyCategoryDTO);
 
+    List<MyCategoryResponse.MyStoreByMyCategoryDTO> getAllMyStoreByMyCategory(Long myCategoryId);
+
+    void createMyCategory(MyCategoryRequest.createMyCategoryDTO createMyCategoryDTO);
+
+    void modifyMyCategory(Long myCategoryId, MyCategoryRequest.updateMyCategoryDTO updateMyCategoryDTO);
+
+    void deleteMyCategory(Long myCategoryId, MyCategoryRequest.deleteMyCategoryDTO request);
 }
