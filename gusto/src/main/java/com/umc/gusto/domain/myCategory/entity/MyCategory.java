@@ -22,16 +22,18 @@ public class MyCategory extends BaseTime{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long myCategoryId;
 
-
+    @Column(nullable = false, length = 10)
     private String myCategoryName;
 
+    @Column(nullable = false)
     private Integer myCategoryIcon;
 
+    @Column(length = 20)
     private String myCategoryScript;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column( length = 10)
+    @Column(name = "publishCategory",nullable = false, length = 10)
     private PublishStatus publishCategory = PublishStatus.PUBLIC;
 
     @Builder.Default
