@@ -25,7 +25,6 @@ public class Review extends BaseTime {
     @Column(length = 105)
     private String menuName;
 
-    @Column(nullable = false)
     private Integer taste;
 
     private Integer spiciness;
