@@ -29,7 +29,7 @@ public class MyCategory extends BaseTime{
     private String myCategoryScript;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "publishCategory", nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'PUBLIC'")
+    @Column(nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'PUBLIC'")
     private PublishStatus publishCategory;
 
     @ManyToOne(fetch = FetchType.LAZY)
