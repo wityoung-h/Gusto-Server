@@ -7,6 +7,7 @@ import com.umc.gusto.global.common.BaseTime;
 import com.umc.gusto.global.common.PublishStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,7 @@ public class MyCategory extends BaseTime{
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
+<<<<<<< HEAD
     @Column(name = "publishCategory",nullable = false, length = 10)
     private PublishStatus publishCategory = PublishStatus.PUBLIC;
 
@@ -40,6 +42,10 @@ public class MyCategory extends BaseTime{
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     private BaseEntity.Status status = BaseEntity.Status.ACTIVE;
+=======
+    @Column(name = "publishCategory", nullable = false, length = 10)
+    private PublishStatus publishCategory = PublishStatus.PUBLIC;
+>>>>>>> e1efffad80468f8d543451dfb16a1bada55beb12
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
