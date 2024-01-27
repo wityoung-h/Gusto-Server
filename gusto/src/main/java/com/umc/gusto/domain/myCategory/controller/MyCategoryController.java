@@ -16,12 +16,12 @@ import java.util.List;
 public class MyCategoryController {
     private final MyCategoryCommandService myCategoryCommandService;
 
-    @GetMapping("/")
+    @GetMapping("/{nickname}")
     public ResponseEntity<List<MyCategoryResponse.MyCategoryDTO>> allMyCategory(
-            @RequestParam(name = "dong", required = false) String dong
-    ) {
+            @RequestParam(name = "dong", required = false) String dong,
+            @PathVariable String nickname) {
         try {
-            List<MyCategoryResponse.MyCategoryDTO> myCategoryList = myCategoryCommandService.getAllMyCategory();
+            List<MyCategoryResponse.MyCategoryDTO> myCategoryList = myCategoryCommandService.getAllMyCategory(nickname);
             return ResponseEntity.ok(myCategoryList);
         } catch (Exception e) {
             // Handle the exception and return a failure response
@@ -29,12 +29,12 @@ public class MyCategoryController {
         }
     }
 
-    @GetMapping("/{myCategoryId}/myStores")
+    @GetMapping("/{nickname}")
     public ResponseEntity<List<MyCategoryResponse.MyStoreByMyCategoryDTO>> allMyStoreByMyCategory(
             @RequestParam(name = "dong", required = false) String dong,
-            @PathVariable Long myCategoryId) {
+            @RequestParam(name = "myCategoryId") Long myCategoryId, @PathVariable String nickname) {
         try {
-            List<MyCategoryResponse.MyStoreByMyCategoryDTO> myStoreList = myCategoryCommandService.getAllMyStoreByMyCategory(myCategoryId);
+            List<MyCategoryResponse.MyStoreByMyCategoryDTO> myStoreList = myCategoryCommandService.getAllMyStoreByMyCategory(nickname, myCategoryId);
             return ResponseEntity.ok(myStoreList);
         } catch (Exception e) {
             // Handle the exception and return a failure response

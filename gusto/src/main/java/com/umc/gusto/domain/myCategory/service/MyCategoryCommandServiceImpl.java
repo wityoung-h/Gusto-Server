@@ -1,11 +1,15 @@
 package com.umc.gusto.domain.myCategory.service;
 
 import com.umc.gusto.domain.myCategory.entity.MyCategory;
+import com.umc.gusto.domain.myCategory.entity.Pin;
 import com.umc.gusto.domain.myCategory.model.request.MyCategoryRequest;
 import com.umc.gusto.domain.myCategory.model.response.MyCategoryResponse;
 import com.umc.gusto.domain.myCategory.repository.MyCategoryRepository;
+import com.umc.gusto.domain.myCategory.repository.PinRepository;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.repository.StoreRepository;
+import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,10 +23,13 @@ import java.util.stream.Collectors;
 public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
 
     private final MyCategoryRepository myCategoryRepository;
-    private final StoreRepository storeRepository;
+    private final PinRepository pinRepository;
+    private final UserRepository userRepository;
 
-    public List<MyCategoryResponse.MyCategoryDTO> getAllMyCategory() {
-        List<MyCategory> myCategoryList = myCategoryRepository.findByStatus(BaseEntity.Status.ACTIVE);      // status가 ACTIVE인 카테고리 조회
+    public List<MyCategoryResponse.MyCategoryDTO> getAllMyCategory(String nickname) {
+        User user = userRepository.findByNickname(nickname);
+
+        List<MyCategory> myCategoryList = myCategoryRepository.findByStatusAndUser(BaseEntity.Status.ACTIVE, user);      // status가 ACTIVE인 카테고리 조회
 
         return myCategoryList.stream()
                 .map(myCategory -> MyCategoryResponse.MyCategoryDTO.builder()
@@ -36,15 +43,15 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
     }
 
     @Override
-    public List<MyCategoryResponse.MyStoreByMyCategoryDTO> getAllMyStoreByMyCategory(Long myCategoryId) {
+    public List<MyCategoryResponse.MyStoreByMyCategoryDTO> getAllMyStoreByMyCategory(String name, Long myCategoryId) {
         MyCategory existingMyCategory = myCategoryRepository.findById(myCategoryId)
                 .orElseThrow(() -> new RuntimeException(""));
-        List<Store> myStoreList;
-        myStoreList = storeRepository.findByMyCategory(existingMyCategory);
+        List<Pin> pinList;
+        pinList = pinRepository.findByMyCategoryOrderByPinId(existingMyCategory);
 
-        return myStoreList.stream()
+        return pinList.stream()
                 .map(store -> MyCategoryResponse.MyStoreByMyCategoryDTO.builder()
-                        .storeId(store.getStoreId())
+                        .storeId(store.getPinId())
                         .storeName(store.getStoreName())
                         .address(store.getAddress())
                         .build())
