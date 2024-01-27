@@ -19,9 +19,8 @@ public class Social extends BaseEntity {
     @Column(nullable = false)
     private SocialType socialType;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
-    private SocialStatus socialStatus = SocialStatus.ACTIVE;
+    @Column(nullable = false)
+    private String providerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
@@ -29,9 +28,5 @@ public class Social extends BaseEntity {
 
     public enum SocialType {
         KAKAO, NAVER, GOOGLE
-    }
-
-    public enum SocialStatus {
-        ACTIVE, INACTIVE, PAUSE
     }
 }
