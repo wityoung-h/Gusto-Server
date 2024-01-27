@@ -1,4 +1,4 @@
-package com.umc.gusto.domain.user.model;
+package com.umc.gusto.global.auth.model;
 
 
 import com.umc.gusto.domain.user.entity.Social;

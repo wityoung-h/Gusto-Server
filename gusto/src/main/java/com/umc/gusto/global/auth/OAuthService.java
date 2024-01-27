@@ -1,8 +1,9 @@
-package com.umc.gusto.domain.user;
+package com.umc.gusto.global.auth;
 
+import com.umc.gusto.domain.user.SocialRepository;
 import com.umc.gusto.domain.user.entity.Social;
-import com.umc.gusto.domain.user.model.OAuth2UserWithAuthority;
-import com.umc.gusto.domain.user.model.OAuthAttributes;
+import com.umc.gusto.global.auth.model.OAuth2UserWithAuthority;
+import com.umc.gusto.global.auth.model.OAuthAttributes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
