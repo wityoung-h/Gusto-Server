@@ -35,7 +35,7 @@ public class MyCategoryController {
             @RequestParam(name = "dong", required = false) String dong,
             @RequestParam(name = "myCategoryId") Long myCategoryId, @PathVariable String nickname) {
         try {
-            List<MyCategoryResponse.PinByMyCategoryDTO> myStoreList = myCategoryCommandService.getAllPinByMyCategory(nickname, myCategoryId);
+            List<MyCategoryResponse.PinByMyCategoryDTO> myStoreList = myCategoryCommandService.getAllPinByMyCategory(nickname, myCategoryId, dong);
             return ResponseEntity.ok(myStoreList);
         } catch (Exception e) {
             // Handle the exception and return a failure response

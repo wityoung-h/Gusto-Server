@@ -7,9 +7,7 @@ import com.umc.gusto.domain.myCategory.model.response.MyCategoryResponse;
 import com.umc.gusto.domain.myCategory.repository.MyCategoryRepository;
 import com.umc.gusto.domain.myCategory.repository.PinRepository;
 import com.umc.gusto.domain.review.entity.Review;
-import com.umc.gusto.domain.review.repository.ReviewRepository;
-import com.umc.gusto.domain.store.entity.Store;
-import com.umc.gusto.domain.store.repository.StoreRepository;
+import com.umc.gusto.domain.review.repository.ReviewRepository;;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
@@ -47,11 +45,10 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
 
 
     @Override
-    public List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategory(String nickname, Long myCategoryId) {
+    public List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategory(String nickname, Long myCategoryId, String dong) {
         User user = userRepository.findByNickname(nickname);
         MyCategory existingMyCategory = myCategoryRepository.findByMyCategoryIdAndUser(myCategoryId, user);
-        List<Pin> pinList;
-        pinList = pinRepository.findByMyCategoryOrderByPinIdDesc(existingMyCategory);
+        List<Pin> pinList = pinRepository.findByMyCategoryOrderByPinIdDesc(existingMyCategory);
 
         return pinList.stream()
                 .map(pin -> {
