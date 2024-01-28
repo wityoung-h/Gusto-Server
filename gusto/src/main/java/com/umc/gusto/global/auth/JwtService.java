@@ -48,4 +48,16 @@ public class JwtService implements InitializingBean {
 
         return tokens;
     }
+
+    public Claims getClaims(String token) {
+        try {
+            return (Claims) Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parse(token)
+                    .getPayload();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
+    }
 }
