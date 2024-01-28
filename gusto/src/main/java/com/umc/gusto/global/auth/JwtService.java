@@ -1,7 +1,7 @@
 package com.umc.gusto.global.auth;
 
 import com.umc.gusto.global.auth.model.TokenDTO;
-import com.umc.gusto.global.auth.secret.JwtConfig;
+import com.umc.gusto.global.config.secret.JwtConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
