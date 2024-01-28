@@ -22,10 +22,11 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         if(authentication.getPrincipal() instanceof CustomOAuth2User) {
             CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+            Social socialInfo = oAuth2User.getSocialInfo();
 
             response.setCharacterEncoding("utf-8");
 
-            if(oAuth2User.getSocialStatus() == Social.SocialStatus.CONNECTED){
+            if(socialInfo.getSocialStatus() == Social.SocialStatus.CONNECTED){
                 // TODO: uesr 정보 가져오기 && x-auth-token 발급하기
                 response.setHeader("X-AUTH-TOKEN", "tempcode");
                 response.getWriter();
@@ -35,7 +36,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             // social temporal token 및 OAuthAttributes return
             response.setContentType("application/json");
             response.setHeader("Location", "http://{domain}/sign-in");
-            response.setHeader("temp-token", oAuth2User.getTemporalToken().toString());
+            response.setHeader("temp-token", String.valueOf(socialInfo.getTemporalToken()));
 
             // TODO: 차후 응답 코드 형태 맞춰 리팩토링할 것
             String body = """

@@ -53,8 +53,7 @@ public class OAuthService extends DefaultOAuth2UserService {
         return CustomOAuth2User.builder()
                 .delegate(oAuth2User)
                 .oAuthAttributes(oAuthAttributes)
-                .socialStatus(info.getSocialStatus())
-                .temporalToken(info.getTemporalToken())
+                .socialInfo(info)
                 .build();
     }
 }

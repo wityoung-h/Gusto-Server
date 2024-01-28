@@ -17,8 +17,7 @@ import java.util.UUID;
 public class CustomOAuth2User implements OAuth2User {
     private final OAuth2User delegate;
     private final OAuthAttributes oAuthAttributes;
-    private final Social.SocialStatus socialStatus;
-    private final UUID temporalToken;
+    private final Social socialInfo;
 
     @Override
     public Map<String, Object> getAttributes() {
