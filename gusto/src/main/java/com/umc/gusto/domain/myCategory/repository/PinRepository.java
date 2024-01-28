@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface PinRepository extends JpaRepository<Pin, Long> {
     List<Pin> findByMyCategoryOrderByPinIdDesc(MyCategory myCategory);
+
+    List<Pin> findAllByMyCategoryOrderByPinIdDesc(MyCategory myCategory);
 }

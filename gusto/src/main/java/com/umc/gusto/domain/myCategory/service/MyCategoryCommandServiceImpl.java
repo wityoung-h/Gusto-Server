@@ -8,6 +8,10 @@ import com.umc.gusto.domain.myCategory.repository.MyCategoryRepository;
 import com.umc.gusto.domain.myCategory.repository.PinRepository;
 import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.review.repository.ReviewRepository;;
+import com.umc.gusto.domain.store.entity.Store;
+import com.umc.gusto.domain.store.entity.Town;
+import com.umc.gusto.domain.store.repository.StoreRepository;
+import com.umc.gusto.domain.store.repository.TownRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
@@ -25,6 +29,8 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
     private final MyCategoryRepository myCategoryRepository;
     private final PinRepository pinRepository;
     private final UserRepository userRepository;
+    private final StoreRepository storeRepository;
+    private final TownRepository townRepository;
     private final ReviewRepository reviewRepository;
 
     public List<MyCategoryResponse.MyCategoryDTO> getAllMyCategory(String nickname) {
@@ -43,9 +49,33 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
                 .collect(Collectors.toList());
     }
 
+    public List<MyCategoryResponse.MyCategoryDTO> getAllMyCategoryWithLocation(String townName) {
+        List<MyCategory>myCategoryList = myCategoryRepository.findByStatus(BaseEntity.Status.ACTIVE);      // status가 ACTIVE인 카테고리 조회
+        Town town = townRepository.findByTownName(townName);
+        List<Store> storesList = storeRepository.findByTown(town);                                         // 특정 townName인 storesList
+
+        return myCategoryList.stream()
+                .map(myCategory -> {
+                    List<Pin> pinList = pinRepository.findAllByMyCategoryOrderByPinIdDesc(myCategory);     // 먼저 카테고리로 구분
+                    List<Store> storesWithPins = pinList.stream()
+                            .map(Pin::getStore)
+                            .filter(storesList::contains)                                                  // storesList에 포함된 store만 필터링!
+                            .toList();
+
+                    return MyCategoryResponse.MyCategoryDTO.builder()
+                            .myCategoryId(myCategory.getMyCategoryId())
+                            .myCategoryName(myCategory.getMyCategoryName())
+                            .myCategoryIcon(myCategory.getMyCategoryIcon())
+                            .publishCategory(myCategory.getPublishCategory())
+                            .pinCnt(storesWithPins.size())            // pin 개수 받아오기로 변경
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
 
     @Override
-    public List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategory(String nickname, Long myCategoryId, String dong) {
+    public List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategory(String nickname, Long myCategoryId, String townName) {
         User user = userRepository.findByNickname(nickname);
         MyCategory existingMyCategory = myCategoryRepository.findByMyCategoryIdAndUser(myCategoryId, user);
         List<Pin> pinList = pinRepository.findByMyCategoryOrderByPinIdDesc(existingMyCategory);

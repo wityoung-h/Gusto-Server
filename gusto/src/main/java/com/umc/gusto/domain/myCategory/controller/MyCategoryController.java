@@ -19,14 +19,25 @@ public class MyCategoryController {
 
     @GetMapping("/{nickname}")
     public ResponseEntity<List<MyCategoryResponse.MyCategoryDTO>> allMyCategory(
-            @RequestParam(name = "dong", required = false) String dong,
             @PathVariable String nickname) {
         try {
             List<MyCategoryResponse.MyCategoryDTO> myCategoryList = myCategoryCommandService.getAllMyCategory(nickname);
             return ResponseEntity.ok(myCategoryList);
         } catch (Exception e) {
             // Handle the exception and return a failure response
-            throw new RuntimeException("MyCategory with the same name already exists and is in ACTIVE");
+            throw new RuntimeException("error");
+        }
+    }
+
+    @GetMapping("")
+    public ResponseEntity<List<MyCategoryResponse.MyCategoryDTO>> allMyCategoryWithLocation(
+            @RequestParam(name = "townName", required = false) String townName) {
+        try {
+            List<MyCategoryResponse.MyCategoryDTO> myCategoryList = myCategoryCommandService.getAllMyCategoryWithLocation(townName);
+            return ResponseEntity.ok(myCategoryList);
+        } catch (Exception e) {
+            // Handle the exception and return a failure response
+            throw new RuntimeException("error");
         }
     }
 
@@ -54,7 +65,7 @@ public class MyCategoryController {
             return ResponseEntity.ok("success");
         } catch (Exception e) {
             // 예외가 발생하면 처리하고 실패 응답을 반환합니다.
-            throw new RuntimeException("error");
+            throw new RuntimeException("MyCategory with the same name already exists and is in ACTIVE");
         }
     }
 
