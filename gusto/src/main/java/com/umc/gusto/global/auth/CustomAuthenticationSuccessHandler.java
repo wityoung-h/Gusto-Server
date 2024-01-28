@@ -3,6 +3,7 @@ package com.umc.gusto.global.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.global.auth.model.CustomOAuth2User;
+import com.umc.gusto.global.auth.model.TokenDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +18,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private final ObjectMapper objectMapper;
+    private final JwtService jwtService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -27,8 +29,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             response.setCharacterEncoding("utf-8");
 
             if(socialInfo.getSocialStatus() == Social.SocialStatus.CONNECTED){
-                // TODO: uesr 정보 가져오기 && x-auth-token 발급하기
-                response.setHeader("X-AUTH-TOKEN", "tempcode");
+                TokenDTO tokens = jwtService.createToken(String.valueOf(socialInfo.getUser().getUserid()));
+                response.setHeader("X-AUTH-TOKEN", tokens.getAccessToken());
+                response.setHeader("refresh-token", tokens.getRefreshToken());
                 response.getWriter();
                 return;
             }
