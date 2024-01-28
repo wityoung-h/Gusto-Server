@@ -2,20 +2,17 @@ package com.umc.gusto.global.auth;
 
 import com.umc.gusto.domain.user.SocialRepository;
 import com.umc.gusto.domain.user.entity.Social;
-import com.umc.gusto.global.auth.model.OAuth2UserWithAuthority;
+import com.umc.gusto.global.auth.model.CustomOAuth2User;
 import com.umc.gusto.global.auth.model.OAuthAttributes;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,17 +33,28 @@ public class OAuthService extends DefaultOAuth2UserService {
 
         Optional<Social> socialInfo = socialRepository.findBySocialTypeAndProviderId(provider, oAuthAttributes.getId());
 
-        Set<GrantedAuthority> authoritySet = new HashSet<>();
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_USER");
+        Social info;
 
         if(socialInfo.isEmpty()) {
-            authority = new SimpleGrantedAuthority("ROLE_NEW");
+             info = socialRepository.save(Social.builder()
+                     .socialType(provider)
+                     .providerId(oAuthAttributes.getId())
+                     .socialStatus(Social.SocialStatus.WAITING_SIGN_UP)
+                     .temporalToken(UUID.randomUUID())
+                     .build());
+        } else {
+            info = socialInfo.get();
         }
 
-        authoritySet.add(authority);
+        if(info.getSocialStatus() == Social.SocialStatus.DISCONNECTED) {
+            // error throw
+        }
 
-        OAuth2UserWithAuthority oAuth2UserWithAuthority = new OAuth2UserWithAuthority(oAuth2User, authoritySet, oAuthAttributes);
-
-        return oAuth2UserWithAuthority;
+        return CustomOAuth2User.builder()
+                .delegate(oAuth2User)
+                .oAuthAttributes(oAuthAttributes)
+                .socialStatus(info.getSocialStatus())
+                .temporalToken(info.getTemporalToken())
+                .build();
     }
 }

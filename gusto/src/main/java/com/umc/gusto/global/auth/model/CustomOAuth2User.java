@@ -1,5 +1,6 @@
 package com.umc.gusto.global.auth.model;
 
+import com.umc.gusto.domain.user.entity.Social;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,14 +9,16 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.UUID;
 
 @Getter
 @Builder
 @AllArgsConstructor
-public class OAuth2UserWithAuthority implements OAuth2User {
+public class CustomOAuth2User implements OAuth2User {
     private final OAuth2User delegate;
-    private final Collection<? extends GrantedAuthority> authorities;
     private final OAuthAttributes oAuthAttributes;
+    private final Social.SocialStatus socialStatus;
+    private final UUID temporalToken;
 
     @Override
     public Map<String, Object> getAttributes() {
@@ -24,7 +27,7 @@ public class OAuth2UserWithAuthority implements OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return delegate.getAuthorities();
     }
 
     @Override
