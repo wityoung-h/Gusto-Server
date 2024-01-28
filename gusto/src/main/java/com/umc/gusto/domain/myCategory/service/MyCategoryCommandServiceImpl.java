@@ -6,6 +6,8 @@ import com.umc.gusto.domain.myCategory.model.request.MyCategoryRequest;
 import com.umc.gusto.domain.myCategory.model.response.MyCategoryResponse;
 import com.umc.gusto.domain.myCategory.repository.MyCategoryRepository;
 import com.umc.gusto.domain.myCategory.repository.PinRepository;
+import com.umc.gusto.domain.review.entity.Review;
+import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
@@ -25,6 +27,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
     private final MyCategoryRepository myCategoryRepository;
     private final PinRepository pinRepository;
     private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
 
     public List<MyCategoryResponse.MyCategoryDTO> getAllMyCategory(String nickname) {
         User user = userRepository.findByNickname(nickname);
@@ -37,24 +40,33 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
                         .myCategoryName(myCategory.getMyCategoryName())
                         .myCategoryIcon(myCategory.getMyCategoryIcon())
                         .publishCategory(myCategory.getPublishCategory())
-                        .myStoresCnt(myCategory.getStoreList().size())
+                        .pinCnt(myCategory.getPinList().size())            // pin 개수 받아오기로 변경
                         .build())
                 .collect(Collectors.toList());
     }
 
+
     @Override
-    public List<MyCategoryResponse.MyStoreByMyCategoryDTO> getAllMyStoreByMyCategory(String name, Long myCategoryId) {
-        MyCategory existingMyCategory = myCategoryRepository.findById(myCategoryId)
-                .orElseThrow(() -> new RuntimeException(""));
+    public List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategory(String nickname, Long myCategoryId) {
+        User user = userRepository.findByNickname(nickname);
+        MyCategory existingMyCategory = myCategoryRepository.findByMyCategoryIdAndUser(myCategoryId, user);
         List<Pin> pinList;
-        pinList = pinRepository.findByMyCategoryOrderByPinId(existingMyCategory);
+        pinList = pinRepository.findByMyCategoryOrderByPinIdDesc(existingMyCategory);
 
         return pinList.stream()
-                .map(store -> MyCategoryResponse.MyStoreByMyCategoryDTO.builder()
-                        .storeId(store.getPinId())
-                        .storeName(store.getStoreName())
-                        .address(store.getAddress())
-                        .build())
+                .map(pin -> {
+                    Optional<Review> topReviewOptional = reviewRepository.findTopByStoreOrderByLikedDesc(pin.getStore());       // 가장 좋아요가 많은 review
+                    String reviewImg = topReviewOptional.map(Review::getImg1).orElse(null);                               // 가장 좋아요가 많은 review 이미지
+                    Integer reviewCnt = reviewRepository.countByStoreAndUser(pin.getStore(), user);                             // 내가 작성한 리뷰의 개수 == 방문 횟수
+
+                    return  MyCategoryResponse.PinByMyCategoryDTO.builder()
+                                .pinId(pin.getPinId())
+                                .storeName(pin.getStore().getStoreName())
+                                .address(pin.getStore().getAddress())
+                                .reviewImg(reviewImg)
+                                .reviewCnt(reviewCnt)
+                                .build();
+                })
                 .collect(Collectors.toList());
     }
 

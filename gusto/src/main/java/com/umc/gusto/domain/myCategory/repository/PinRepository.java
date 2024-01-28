@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PinRepository extends JpaRepository<Pin, Long> {
-    List<Pin> findByMyCategoryOrderByPinId(MyCategory myCategory);
+    List<Pin> findByMyCategoryOrderByPinIdDesc(MyCategory myCategory);
 }

@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface MyCategoryRepository extends JpaRepository<MyCategory, Long> {
 
     List<MyCategory> findByStatusAndUser(BaseEntity.Status status, User user);
-
+    MyCategory findByMyCategoryIdAndUser(Long myCategoryId, User user);
     Optional<MyCategory> findByMyCategoryName(String myCategoryName);
 }

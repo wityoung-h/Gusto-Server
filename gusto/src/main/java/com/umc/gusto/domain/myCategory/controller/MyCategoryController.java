@@ -29,12 +29,12 @@ public class MyCategoryController {
         }
     }
 
-    @GetMapping("/{nickname}")
-    public ResponseEntity<List<MyCategoryResponse.MyStoreByMyCategoryDTO>> allMyStoreByMyCategory(
+    @GetMapping("/pinStores/{nickname}")
+    public ResponseEntity<List<MyCategoryResponse.PinByMyCategoryDTO>> allMyStoreByMyCategory(
             @RequestParam(name = "dong", required = false) String dong,
             @RequestParam(name = "myCategoryId") Long myCategoryId, @PathVariable String nickname) {
         try {
-            List<MyCategoryResponse.MyStoreByMyCategoryDTO> myStoreList = myCategoryCommandService.getAllMyStoreByMyCategory(nickname, myCategoryId);
+            List<MyCategoryResponse.PinByMyCategoryDTO> myStoreList = myCategoryCommandService.getAllPinByMyCategory(nickname, myCategoryId);
             return ResponseEntity.ok(myStoreList);
         } catch (Exception e) {
             // Handle the exception and return a failure response

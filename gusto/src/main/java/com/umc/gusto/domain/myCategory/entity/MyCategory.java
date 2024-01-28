@@ -49,9 +49,6 @@ public class MyCategory extends BaseTime{
     @OneToMany(mappedBy = "myCategory", cascade = CascadeType.ALL)
     private final List<Pin> pinList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "myCategory", cascade = CascadeType.ALL)
-    private final List<Store> storeList = new ArrayList<>();
-
     public void setMyCategoryName(String myCategoryName) {
         this.myCategoryName = myCategoryName;
     }
