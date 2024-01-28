@@ -75,7 +75,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
 
 
     @Override
-    public List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategory(String nickname, Long myCategoryId, String townName) {
+    public List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategory(String nickname, Long myCategoryId) {
         User user = userRepository.findByNickname(nickname);
         MyCategory existingMyCategory = myCategoryRepository.findByMyCategoryIdAndUser(myCategoryId, user);
         List<Pin> pinList = pinRepository.findByMyCategoryOrderByPinIdDesc(existingMyCategory);
@@ -93,6 +93,31 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
                                 .reviewImg(reviewImg)
                                 .reviewCnt(reviewCnt)
                                 .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategoryWithLocation(Long myCategoryId, String townName) {
+        MyCategory existingMyCategory = myCategoryRepository.findByMyCategoryId(myCategoryId);
+        Town town = townRepository.findByTownName(townName);
+        List<Store> storesList = storeRepository.findByTown(town);
+        List<Pin> pinList = pinRepository.findByMyCategoryOrderByPinIdDesc(existingMyCategory);
+
+        return pinList.stream()
+                .filter(pin -> storesList.contains(pin.getStore()))             // townName을 기준으로 보일 수 있는 store가 포함된 pin만 보이기(핀은 화살표 오른쯕을 기준으로 형성)
+                .map(pin -> {
+                    Optional<Review> topReviewOptional = reviewRepository.findTopByStoreOrderByLikedDesc(pin.getStore());       // 가장 좋아요가 많은 review
+                    String reviewImg = topReviewOptional.map(Review::getImg1).orElse(null);                               // 가장 좋아요가 많은 review 이미지
+                    Integer reviewCnt = reviewRepository.countByStore(pin.getStore());                             // 내가 작성한 리뷰의 개수 == 방문 횟수
+
+                    return  MyCategoryResponse.PinByMyCategoryDTO.builder()
+                            .pinId(pin.getPinId())
+                            .storeName(pin.getStore().getStoreName())
+                            .address(pin.getStore().getAddress())
+                            .reviewImg(reviewImg)
+                            .reviewCnt(reviewCnt)
+                            .build();
                 })
                 .collect(Collectors.toList());
     }

@@ -10,9 +10,11 @@ public interface MyCategoryCommandService {
 
     List<MyCategoryResponse.MyCategoryDTO> getAllMyCategory(String nickname);
 
-    List<MyCategoryResponse.MyCategoryDTO> getAllMyCategoryWithLocation(String name);
+    List<MyCategoryResponse.MyCategoryDTO> getAllMyCategoryWithLocation(String townName);
 
-    List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategory(String nickname, Long myCategoryId, String dong);
+    List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategory(String nickname, Long myCategoryId);
+
+    List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategoryWithLocation(Long myCategoryId, String townName);
 
     void createMyCategory(MyCategoryRequest.createMyCategoryDTO createMyCategoryDTO);
 

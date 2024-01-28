@@ -13,5 +13,6 @@ public interface MyCategoryRepository extends JpaRepository<MyCategory, Long> {
     List<MyCategory> findByStatusAndUser(BaseEntity.Status status, User user);
     List<MyCategory> findByStatus(BaseEntity.Status status);
     MyCategory findByMyCategoryIdAndUser(Long myCategoryId, User user);
+    MyCategory findByMyCategoryId(Long myCategoryId);
     Optional<MyCategory> findByMyCategoryName(String myCategoryName);
 }

@@ -31,7 +31,7 @@ public class MyCategoryController {
 
     @GetMapping("")
     public ResponseEntity<List<MyCategoryResponse.MyCategoryDTO>> allMyCategoryWithLocation(
-            @RequestParam(name = "townName", required = false) String townName) {
+            @RequestParam(name = "townName") String townName) {
         try {
             List<MyCategoryResponse.MyCategoryDTO> myCategoryList = myCategoryCommandService.getAllMyCategoryWithLocation(townName);
             return ResponseEntity.ok(myCategoryList);
@@ -42,12 +42,24 @@ public class MyCategoryController {
     }
 
     @GetMapping("/pinStores/{nickname}")
-    public ResponseEntity<List<MyCategoryResponse.PinByMyCategoryDTO>> allMyStoreByMyCategory(
-            @RequestParam(name = "dong", required = false) String dong,
+    public ResponseEntity<List<MyCategoryResponse.PinByMyCategoryDTO>> allPinByMyCategory(
             @RequestParam(name = "myCategoryId") Long myCategoryId, @PathVariable String nickname) {
         try {
-            List<MyCategoryResponse.PinByMyCategoryDTO> myStoreList = myCategoryCommandService.getAllPinByMyCategory(nickname, myCategoryId, dong);
+            List<MyCategoryResponse.PinByMyCategoryDTO> myStoreList = myCategoryCommandService.getAllPinByMyCategory(nickname, myCategoryId);
             return ResponseEntity.ok(myStoreList);
+        } catch (Exception e) {
+            // Handle the exception and return a failure response
+            throw new RuntimeException("error");
+        }
+    }
+
+    @GetMapping("/pinStores")
+    public ResponseEntity<List<MyCategoryResponse.PinByMyCategoryDTO>> allPinByCategoryWithLocation(
+            @RequestParam(name = "myCategoryId") Long myCategoryId,
+            @RequestParam(name = "townName") String townName) {
+        try {
+            List<MyCategoryResponse.PinByMyCategoryDTO> myCategoryList = myCategoryCommandService.getAllPinByMyCategoryWithLocation(myCategoryId,townName);
+            return ResponseEntity.ok(myCategoryList);
         } catch (Exception e) {
             // Handle the exception and return a failure response
             throw new RuntimeException("error");
