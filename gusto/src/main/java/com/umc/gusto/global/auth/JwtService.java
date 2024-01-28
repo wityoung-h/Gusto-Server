@@ -5,19 +5,25 @@ import com.umc.gusto.global.config.secret.JwtConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class JwtService implements InitializingBean {
     private static final String UUID = "uuid";
     private static SecretKey secretKey;
 
+    private final UserDetailsService userDetailService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -50,14 +56,27 @@ public class JwtService implements InitializingBean {
     }
 
     public Claims getClaims(String token) {
+        return (Claims) Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parse(token)
+                .getPayload();
+    }
+
+    public boolean checkValidationToken(String token) {
         try {
-            return (Claims) Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parse(token)
-                    .getPayload();
+            getClaims(token);
         } catch (ExpiredJwtException e) {
-            return e.getClaims();
+            throw e;
+        } catch (Exception e) {
+            return false;
         }
+        return true;
+    }
+
+    public Authentication getAuthentication(String token) {
+        String uuid = (String) getClaims(token).get(UUID);
+        UserDetails user = userDetailService.loadUserByUsername(uuid);
+        return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
     }
 }

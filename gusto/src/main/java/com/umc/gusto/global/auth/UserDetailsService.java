@@ -1,0 +1,27 @@
+package com.umc.gusto.global.auth;
+
+import com.umc.gusto.domain.user.UserRepository;
+import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.global.auth.model.AuthUser;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+
+
+@Service
+@RequiredArgsConstructor
+public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
+    @Autowired
+    private final UserRepository userRepository;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findById(UUID.fromString(username)).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+
+        return new AuthUser(user);
+    }
+}
