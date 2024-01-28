@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface MyCategoryCommandService {
 
-    List<MyCategoryResponse.MyCategoryDTO> getAllMyCategory();
+    List<MyCategoryResponse.MyCategoryDTO> getAllMyCategory(String nickname);
 
-    List<MyCategoryResponse.MyStoreByMyCategoryDTO> getAllMyStoreByMyCategory(Long myCategoryId);
+    List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategory(String nickname, Long myCategoryId, String dong);
 
     void createMyCategory(MyCategoryRequest.createMyCategoryDTO createMyCategoryDTO);
 
     void modifyMyCategory(Long myCategoryId, MyCategoryRequest.updateMyCategoryDTO updateMyCategoryDTO);
 
-    void deleteMyCategory(Long myCategoryId, MyCategoryRequest.deleteMyCategoryDTO request);
+    void deleteMyCategories(List<Long> myCategoryId);
 }

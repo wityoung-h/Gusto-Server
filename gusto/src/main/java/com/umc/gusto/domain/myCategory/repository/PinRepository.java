@@ -1,4 +1,4 @@
-package com.umc.gusto.domain.store.repository;
+package com.umc.gusto.domain.myCategory.repository;
 
 import com.umc.gusto.domain.myCategory.entity.MyCategory;
 import com.umc.gusto.domain.myCategory.entity.Pin;
@@ -7,5 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface StoreRepository extends JpaRepository<Store, Long> {
+public interface PinRepository extends JpaRepository<Pin, Long> {
+    List<Pin> findByMyCategoryOrderByPinIdDesc(MyCategory myCategory);
 }

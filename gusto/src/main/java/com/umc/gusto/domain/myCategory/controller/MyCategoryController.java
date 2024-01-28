@@ -4,6 +4,7 @@ import com.umc.gusto.domain.myCategory.model.request.MyCategoryRequest;
 import com.umc.gusto.domain.myCategory.model.response.MyCategoryResponse;
 import com.umc.gusto.domain.myCategory.service.MyCategoryCommandService;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +17,12 @@ import java.util.List;
 public class MyCategoryController {
     private final MyCategoryCommandService myCategoryCommandService;
 
-    @GetMapping("/")
+    @GetMapping("/{nickname}")
     public ResponseEntity<List<MyCategoryResponse.MyCategoryDTO>> allMyCategory(
-            @RequestParam(name = "dong", required = false) String dong
-    ) {
+            @RequestParam(name = "dong", required = false) String dong,
+            @PathVariable String nickname) {
         try {
-            List<MyCategoryResponse.MyCategoryDTO> myCategoryList = myCategoryCommandService.getAllMyCategory();
+            List<MyCategoryResponse.MyCategoryDTO> myCategoryList = myCategoryCommandService.getAllMyCategory(nickname);
             return ResponseEntity.ok(myCategoryList);
         } catch (Exception e) {
             // Handle the exception and return a failure response
@@ -29,12 +30,12 @@ public class MyCategoryController {
         }
     }
 
-    @GetMapping("/{myCategoryId}/myStores")
-    public ResponseEntity<List<MyCategoryResponse.MyStoreByMyCategoryDTO>> allMyStoreByMyCategory(
+    @GetMapping("/pinStores/{nickname}")
+    public ResponseEntity<List<MyCategoryResponse.PinByMyCategoryDTO>> allMyStoreByMyCategory(
             @RequestParam(name = "dong", required = false) String dong,
-            @PathVariable Long myCategoryId) {
+            @RequestParam(name = "myCategoryId") Long myCategoryId, @PathVariable String nickname) {
         try {
-            List<MyCategoryResponse.MyStoreByMyCategoryDTO> myStoreList = myCategoryCommandService.getAllMyStoreByMyCategory(myCategoryId);
+            List<MyCategoryResponse.PinByMyCategoryDTO> myStoreList = myCategoryCommandService.getAllPinByMyCategory(nickname, myCategoryId, dong);
             return ResponseEntity.ok(myStoreList);
         } catch (Exception e) {
             // Handle the exception and return a failure response
@@ -75,10 +76,10 @@ public class MyCategoryController {
 
     }
 
-    @PatchMapping("/{myCategoryId}/delete")
-    public ResponseEntity<String> deleteMyCategory(@PathVariable Long myCategoryId, MyCategoryRequest.deleteMyCategoryDTO request) {
+    @PatchMapping("/delete")
+    public ResponseEntity<String> deleteMyCategory(@RequestParam(name = "myCategoryId") List<Long> myCategoryIds) {
         try {
-            myCategoryCommandService.deleteMyCategory(myCategoryId, request);
+            myCategoryCommandService.deleteMyCategories(myCategoryIds);
 
             return ResponseEntity.ok("Category deleted successfully");
         } catch (Exception e) {

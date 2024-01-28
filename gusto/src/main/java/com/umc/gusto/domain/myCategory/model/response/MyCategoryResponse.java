@@ -17,15 +17,15 @@ public class MyCategoryResponse {
         String myCategoryName;
         Integer myCategoryIcon;
         PublishStatus publishCategory;
-        Integer myStoresCnt;
+        Integer pinCnt;
     }
 
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class MyStoreByMyCategoryDTO{
-        Long storeId;
+    public static class PinByMyCategoryDTO{
+        Long pinId;
         String storeName;
         String address;
         String reviewImg;
