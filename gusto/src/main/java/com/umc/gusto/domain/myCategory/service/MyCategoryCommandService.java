@@ -16,5 +16,5 @@ public interface MyCategoryCommandService {
 
     void modifyMyCategory(Long myCategoryId, MyCategoryRequest.updateMyCategoryDTO updateMyCategoryDTO);
 
-    void deleteMyCategory(Long myCategoryId, MyCategoryRequest.deleteMyCategoryDTO request);
+    void deleteMyCategories(List<Long> myCategoryId);
 }

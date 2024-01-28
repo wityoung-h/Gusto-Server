@@ -4,6 +4,7 @@ import com.umc.gusto.domain.myCategory.model.request.MyCategoryRequest;
 import com.umc.gusto.domain.myCategory.model.response.MyCategoryResponse;
 import com.umc.gusto.domain.myCategory.service.MyCategoryCommandService;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -75,10 +76,10 @@ public class MyCategoryController {
 
     }
 
-    @PatchMapping("/{myCategoryId}/delete")
-    public ResponseEntity<String> deleteMyCategory(@PathVariable Long myCategoryId, MyCategoryRequest.deleteMyCategoryDTO request) {
+    @PatchMapping("/delete")
+    public ResponseEntity<String> deleteMyCategory(@RequestParam(name = "myCategoryId") List<Long> myCategoryIds) {
         try {
-            myCategoryCommandService.deleteMyCategory(myCategoryId, request);
+            myCategoryCommandService.deleteMyCategories(myCategoryIds);
 
             return ResponseEntity.ok("Category deleted successfully");
         } catch (Exception e) {

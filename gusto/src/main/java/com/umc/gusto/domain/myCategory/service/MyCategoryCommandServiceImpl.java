@@ -70,10 +70,9 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
                 .collect(Collectors.toList());
     }
 
-    // 겹치는 NAME이 있다면 추가 X, 겹치는 name인데 status가 inactive면 active로 변경
+    // 동일 user가 작성한 카테고리 중 겹치는 NAME이 있다면 추가 X, 겹치는 name인데 status가 inactive면 active로 변경 => 토큰을 통해 nickname 가져올 것
     @Override
     public void createMyCategory(MyCategoryRequest.createMyCategoryDTO createMyCategoryDTO) {
-
         // 중복 이름 체크
         Optional<MyCategory> myCategoryOptional = myCategoryRepository.findByMyCategoryName(createMyCategoryDTO.getMyCategoryName());
 
@@ -128,15 +127,15 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
 //        }
     }
 
-    @Override
-    public void deleteMyCategory(Long myCategoryId, MyCategoryRequest.deleteMyCategoryDTO request) {
-        MyCategory existingMyCategory = myCategoryRepository.findById(myCategoryId)
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + myCategoryId));
+    public void deleteMyCategories(List<Long> myCategoryIds) {
+        for (Long myCategoryId : myCategoryIds) {
+            MyCategory existingMyCategory = myCategoryRepository.findById(myCategoryId)
+                    .orElseThrow(() -> new RuntimeException("Category not found with id: " + myCategoryId));
 
-        existingMyCategory.setStatus(BaseEntity.Status.INACTIVE);
+            existingMyCategory.setStatus(BaseEntity.Status.INACTIVE);
 
-        myCategoryRepository.save(existingMyCategory);
-
+            myCategoryRepository.save(existingMyCategory);
+        }
     }
 
 }
