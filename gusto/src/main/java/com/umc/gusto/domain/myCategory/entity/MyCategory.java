@@ -14,10 +14,11 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class MyCategory extends BaseTime{
+public class MyCategory extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,33 +38,11 @@ public class MyCategory extends BaseTime{
     @Column(name = "publishCategory",nullable = false, length = 10)
     private PublishStatus publishCategory = PublishStatus.PUBLIC;
 
-    @Builder.Default
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
-    private BaseEntity.Status status = BaseEntity.Status.ACTIVE;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private User user;
 
     @OneToMany(mappedBy = "myCategory", cascade = CascadeType.ALL)
     private final List<Pin> pinList = new ArrayList<>();
-
-    public void setMyCategoryName(String myCategoryName) {
-        this.myCategoryName = myCategoryName;
-    }
-
-    public void setMyCategoryIcon(Integer myCategoryIcon) {
-        this.myCategoryIcon = myCategoryIcon;
-    }
-
-    public void setMyCategoryScript(String myCategoryScript) {
-        this.myCategoryScript = myCategoryScript;
-    }
-
-    public void setPublishCategory(PublishStatus publishCategory) {
-        this.publishCategory = publishCategory;
-    }
-
-    public void setStatus(BaseEntity.Status status) {this.status = status;}
+    
 }
