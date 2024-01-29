@@ -25,6 +25,7 @@ public class Social extends BaseTime {
     @Column(nullable = false)
     private String providerId;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 15)
     private SocialStatus socialStatus = SocialStatus.WAITING_SIGN_UP;
@@ -42,5 +43,13 @@ public class Social extends BaseTime {
 
     public enum SocialStatus {
         CONNECTED, WAITING_SIGN_UP, DISCONNECTED
+    }
+
+    public void updateUser(User user) {
+        this.user = user;
+    }
+
+    public void updateSocialStatus(SocialStatus socialStatus) {
+        this.socialStatus = socialStatus;
     }
 }
