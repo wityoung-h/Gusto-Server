@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.global.auth.model.CustomOAuth2User;
 import com.umc.gusto.global.auth.model.Tokens;
-import com.umc.gusto.global.config.secret.JwtConfig;
-import com.umc.gusto.global.util.RedisService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,22 +19,18 @@ import java.io.IOException;
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private final ObjectMapper objectMapper;
     private final JwtService jwtService;
-    private final RedisService redisService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        if(authentication.getPrincipal() instanceof CustomOAuth2User) {
-            CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+        if(authentication.getPrincipal() instanceof CustomOAuth2User oAuth2User) {
             Social socialInfo = oAuth2User.getSocialInfo();
 
             response.setCharacterEncoding("utf-8");
 
             if(socialInfo.getSocialStatus() == Social.SocialStatus.CONNECTED){
                 String userUUID = String.valueOf(socialInfo.getUser().getUserid());
-                Tokens tokens = jwtService.createToken(userUUID);
-                
-                // redis에 refresh token 정보를 저장
-                redisService.setValuesWithTimeout(tokens.getRefreshToken(), userUUID, JwtConfig.REFRESH_TOKEN_VALID_TIME);
+
+                Tokens tokens = jwtService.createAndSaveTokens(userUUID);
                 
                 response.setHeader("X-AUTH-TOKEN", tokens.getAccessToken());
                 response.setHeader("refresh-token", tokens.getRefreshToken());

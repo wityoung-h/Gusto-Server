@@ -2,6 +2,7 @@ package com.umc.gusto.global.auth;
 
 import com.umc.gusto.global.auth.model.Tokens;
 import com.umc.gusto.global.config.secret.JwtConfig;
+import com.umc.gusto.global.util.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -16,6 +17,9 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.util.Date;
 
+import static com.umc.gusto.global.config.secret.JwtConfig.ACCESS_TOKEN_VALID_TIME;
+import static com.umc.gusto.global.config.secret.JwtConfig.REFRESH_TOKEN_VALID_TIME;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -24,6 +28,7 @@ public class JwtService implements InitializingBean {
     private static SecretKey secretKey;
 
     private final UserDetailsService userDetailService;
+    private final RedisService redisService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -35,7 +40,7 @@ public class JwtService implements InitializingBean {
         Date now = new Date();
 
         String accessToken = Jwts.builder()
-                .expiration(new Date(now.getTime() + JwtConfig.ACCESS_TOKEN_VALID_TIME))
+                .expiration(new Date(now.getTime() + ACCESS_TOKEN_VALID_TIME))
                 .subject("access-token")
                 .claim(UUID, userUUID)
                 .issuedAt(now)
@@ -43,7 +48,7 @@ public class JwtService implements InitializingBean {
                 .compact();
 
         String refreshToken = Jwts.builder()
-                .expiration(new Date(now.getTime() + JwtConfig.REFRESH_TOKEN_VALID_TIME))
+                .expiration(new Date(now.getTime() + REFRESH_TOKEN_VALID_TIME))
                 .subject("refresh-token")
                 .claim(UUID, userUUID)
                 .issuedAt(now)
@@ -78,5 +83,12 @@ public class JwtService implements InitializingBean {
         String uuid = (String) getClaims(token).get(UUID);
         UserDetails user = userDetailService.loadUserByUsername(uuid);
         return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
+    }
+
+    public Tokens createAndSaveTokens(String userUUID) {
+        Tokens tokens = createToken(userUUID);
+        redisService.setValuesWithTimeout(tokens.getRefreshToken(), userUUID, REFRESH_TOKEN_VALID_TIME);
+
+        return tokens;
     }
 }

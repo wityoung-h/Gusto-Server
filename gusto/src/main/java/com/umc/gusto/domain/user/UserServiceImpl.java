@@ -5,7 +5,6 @@ import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.global.auth.JwtService;
 import com.umc.gusto.global.auth.model.Tokens;
-import com.umc.gusto.global.config.secret.JwtConfig;
 import com.umc.gusto.global.util.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +22,6 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final SocialRepository socialRepository;
     private final JwtService jwtService;
-    private final RedisService redisService;
-
 
     @Value("${default.img.url.profile}")
     private String DEFAULT_IMG;
@@ -69,9 +66,8 @@ public class UserServiceImpl implements UserService{
         socialInfo.updateSocialStatus(Social.SocialStatus.CONNECTED);
         socialRepository.save(socialInfo);
 
-        // access-token 및 refresh-token 생성
-        Tokens tokens = jwtService.createToken(String.valueOf(user.getUserid()));
-        redisService.setValuesWithTimeout(tokens.getRefreshToken(), String.valueOf(user.getUserid()), JwtConfig.REFRESH_TOKEN_VALID_TIME);
+        // access-token 및 refresh-token 생성, 저장
+        Tokens tokens = jwtService.createAndSaveTokens(String.valueOf(user.getUserid()));
 
         return tokens;
     }
