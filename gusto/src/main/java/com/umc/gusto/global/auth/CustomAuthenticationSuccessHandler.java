@@ -3,7 +3,7 @@ package com.umc.gusto.global.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.global.auth.model.CustomOAuth2User;
-import com.umc.gusto.global.auth.model.TokenDTO;
+import com.umc.gusto.global.auth.model.Tokens;
 import com.umc.gusto.global.config.secret.JwtConfig;
 import com.umc.gusto.global.util.RedisService;
 import jakarta.servlet.ServletException;
@@ -33,7 +33,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
             if(socialInfo.getSocialStatus() == Social.SocialStatus.CONNECTED){
                 String userUUID = String.valueOf(socialInfo.getUser().getUserid());
-                TokenDTO tokens = jwtService.createToken(userUUID);
+                Tokens tokens = jwtService.createToken(userUUID);
                 
                 // redis에 refresh token 정보를 저장
                 redisService.setValuesWithTimeout(tokens.getRefreshToken(), userUUID, JwtConfig.REFRESH_TOKEN_VALID_TIME);
