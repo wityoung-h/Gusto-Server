@@ -1,6 +1,6 @@
 package com.umc.gusto.global.auth;
 
-import com.umc.gusto.global.auth.model.TokenDTO;
+import com.umc.gusto.global.auth.model.Tokens;
 import com.umc.gusto.global.config.secret.JwtConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -31,7 +31,7 @@ public class JwtService implements InitializingBean {
         secretKey = JwtConfig.RANDOM_SECRET_KEY;
     }
 
-    public TokenDTO createToken(String userUUID) {
+    public Tokens createToken(String userUUID) {
         Date now = new Date();
 
         String accessToken = Jwts.builder()
@@ -50,7 +50,7 @@ public class JwtService implements InitializingBean {
                 .signWith(secretKey)
                 .compact();
 
-        TokenDTO tokens = new TokenDTO(accessToken, refreshToken);
+        Tokens tokens = new Tokens(accessToken, refreshToken);
 
         return tokens;
     }
