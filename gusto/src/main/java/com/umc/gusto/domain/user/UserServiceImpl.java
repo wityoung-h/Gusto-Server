@@ -38,7 +38,8 @@ public class UserServiceImpl implements UserService{
         UUID socialUID = UUID.fromString(tempToken);
         Social socialInfo = socialRepository.findByTemporalToken(socialUID).orElseThrow(() -> new RuntimeException("유효하지 않은 토큰입니다."));
 
-        // TODO: nickname 중복 체크 필요
+        redisService.deleteValues(request.getNickname());
+        checkNickname(request.getNickname());
 
         String profileImg = DEFAULT_IMG;
         
