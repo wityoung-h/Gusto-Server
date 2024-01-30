@@ -52,4 +52,17 @@ public class UserController {
                 .body("");
     }
 
+    /**
+     * 닉네임 사용 확정 API
+     * [POST] /users/confirm-nickname/{nickname}
+     * @param nickname
+     * @return -
+     */
+    @PostMapping("/confirm-nickname/{nickname}")
+    public ResponseEntity<Object> confirmNickname(@PathVariable("nickname")String nickname) {
+        userService.confirmNickname(nickname);
+
+        return ResponseEntity.ok()
+                .body("");
+    }
 }
