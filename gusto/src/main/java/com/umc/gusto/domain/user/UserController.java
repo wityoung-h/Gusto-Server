@@ -14,6 +14,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
     private final UserService userService;
 
+    /**
+     * 회원 가입 API
+     * [POST] /users/sing-up
+     * @param token
+     * @param multipartFile
+     * @param signUpRequest
+     * @return -
+     */
     @PostMapping("/sign-up")
     public ResponseEntity<Object> signUp(@RequestHeader("Temp-Token") String token,
                          @RequestPart(name = "profileImg", required = false) MultipartFile multipartFile,
@@ -29,4 +37,19 @@ public class UserController {
                 .headers(headers)
                 .body("success"); // 임시 메세지
     }
+
+    /**
+     * 닉네임 중복 체크 API
+     * [POST] /users/check-nickname/{nickname}
+     * @param nickname
+     * @return -
+     */
+    @PostMapping("/check-nickname/{nickname}")
+    public ResponseEntity<Object> checkNickname(@PathVariable("nickname")String nickname) {
+        checkNickname(nickname);
+
+        return ResponseEntity.ok()
+                .body("");
+    }
+
 }
