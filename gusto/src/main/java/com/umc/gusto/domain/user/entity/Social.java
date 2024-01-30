@@ -34,6 +34,9 @@ public class Social extends BaseTime {
     @Column(columnDefinition = "BINARY(16)")
     private UUID temporalToken;
 
+    @Column
+    private String providerId;
+
     public enum SocialType {
         KAKAO, NAVER, GOOGLE
     }
