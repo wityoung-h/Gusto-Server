@@ -3,6 +3,7 @@ package com.umc.gusto.domain.user;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
+import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.auth.JwtService;
 import com.umc.gusto.global.auth.model.Tokens;
 import com.umc.gusto.global.config.secret.JwtConfig;
