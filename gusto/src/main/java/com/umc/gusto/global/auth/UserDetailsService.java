@@ -1,7 +1,7 @@
 package com.umc.gusto.global.auth;
 
-import com.umc.gusto.domain.user.UserRepository;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.auth.model.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
