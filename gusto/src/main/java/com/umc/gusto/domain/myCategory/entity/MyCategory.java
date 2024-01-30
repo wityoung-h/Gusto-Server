@@ -44,5 +44,4 @@ public class MyCategory extends BaseEntity{
 
     @OneToMany(mappedBy = "myCategory", cascade = CascadeType.ALL)
     private final List<Pin> pinList = new ArrayList<>();
-    
 }
