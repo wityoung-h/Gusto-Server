@@ -22,9 +22,6 @@ public class Social extends BaseTime {
     @Column(nullable = false)
     private SocialType socialType;
 
-    @Column(nullable = false)
-    private String providerId;
-
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 15)
