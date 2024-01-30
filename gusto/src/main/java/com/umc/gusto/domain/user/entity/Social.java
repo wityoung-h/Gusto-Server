@@ -19,6 +19,7 @@ public class Social extends BaseEntity {
     @Column(nullable = false)
     private SocialType socialType;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     private SocialStatus socialStatus = SocialStatus.ACTIVE;

@@ -39,13 +39,15 @@ public class User extends BaseTime {
     @Column(nullable = false)
     private String profileImage;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "publishReview", nullable = false, length = 10)
     private PublishStatus publishReview = PublishStatus.PUBLIC;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "publishPin", nullable = false, length = 10)
-    private PublishStatus publishPin = PublishStatus.PUBLIC;;
+    private PublishStatus publishPin = PublishStatus.PUBLIC;
 
     @Column(nullable = false)
     private Long follower;
@@ -56,6 +58,7 @@ public class User extends BaseTime {
     @Column(nullable = false)
     private Integer reviewCnt;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     private MemberStatus memberStatus = MemberStatus.ACTIVE;
