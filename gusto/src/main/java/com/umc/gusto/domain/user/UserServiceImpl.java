@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public void confirmNickname(String nickname) {
         checkNickname(nickname);
-        redisService.setValuesWithTimeout(nickname, null, NICKNAME_EXPIRED_TIME);
+        redisService.setValuesWithTimeout(nickname, "null", NICKNAME_EXPIRED_TIME);
     }
 
 
