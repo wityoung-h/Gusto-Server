@@ -8,4 +8,7 @@ public interface UserService {
     
     // 회원 가입 시 사용
     Tokens createUser(String tempToken, MultipartFile multipartFile, SignUpRequest signUpRequest);
+
+    // 닉네임 중복 체크
+    void checkNickname(String nickname);
 }

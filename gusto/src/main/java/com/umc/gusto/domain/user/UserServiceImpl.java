@@ -34,7 +34,6 @@ public class UserServiceImpl implements UserService{
         UUID socialUID = UUID.fromString(tempToken);
         Social socialInfo = socialRepository.findByTemporalToken(socialUID).orElseThrow(() -> new RuntimeException("유효하지 않은 토큰입니다."));
 
-
         // TODO: nickname 중복 체크 필요
 
         String profileImg = DEFAULT_IMG;
@@ -71,4 +70,17 @@ public class UserServiceImpl implements UserService{
 
         return tokens;
     }
+
+    @Override
+    public void checkNickname(String nickname) {
+        // redis 내 검색
+        redisService.getValues(nickname).orElseThrow(() -> new RuntimeException("이미 사용중인 닉네임입니다."));
+
+        // DB 내 검색
+        if(userRepository.countUsersByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE) > 0) {
+            throw new RuntimeException("이미 사용중인 닉네임입니다.");
+        }
+    }
+
+
 }
