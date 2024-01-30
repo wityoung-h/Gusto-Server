@@ -5,6 +5,7 @@ import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.global.auth.JwtService;
 import com.umc.gusto.global.auth.model.Tokens;
+import com.umc.gusto.global.config.secret.JwtConfig;
 import com.umc.gusto.global.util.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,9 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final SocialRepository socialRepository;
     private final JwtService jwtService;
+    private final RedisService redisService;
+    private static final long NICKNAME_EXPIRED_TIME = 1000L * 60 * 15;
+
 
     @Value("${default.img.url.profile}")
     private String DEFAULT_IMG;
@@ -65,8 +69,9 @@ public class UserServiceImpl implements UserService{
         socialInfo.updateSocialStatus(Social.SocialStatus.CONNECTED);
         socialRepository.save(socialInfo);
 
-        // access-token 및 refresh-token 생성, 저장
-        Tokens tokens = jwtService.createAndSaveTokens(String.valueOf(user.getUserid()));
+        // access-token 및 refresh-token 생성
+        Tokens tokens = jwtService.createToken(String.valueOf(user.getUserid()));
+        redisService.setValuesWithTimeout(tokens.getRefreshToken(), String.valueOf(user.getUserid()), JwtConfig.REFRESH_TOKEN_VALID_TIME);
 
         return tokens;
     }
@@ -80,6 +85,12 @@ public class UserServiceImpl implements UserService{
         if(userRepository.countUsersByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE) > 0) {
             throw new RuntimeException("이미 사용중인 닉네임입니다.");
         }
+    }
+
+    @Override
+    public void confirmNickname(String nickname) {
+        checkNickname(nickname);
+        redisService.setValuesWithTimeout(nickname, null, NICKNAME_EXPIRED_TIME);
     }
 
 
