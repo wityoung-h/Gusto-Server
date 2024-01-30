@@ -81,7 +81,9 @@ public class UserServiceImpl implements UserService{
     @Override
     public void checkNickname(String nickname) {
         // redis 내 검색
-        redisService.getValues(nickname).orElseThrow(() -> new RuntimeException("이미 사용중인 닉네임입니다."));
+        redisService.getValues(nickname).ifPresent(a -> {
+            throw new RuntimeException("이미 사용중인 닉네임입니다.");
+        });
 
         // DB 내 검색
         if(userRepository.countUsersByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE) > 0) {
