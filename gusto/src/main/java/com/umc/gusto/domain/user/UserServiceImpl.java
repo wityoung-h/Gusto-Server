@@ -3,6 +3,7 @@ package com.umc.gusto.domain.user;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
+import com.umc.gusto.domain.user.model.response.ProfileRes;
 import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.auth.JwtService;
 import com.umc.gusto.global.auth.model.Tokens;
@@ -97,5 +98,8 @@ public class UserServiceImpl implements UserService{
         redisService.setValuesWithTimeout(nickname, "null", NICKNAME_EXPIRED_TIME);
     }
 
-
+    @Override
+    public ProfileRes getProfile(String nickname) {
+        return null;
+    }
 }

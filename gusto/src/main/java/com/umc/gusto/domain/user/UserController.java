@@ -1,6 +1,7 @@
 package com.umc.gusto.domain.user;
 
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
+import com.umc.gusto.domain.user.model.response.ProfileRes;
 import com.umc.gusto.global.auth.model.Tokens;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -64,5 +65,17 @@ public class UserController {
 
         return ResponseEntity.ok()
                 .body("");
+    }
+
+    /**
+     * 먹스또 프로필 조회
+     * [GET] /users/{nickname}/profile
+     * @param nickname
+     * @return ProfileREs
+     */
+    @GetMapping("/{nickname}/profile")
+    public ResponseEntity<ProfileRes> retrieveProfile(@PathVariable("nickname") String nickname) {
+        return ResponseEntity.ok()
+                .body(null);
     }
 }
