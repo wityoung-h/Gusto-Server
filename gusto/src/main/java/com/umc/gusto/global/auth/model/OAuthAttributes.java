@@ -1,6 +1,7 @@
 package com.umc.gusto.global.auth.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
 import lombok.*;
@@ -13,6 +14,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OAuthAttributes {
+    @JsonIgnore
     private String id;
     private String nickname;
     private String profileImg;
