@@ -14,4 +14,7 @@ public interface UserService {
 
     // 닉네임 사용 확정 - 회원 가입 시
     void confirmNickname(String nickname);
+
+    // 닉네임 랜덤 생성
+    String generateRandomNickname();
 }
