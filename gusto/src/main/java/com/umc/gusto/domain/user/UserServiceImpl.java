@@ -8,6 +8,8 @@ import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.auth.JwtService;
 import com.umc.gusto.global.auth.model.Tokens;
 import com.umc.gusto.global.config.secret.JwtConfig;
+import com.umc.gusto.global.exception.Code;
+import com.umc.gusto.global.exception.GeneralException;
 import com.umc.gusto.global.util.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -100,6 +102,9 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public ProfileRes getProfile(String nickname) {
-        return null;
+        User user = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
+
+        return new ProfileRes(user.getNickname(), user.getReviewCnt(), user.getPinCnt(), user.getFollower());
     }
 }

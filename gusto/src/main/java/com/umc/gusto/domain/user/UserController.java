@@ -71,11 +71,13 @@ public class UserController {
      * 먹스또 프로필 조회
      * [GET] /users/{nickname}/profile
      * @param nickname
-     * @return ProfileREs
+     * @return ProfileRes
      */
     @GetMapping("/{nickname}/profile")
     public ResponseEntity<ProfileRes> retrieveProfile(@PathVariable("nickname") String nickname) {
+        ProfileRes profileRes = userService.getProfile(nickname);
+
         return ResponseEntity.ok()
-                .body(null);
+                .body(profileRes);
     }
 }
