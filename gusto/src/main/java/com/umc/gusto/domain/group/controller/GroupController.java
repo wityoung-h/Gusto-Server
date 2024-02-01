@@ -17,9 +17,9 @@ public class GroupController {
     private final GroupService groupService;
 
     @PostMapping
-    public ResponseEntity<GroupResponseDto.PostGroupResponseDto> createGroup(@AuthenticationPrincipal AuthUser authUser, @RequestBody GroupRequestDto.CreateGroupDTO CreateGroupDTO){
+    public ResponseEntity<GroupResponseDto.PostGroupResponseDto> createGroup(@AuthenticationPrincipal AuthUser authUser, @RequestBody GroupRequestDto.CreateGroupDTO createGroupDTO){
         User owner = authUser.getUser();
-        GroupResponseDto.PostGroupResponseDto newGroup = groupService.createGroup(owner, CreateGroupDTO);
+        GroupResponseDto.PostGroupResponseDto newGroup = groupService.createGroup(owner, createGroupDTO);
         return ResponseEntity.ok().body(newGroup);
     }
 
@@ -27,6 +27,13 @@ public class GroupController {
     public ResponseEntity<GroupResponseDto.GetGroupResponseDto> getGroup(@PathVariable Long groupId){
         GroupResponseDto.GetGroupResponseDto getGroup = groupService.getGroup(groupId);
         return ResponseEntity.ok().body(getGroup);
+    }
+
+    @PatchMapping("/{groupId}")
+    public ResponseEntity<GroupResponseDto.UpdateGroupResponseDto> updateGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId, @RequestBody GroupRequestDto.UpdateGroupDTO updateGroupDTO){
+        User owner = authUser.getUser();
+        GroupResponseDto.UpdateGroupResponseDto updatedGroup = groupService.updateGroup(owner, groupId, updateGroupDTO);
+        return ResponseEntity.ok().body(updatedGroup);
     }
 
 }

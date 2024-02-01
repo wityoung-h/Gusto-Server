@@ -35,4 +35,12 @@ public class Group extends BaseEntity {
 
     @Column(columnDefinition = "VARCHAR(50)")
     private String notice;
+
+    public void updateGroupName(String groupName){
+        this.groupName = groupName;
+    }
+
+    public void updateNotice(String notice){
+        this.notice = notice;
+    }
 }

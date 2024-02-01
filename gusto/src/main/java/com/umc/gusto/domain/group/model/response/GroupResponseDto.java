@@ -30,4 +30,15 @@ public class GroupResponseDto {
         String notice;
         List<GroupMemberResponseDto.GetGroupMemberResponseDto> groupMembers;
     }
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateGroupResponseDto{
+        Long groupId;
+        String groupName;
+        String groupScript;
+        Long owner;
+        String notice;
+    }
 }

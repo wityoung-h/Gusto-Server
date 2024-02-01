@@ -60,4 +60,30 @@ public class GroupServiceImpl implements GroupService{
                 .groupMembers(groupMembersDto)
                 .build();
     }
+
+    @Transactional
+    public GroupResponseDto.UpdateGroupResponseDto updateGroup(User owner, Long groupId, GroupRequestDto.UpdateGroupDTO updateGroupDTO){
+        Group group = groupRepository.findGroupByGroupId(groupId)
+                .orElseThrow(()->new RuntimeException("Group not found"));
+        Long ownerMemberId = groupMemberRepository.findGroupMemberIdByGroupAndUser(group, group.getOwner());
+
+        // 그룹 이름 수정 (owner만 수정 가능)
+        if(owner.equals(group.getOwner()) && updateGroupDTO.getGroupName() != null){
+            group.updateGroupName(updateGroupDTO.getGroupName());
+        }
+
+        //그룹 공지 수정
+        if(updateGroupDTO.getNotice() != null){
+            group.updateNotice(updateGroupDTO.getNotice());
+        }
+
+        groupRepository.save(group);
+        return GroupResponseDto.UpdateGroupResponseDto.builder()
+                .groupId(group.getGroupId())
+                .groupName(group.getGroupName())
+                .groupScript(group.getGroupScript())
+                .owner(ownerMemberId)
+                .notice(group.getNotice())
+                .build();
+    }
 }

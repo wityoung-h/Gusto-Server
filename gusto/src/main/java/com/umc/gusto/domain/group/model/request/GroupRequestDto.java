@@ -16,4 +16,13 @@ public class GroupRequestDto {
         String groupScript;
         BaseEntity.Status status = BaseEntity.Status.ACTIVE;
     }
+
+    @Getter
+    public static class UpdateGroupDTO{
+        @NotBlank
+        @Size(min=1, max=10)
+        String groupName;
+        @Size(min=1, max=50)
+        String notice;
+    }
 }
