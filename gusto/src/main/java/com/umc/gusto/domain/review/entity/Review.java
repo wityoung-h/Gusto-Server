@@ -66,4 +66,8 @@ public class Review extends BaseTime {
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private final Set<Tagging> taggingSet = new HashSet<>();          // 중복 허용x
+
+    public void connectHashTag(Tagging tagging){
+        this.taggingSet.add(tagging);
+    }
 }
