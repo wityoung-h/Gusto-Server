@@ -50,4 +50,12 @@ public class ReviewController {
         //TODO: 응답 형식 맞추기
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * 리뷰 1건 조회
+     */
+    @GetMapping("{reviewId}")
+    public ResponseEntity<?> getReview(@PathVariable Long reviewId){
+        return ResponseEntity.ok().body(reviewService.getReview(reviewId));
+    }
 }

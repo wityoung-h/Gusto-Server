@@ -18,6 +18,7 @@ public class ReviewRequest {
         String img;
         String menuName;
         String hashTagId;
+        @NotNull
         @DecimalMin(value = "0", message = "점수가 0보다 작을 수 없습니다.")
         @DecimalMax(value = "5", message = "점수가 5보다 클 수 없습니다.")
         Integer taste;

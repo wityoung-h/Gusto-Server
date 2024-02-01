@@ -35,7 +35,8 @@ public class Review extends BaseTime {
 
     private Integer parking;
 
-    private LocalDate visitedAt;
+    @Builder.Default
+    private LocalDate visitedAt = LocalDate.now();
 
     private String img1;
 

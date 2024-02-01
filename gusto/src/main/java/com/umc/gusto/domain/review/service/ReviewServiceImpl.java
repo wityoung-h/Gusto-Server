@@ -4,6 +4,7 @@ import com.umc.gusto.domain.review.entity.HashTag;
 import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.review.entity.Tagging;
 import com.umc.gusto.domain.review.model.request.ReviewRequest;
+import com.umc.gusto.domain.review.model.response.ReviewResponse;
 import com.umc.gusto.domain.review.repository.HashTagRepository;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.store.entity.Store;
@@ -46,7 +47,6 @@ public class ReviewServiceImpl implements ReviewService{
                 .parking(createReviewDTO.getParking())
                 .comment(createReviewDTO.getComment())
                 .build();
-
 
         //리뷰와 해시태그 연결
         String[] hashTags = createReviewDTO.getHashTagId().split(",");
@@ -108,6 +108,14 @@ public class ReviewServiceImpl implements ReviewService{
         Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
 
         reviewRepository.delete(review);
+    }
+
+    @Override
+    public ReviewResponse.ReviewDetailDTO getReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+        StringBuilder hashTags = new StringBuilder();
+        review.getTaggingSet().stream().map(Tagging::getHashTag).forEach(o-> hashTags.append(o).append(","));
+        return ReviewResponse.ReviewDetailDTO.of(review, hashTags.toString());
     }
 
     private void connectHashTag(Review review, String[] hashTags){
