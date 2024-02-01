@@ -15,9 +15,12 @@ import com.umc.gusto.domain.store.repository.TownRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
+import com.umc.gusto.global.common.PublishStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,6 +42,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
         List<MyCategory> myCategoryList = myCategoryRepository.findByStatusAndUser(BaseEntity.Status.ACTIVE, user);      // status가 ACTIVE인 카테고리 조회
 
         return myCategoryList.stream()
+                .filter(myCategory -> myCategory.getPublishCategory() != PublishStatus.PRIVATE)         // publishCategory가 PRIVATE이 아닌 경우만 FILTER
                 .map(myCategory -> MyCategoryResponse.MyCategoryDTO.builder()
                         .myCategoryId(myCategory.getMyCategoryId())
                         .myCategoryName(myCategory.getMyCategoryName())
@@ -51,8 +55,8 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
 
     public List<MyCategoryResponse.MyCategoryDTO> getAllMyCategoryWithLocation(String townName) {
         List<MyCategory>myCategoryList = myCategoryRepository.findByStatus(BaseEntity.Status.ACTIVE);      // status가 ACTIVE인 카테고리 조회
-        Town town = townRepository.findByTownName(townName);
-        List<Store> storesList = storeRepository.findByTown(town);                                         // 특정 townName인 storesList
+        Optional<Town> town = townRepository.findByTownName(townName);
+        List<Store> storesList = storeRepository.findByTown(town.orElse(null));                                         // 특정 townName인 storesList
 
         return myCategoryList.stream()
                 .map(myCategory -> {
@@ -77,8 +81,10 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
     @Override
     public List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategory(String nickname, Long myCategoryId) {
         User user = userRepository.findByNickname(nickname);
-        MyCategory existingMyCategory = myCategoryRepository.findByMyCategoryIdAndUser(myCategoryId, user);
-        List<Pin> pinList = pinRepository.findByMyCategoryOrderByPinIdDesc(existingMyCategory);
+        Optional<MyCategory> existingMyCategory = myCategoryRepository.findByMyCategoryIdAndUser(myCategoryId, user);
+        // 카테고리 별 가게 목록이 비어있으면 pinList도 비어 있음
+        List<Pin> pinList = existingMyCategory.map(pinRepository::findByMyCategoryOrderByPinIdDesc)
+                .orElse(Collections.emptyList());
 
         return pinList.stream()
                 .map(pin -> {
@@ -99,10 +105,11 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
 
     @Override
     public List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategoryWithLocation(Long myCategoryId, String townName) {
-        MyCategory existingMyCategory = myCategoryRepository.findByMyCategoryId(myCategoryId);
-        Town town = townRepository.findByTownName(townName);
-        List<Store> storesList = storeRepository.findByTown(town);
-        List<Pin> pinList = pinRepository.findByMyCategoryOrderByPinIdDesc(existingMyCategory);
+        Optional<MyCategory> existingMyCategory = myCategoryRepository.findByMyCategoryId(myCategoryId);
+        Optional<Town> town = townRepository.findByTownName(townName);
+        List<Store> storesList = storeRepository.findByTown(town.orElse(null));
+        List<Pin> pinList = existingMyCategory.map(pinRepository::findByMyCategoryOrderByPinIdDesc)
+                .orElse(Collections.emptyList());
 
         return pinList.stream()
                 .filter(pin -> storesList.contains(pin.getStore()))             // townName을 기준으로 보일 수 있는 store가 포함된 pin만 보이기(핀은 화살표 오른쯕을 기준으로 형성)
@@ -126,30 +133,28 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
     @Override
     public void createMyCategory(MyCategoryRequest.createMyCategoryDTO createMyCategoryDTO) {
         // 중복 이름 체크
-        Optional<MyCategory> myCategoryOptional = myCategoryRepository.findByMyCategoryName(createMyCategoryDTO.getMyCategoryName());
+        MyCategory myCategoryOptional = myCategoryRepository.findByMyCategoryName(createMyCategoryDTO.getMyCategoryName())
+                .orElseThrow(() -> new RuntimeException("MyCategory with the same name does not exist"));
 
-        if (myCategoryOptional.isPresent()) {
-            MyCategory existing = myCategoryOptional.get();
 
-            if (existing.getStatus() == BaseEntity.Status.INACTIVE) {
-                existing.setStatus(BaseEntity.Status.ACTIVE);
-                myCategoryRepository.save(existing);
-            } else {
-                throw new RuntimeException("MyCategory with the same name already exists and is in ACTIVE");
-            }
+        if (myCategoryOptional.getStatus() == BaseEntity.Status.INACTIVE) {
+            myCategoryOptional.setStatus(BaseEntity.Status.ACTIVE);
+            myCategoryRepository.save(myCategoryOptional);
         } else {
-            MyCategory myCategory = MyCategory.builder()
-                    .myCategoryName(createMyCategoryDTO.getMyCategoryName())
-                    .myCategoryIcon(createMyCategoryDTO.getMyCategoryIcon())
-                    .myCategoryScript(createMyCategoryDTO.getMyCategoryScript())
-                    .publishCategory(createMyCategoryDTO.getPublishCategory())
-                    .build();
-
-            myCategoryRepository.save(myCategory);
+            throw new RuntimeException("MyCategory is in ACTIVE");
         }
 
+        MyCategory myCategory = MyCategory.builder()
+                .myCategoryName(createMyCategoryDTO.getMyCategoryName())
+                .myCategoryIcon(createMyCategoryDTO.getMyCategoryIcon())
+                .myCategoryScript(createMyCategoryDTO.getMyCategoryScript())
+                .publishCategory(createMyCategoryDTO.getPublishCategory())
+                .build();
 
+        myCategoryRepository.save(myCategory);
     }
+
+
 
     public void modifyMyCategory(Long myCategoryId, MyCategoryRequest.updateMyCategoryDTO request) {
         MyCategory existingMyCategory = myCategoryRepository.findById(myCategoryId)
