@@ -31,6 +31,11 @@ public class GroupServiceImpl implements GroupService{
                 .notice("멤버들에게 새로운 공지사항을 공유해보세요!")
                 .build();
         Group savedGroup = groupRepository.save(group);
+        GroupMember ownerMember = GroupMember.builder()
+                .group(savedGroup)
+                .user(owner)
+                .build();
+        groupMemberRepository.save(ownerMember);
         return new GroupResponseDto.PostGroupResponseDto(savedGroup.getGroupId(), savedGroup.getGroupName(), savedGroup.getGroupScript());
     }
 
