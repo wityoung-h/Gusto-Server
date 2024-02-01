@@ -49,13 +49,13 @@ public class User extends BaseTime {
     @Column(name = "publishPin", nullable = false, length = 10)
     private PublishStatus publishPin = PublishStatus.PUBLIC;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "bigint default 0")
     private Long follower;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "int default 0")
     private Integer pinCnt;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "int default 0")
     private Integer reviewCnt;
 
     @Builder.Default
