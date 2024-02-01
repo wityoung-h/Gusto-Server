@@ -71,30 +71,28 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
     @Override
     public void createMyCategory(MyCategoryRequest.createMyCategoryDTO createMyCategoryDTO) {
         // 중복 이름 체크
-        Optional<MyCategory> myCategoryOptional = myCategoryRepository.findByMyCategoryName(createMyCategoryDTO.getMyCategoryName());
+        MyCategory myCategoryOptional = myCategoryRepository.findByMyCategoryName(createMyCategoryDTO.getMyCategoryName())
+                .orElseThrow(() -> new RuntimeException("MyCategory with the same name does not exist"));
 
-        if (myCategoryOptional.isPresent()) {
-            MyCategory existing = myCategoryOptional.get();
 
-            if (existing.getStatus() == BaseEntity.Status.INACTIVE) {
-                existing.setStatus(BaseEntity.Status.ACTIVE);
-                myCategoryRepository.save(existing);
-            } else {
-                throw new RuntimeException("MyCategory with the same name already exists and is in ACTIVE");
-            }
+        if (myCategoryOptional.getStatus() == BaseEntity.Status.INACTIVE) {
+            myCategoryOptional.setStatus(BaseEntity.Status.ACTIVE);
+            myCategoryRepository.save(myCategoryOptional);
         } else {
-            MyCategory myCategory = MyCategory.builder()
-                    .myCategoryName(createMyCategoryDTO.getMyCategoryName())
-                    .myCategoryIcon(createMyCategoryDTO.getMyCategoryIcon())
-                    .myCategoryScript(createMyCategoryDTO.getMyCategoryScript())
-                    .publishCategory(createMyCategoryDTO.getPublishCategory())
-                    .build();
-
-            myCategoryRepository.save(myCategory);
+            throw new RuntimeException("MyCategory with the same name already exists and is in ACTIVE");
         }
 
+        MyCategory myCategory = MyCategory.builder()
+                .myCategoryName(createMyCategoryDTO.getMyCategoryName())
+                .myCategoryIcon(createMyCategoryDTO.getMyCategoryIcon())
+                .myCategoryScript(createMyCategoryDTO.getMyCategoryScript())
+                .publishCategory(createMyCategoryDTO.getPublishCategory())
+                .build();
 
+        myCategoryRepository.save(myCategory);
     }
+
+
 
     public void modifyMyCategory(Long myCategoryId, MyCategoryRequest.updateMyCategoryDTO request) {
         MyCategory existingMyCategory = myCategoryRepository.findById(myCategoryId)
