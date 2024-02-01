@@ -27,13 +27,13 @@ public class RouteController {
 
     // 루트 삭제
     @DeleteMapping("/{routeId}")
-    public ResponseEntity<?> deleteRoute(
-            @PathVariable Long routeId)
+    public ResponseEntity<?> deleteRoute(@PathVariable Long routeId)
     {
-        return null;
+        routeService.deleteRoute(routeId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    // 루트 리스트 조회
+    // 내 루트 조회
     @GetMapping("")
     public ResponseEntity<?> allMyRoute(){
         return null;

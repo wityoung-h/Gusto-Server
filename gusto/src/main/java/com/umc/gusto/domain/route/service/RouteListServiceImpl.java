@@ -12,12 +12,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class RouteListServiceImpl {
-
+public class RouteListServiceImpl implements RouteListService{
     private final RouteListRepository routeListRepository;
     private final StoreRepository storeRepository;
 
-    public void createRouteList(Route route, List<RouteListRequest.createRouteListDto> request){
+
+    @Override
+    public void createRouteList(Route route, List<RouteListRequest.createRouteListDto> request) {
         //루트리스트 생성
         RouteList routeList = RouteList.builder()
                 .route(route)
@@ -26,4 +27,12 @@ public class RouteListServiceImpl {
 
         routeListRepository.save(routeList);
     }
+
+    @Override
+    public void deleteRouteList(Long routeListId) {
+        RouteList routeList = routeListRepository.findById(routeListId).orElseThrow(() -> new RuntimeException("저장되어 있지 않은 항목입니다."));
+        routeListRepository.delete(routeList);
+
+    }
+
 }
