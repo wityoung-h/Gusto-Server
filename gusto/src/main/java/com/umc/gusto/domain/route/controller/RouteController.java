@@ -34,8 +34,11 @@ public class RouteController {
     }
 
     // 내 루트 조회
-    @GetMapping("")
-    public ResponseEntity<?> allMyRoute(){
+    @GetMapping("/{nickname}")
+    public ResponseEntity<?> allMyRoute(
+            @PathVariable String nickname
+    ){
+        routeService.getRoute(nickname);
         return null;
     }
 

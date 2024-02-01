@@ -7,10 +7,13 @@ import com.umc.gusto.domain.route.model.request.RouteRequest;
 import com.umc.gusto.domain.route.model.response.RouteResponse;
 import com.umc.gusto.domain.route.repository.RouteListRepository;
 import com.umc.gusto.domain.route.repository.RouteRepository;
+import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -20,6 +23,7 @@ public class RouteServiceImpl implements RouteService{
     private final GroupRepository groupRepository;
     private final RouteListRepository routeListRepository;
     private final RouteListServiceImpl routeListService;
+    private final UserRepository userRepository;
 
     @Override
     public void createRoute(RouteRequest.createRouteDto request) {
@@ -53,8 +57,17 @@ public class RouteServiceImpl implements RouteService{
     }
 
     @Override
-    public List<RouteResponse.RouteResponseDto> getRoute() {
-        return null;
+    public List<RouteResponse.RouteResponseDto> getRoute(String nickname) {
+        User user = userRepository.findByNickname(nickname);
+
+        List<Route> routes = routeRepository.findRouteByUser(user);
+        return routes.stream().map(
+                Route -> RouteResponse.RouteResponseDto.builder()
+                        .routeId(Route.getRouteId())
+                        .routeName(Route.getRouteName())
+                        .numStore(routeListRepository.countRouteListByRoute(Route.getRouteId()))
+                        .build())
+                .collect(Collectors.toList());
     }
 
 

@@ -13,8 +13,6 @@ public interface RouteService {
     void deleteRoute(Long routeId);
 
     // 내 루트 조회
-    List<RouteResponse.RouteResponseDto> getRoute();
-    // 리스트 거리 조회
+    List<RouteResponse.RouteResponseDto> getRoute(String nickname);
 
-    // 루트 상세 조회
 }
