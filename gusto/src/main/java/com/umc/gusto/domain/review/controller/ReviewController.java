@@ -27,4 +27,16 @@ public class ReviewController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 리뷰 수정
+     */
+    @PatchMapping("{reviewId}")
+    public ResponseEntity<?> updateReview(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long reviewId, @RequestPart(name = "img", required = false) MultipartFile multipartFile, @RequestBody @Valid ReviewRequest.updateReviewDTO updateReviewDTO){
+        User user = authUser.getUser();
+        reviewService.validateReviewByUser(user, reviewId);
+        reviewService.updateReview(reviewId, updateReviewDTO);
+        //TODO: 응답 형식 맞추기
+        return ResponseEntity.ok().build();
+    }
+
 }

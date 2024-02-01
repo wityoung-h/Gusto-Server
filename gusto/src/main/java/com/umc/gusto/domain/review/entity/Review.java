@@ -55,7 +55,7 @@ public class Review extends BaseTime {
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     @Builder.Default
-    private Integer liked=0;
+    private Integer liked = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
@@ -68,7 +68,39 @@ public class Review extends BaseTime {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private final Set<Tagging> taggingSet = new HashSet<>();          // 중복 허용x
 
-    public void connectHashTag(Tagging tagging){
+    public void connectHashTag(Tagging tagging) {
         this.taggingSet.add(tagging);
+    }
+
+    public void updateVisitedAt(LocalDate visitedAt) {
+        this.visitedAt = visitedAt;
+    }
+
+    public void updateMenu(String menuName) {
+        this.menuName = menuName;
+    }
+
+    public void updateTaste(Integer taste) {
+        this.taste = taste;
+    }
+
+    public void updateSpiciness(Integer spiciness) {
+        this.spiciness = spiciness;
+    }
+
+    public void updateMood(Integer mood){
+        this.mood = mood;
+    }
+
+    public void updateToilet(Integer toilet){
+        this.toilet = toilet;
+    }
+
+    public void updateParking(Integer parking){
+        this.parking = parking;
+    }
+
+    public void updateComment(String comment){
+        this.comment = comment;
     }
 }
