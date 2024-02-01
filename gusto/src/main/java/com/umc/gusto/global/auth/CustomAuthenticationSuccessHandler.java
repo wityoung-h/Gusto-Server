@@ -44,9 +44,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             response.setHeader("temp-token", String.valueOf(socialInfo.getTemporalToken()));
 
             // TODO: 차후 응답 코드 형태 맞춰 리팩토링할 것
-            String body = """
-                    { "isSuccess" : true, "code" : 302, "message" : "회원가입을 진행해야 합니다.", "result" : """
-                    + objectMapper.writeValueAsString(oAuth2User.getOAuthAttributes()) + "}";
+            String body = objectMapper.writeValueAsString(oAuth2User.getOAuthAttributes());
 
             response.getWriter().write(body);
         }

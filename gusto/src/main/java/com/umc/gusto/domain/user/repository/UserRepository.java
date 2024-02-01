@@ -7,4 +7,6 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
     User findByNickname(String nickname);
+
+    Long countUsersByNicknameAndMemberStatusIs(String nickname, User.MemberStatus status);
 }
