@@ -47,7 +47,7 @@ public class OAuthService extends DefaultOAuth2UserService {
         }
 
         if(info.getSocialStatus() == Social.SocialStatus.DISCONNECTED) {
-            // error throw
+            // TODO: error throw
         }
 
         return CustomOAuth2User.builder()
