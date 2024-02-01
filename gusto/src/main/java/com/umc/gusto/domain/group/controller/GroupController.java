@@ -16,11 +16,17 @@ import org.springframework.web.bind.annotation.*;
 public class GroupController {
     private final GroupService groupService;
 
-    @ResponseBody
     @PostMapping
-    public ResponseEntity<GroupResponseDto.PostGroupResponseDto> createGroup(@AuthenticationPrincipal AuthUser authUser, @RequestBody GroupRequestDto.createGroupDTO createGroupDTO){
+    public ResponseEntity<GroupResponseDto.PostGroupResponseDto> createGroup(@AuthenticationPrincipal AuthUser authUser, @RequestBody GroupRequestDto.CreateGroupDTO CreateGroupDTO){
         User owner = authUser.getUser();
-        GroupResponseDto.PostGroupResponseDto newGroup = groupService.createGroup(owner, createGroupDTO);
+        GroupResponseDto.PostGroupResponseDto newGroup = groupService.createGroup(owner, CreateGroupDTO);
         return ResponseEntity.ok().body(newGroup);
     }
+
+    @GetMapping("/{groupId}")
+    public ResponseEntity<GroupResponseDto.GetGroupResponseDto> getGroup(@PathVariable Long groupId){
+        GroupResponseDto.GetGroupResponseDto getGroup = groupService.getGroup(groupId);
+        return ResponseEntity.ok().body(getGroup);
+    }
+
 }

@@ -1,21 +1,29 @@
 package com.umc.gusto.domain.group.service;
 
 import com.umc.gusto.domain.group.entity.Group;
+import com.umc.gusto.domain.group.entity.GroupMember;
+import com.umc.gusto.domain.group.model.request.GroupMemberRequestDto;
 import com.umc.gusto.domain.group.model.request.GroupRequestDto;
+import com.umc.gusto.domain.group.model.response.GroupMemberResponseDto;
 import com.umc.gusto.domain.group.model.response.GroupResponseDto;
+import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.user.entity.User;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService{
     private final GroupRepository groupRepository;
+    private final GroupMemberRepository groupMemberRepository;
 
     @Transactional
-    public GroupResponseDto.PostGroupResponseDto createGroup(User owner, GroupRequestDto.createGroupDTO createGroupDTO){
+    public GroupResponseDto.PostGroupResponseDto createGroup(User owner, GroupRequestDto.CreateGroupDTO createGroupDTO){
         Group group = Group.builder()
                 .groupName(createGroupDTO.getGroupName())
                 .groupScript(createGroupDTO.getGroupScript())
@@ -24,5 +32,27 @@ public class GroupServiceImpl implements GroupService{
                 .build();
         Group savedGroup = groupRepository.save(group);
         return new GroupResponseDto.PostGroupResponseDto(savedGroup.getGroupId(), savedGroup.getGroupName(), savedGroup.getGroupScript());
+    }
+
+    @Transactional(readOnly = true)
+    public GroupResponseDto.GetGroupResponseDto getGroup(Long groupId){
+        Group group = groupRepository.findGroupByGroupId(groupId)
+                .orElseThrow(()->new RuntimeException("Group not found"));
+        List<GroupMember> groupMembers = groupMemberRepository.findGroupMembersByGroup(group);
+        List<GroupMemberResponseDto.GetGroupMemberResponseDto> groupMembersDto = groupMembers.stream()
+                .map(member -> new GroupMemberResponseDto.GetGroupMemberResponseDto(
+                        member.getGroupMemberId(),
+                        member.getUser().getNickname(),
+                        member.getUser().getProfileImage()
+                ))
+                .collect(Collectors.toList());
+        return GroupResponseDto.GetGroupResponseDto.builder()
+                .groupId(group.getGroupId())
+                .groupName(group.getGroupName())
+                .groupScript(group.getGroupScript())
+                .owner(group.getOwner().getNickname())
+                .notice(group.getNotice())
+                .groupMembers(groupMembersDto)
+                .build();
     }
 }

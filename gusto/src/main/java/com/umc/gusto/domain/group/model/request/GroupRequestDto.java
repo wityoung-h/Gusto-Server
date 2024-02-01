@@ -7,7 +7,7 @@ import lombok.Getter;
 
 public class GroupRequestDto {
     @Getter
-    public static class createGroupDTO{
+    public static class CreateGroupDTO{
         @NotBlank
         @Size(min=1, max=10)
         String groupName;

@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.group.entity;
 
+import com.umc.gusto.domain.group.model.response.GroupMemberResponseDto;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseTime;
 import jakarta.persistence.*;

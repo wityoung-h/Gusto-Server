@@ -5,5 +5,6 @@ import com.umc.gusto.domain.group.model.response.GroupResponseDto;
 import com.umc.gusto.domain.user.entity.User;
 
 public interface GroupService {
-    GroupResponseDto.PostGroupResponseDto createGroup(User owner, GroupRequestDto.createGroupDTO createGroupDTO);
+    GroupResponseDto.PostGroupResponseDto createGroup(User owner, GroupRequestDto.CreateGroupDTO createGroupDTO);
+    GroupResponseDto.GetGroupResponseDto getGroup(Long groupId);
 }
