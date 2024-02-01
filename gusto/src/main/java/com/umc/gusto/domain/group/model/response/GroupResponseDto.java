@@ -26,7 +26,7 @@ public class GroupResponseDto {
         Long groupId;
         String groupName;
         String groupScript;
-        String owner;
+        Long owner;
         String notice;
         List<GroupMemberResponseDto.GetGroupMemberResponseDto> groupMembers;
     }

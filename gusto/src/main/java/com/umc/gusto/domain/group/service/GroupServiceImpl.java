@@ -2,7 +2,6 @@ package com.umc.gusto.domain.group.service;
 
 import com.umc.gusto.domain.group.entity.Group;
 import com.umc.gusto.domain.group.entity.GroupMember;
-import com.umc.gusto.domain.group.model.request.GroupMemberRequestDto;
 import com.umc.gusto.domain.group.model.request.GroupRequestDto;
 import com.umc.gusto.domain.group.model.response.GroupMemberResponseDto;
 import com.umc.gusto.domain.group.model.response.GroupResponseDto;
@@ -43,6 +42,7 @@ public class GroupServiceImpl implements GroupService{
     public GroupResponseDto.GetGroupResponseDto getGroup(Long groupId){
         Group group = groupRepository.findGroupByGroupId(groupId)
                 .orElseThrow(()->new RuntimeException("Group not found"));
+        Long ownerMemberId = groupMemberRepository.findGroupMemberIdByGroupAndUser(group, group.getOwner());
         List<GroupMember> groupMembers = groupMemberRepository.findGroupMembersByGroup(group);
         List<GroupMemberResponseDto.GetGroupMemberResponseDto> groupMembersDto = groupMembers.stream()
                 .map(member -> new GroupMemberResponseDto.GetGroupMemberResponseDto(
@@ -55,7 +55,7 @@ public class GroupServiceImpl implements GroupService{
                 .groupId(group.getGroupId())
                 .groupName(group.getGroupName())
                 .groupScript(group.getGroupScript())
-                .owner(group.getOwner().getNickname())
+                .owner(ownerMemberId)
                 .notice(group.getNotice())
                 .groupMembers(groupMembersDto)
                 .build();
