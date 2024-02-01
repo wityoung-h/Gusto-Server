@@ -54,7 +54,7 @@ public class OAuthAttributes {
         oAuthAttributes.age = User.Age.NONE;
 
         providedAge.ifPresent(age -> {
-            switch (Integer.valueOf(age)) {
+            switch (Integer.valueOf(age.substring(0, age.indexOf("-")))) {
                 case 0 -> oAuthAttributes.age = User.Age.NONE;
                 case 10 -> oAuthAttributes.age = User.Age.TEEN;
                 case 20 -> oAuthAttributes.age = User.Age.TWENTIES;
