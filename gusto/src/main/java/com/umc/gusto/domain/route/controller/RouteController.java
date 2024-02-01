@@ -2,6 +2,7 @@ package com.umc.gusto.domain.route.controller;
 
 import com.umc.gusto.domain.route.model.request.RouteRequest;
 import com.umc.gusto.domain.route.service.RouteServiceImpl;
+import com.umc.gusto.global.auth.UserDetailsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,9 +19,10 @@ public class RouteController {
     // 루트 생성
     @PostMapping("")
     public ResponseEntity<?> create(
-            @RequestBody @Valid RouteRequest.createRouteDto request){
-    routeService.createRoute(request);
-    return ResponseEntity.status(HttpStatus.CREATED).build();
+            @RequestBody @Valid RouteRequest.createRouteDto request)
+    {
+        routeService.createRoute(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     // 루트 삭제
