@@ -11,6 +11,7 @@ import com.umc.gusto.domain.review.repository.ReviewRepository;;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
+import com.umc.gusto.global.common.PublishStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
         List<MyCategory> myCategoryList = myCategoryRepository.findByStatusAndUser(BaseEntity.Status.ACTIVE, user);      // status가 ACTIVE인 카테고리 조회
 
         return myCategoryList.stream()
+                .filter(myCategory -> myCategory.getPublishCategory() != PublishStatus.PRIVATE)         // publishCategory가 PRIVATE이 아닌 경우만 FILTER
                 .map(myCategory -> MyCategoryResponse.MyCategoryDTO.builder()
                         .myCategoryId(myCategory.getMyCategoryId())
                         .myCategoryName(myCategory.getMyCategoryName())
