@@ -1,0 +1,28 @@
+package com.umc.gusto.global.util;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
+@Service
+@RequiredArgsConstructor
+public class RedisService {
+    private final RedisTemplate<String, String> redisTemplate;
+
+    public void setValuesWithTimeout(String key, String value, long timeout) {
+        redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.MICROSECONDS);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<String> getValues(String key) {
+        return Optional.ofNullable(redisTemplate.opsForValue().get(key));
+    }
+
+    public void deleteValues(String key) {
+        redisTemplate.delete(key);
+    }
+}
