@@ -11,28 +11,22 @@ import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.repository.UserRepository;
-import com.umc.gusto.global.auth.model.AuthUser;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.customException.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService{
     private final ReviewRepository reviewRepository;
-    private final UserRepository userRepository;
     private final StoreRepository storeRepository;
     private final HashTagRepository hashTagRepository;
-    private final TaggingRepository taggingRepository;
 
     @Override
-    public void createReview(AuthUser authUser, ReviewRequest.createReviewDTO createReviewDTO) {
+    public void createReview(User user, ReviewRequest.createReviewDTO createReviewDTO) {
         Store store= storeRepository.findById(createReviewDTO.getStoreId()).orElseThrow(()-> new NotFoundException(Code.STORE_NOT_FOUND));
-        User user = authUser.getUser();
+
         //리뷰 생성
         Review review = Review.builder()
                 .store(store)

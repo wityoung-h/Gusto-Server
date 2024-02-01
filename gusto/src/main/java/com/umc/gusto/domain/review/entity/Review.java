@@ -54,7 +54,8 @@ public class Review extends BaseTime {
     private PublishStatus publishReview = PublishStatus.PUBLIC;
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
-    private Integer liked;
+    @Builder.Default
+    private Integer liked=0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")

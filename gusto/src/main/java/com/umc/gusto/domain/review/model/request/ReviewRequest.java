@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 public class ReviewRequest {
     @Getter
-    public class createReviewDTO{
+    public static class createReviewDTO{
         @NotNull(message = "storeId는 null일 수 없습니다.")
         Long storeId;
         LocalDate visitedAt;
