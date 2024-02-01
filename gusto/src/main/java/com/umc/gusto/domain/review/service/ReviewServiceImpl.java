@@ -103,6 +103,13 @@ public class ReviewServiceImpl implements ReviewService{
         reviewRepository.save(review);
     }
 
+    @Override
+    public void deleteReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+
+        reviewRepository.delete(review);
+    }
+
     private void connectHashTag(Review review, String[] hashTags){
         for(String hashTagId : hashTags){
             HashTag hashTag = hashTagRepository.findById(Long.parseLong(hashTagId)).orElseThrow(()-> new NotFoundException(Code.HASHTAG_NOT_FOUND));

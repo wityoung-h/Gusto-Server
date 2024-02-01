@@ -7,4 +7,5 @@ public interface ReviewService {
     void validateReviewByUser(final User user, final Long reviewId);
     void createReview(User user, ReviewRequest.createReviewDTO createReviewDTO);
     void updateReview(Long reviewId, ReviewRequest.updateReviewDTO updateReviewDTO);
+    void deleteReview(Long reviewId);
 }

@@ -39,4 +39,15 @@ public class ReviewController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 리뷰 삭제
+     */
+    @DeleteMapping("{reviewId}")
+    public ResponseEntity<?> deleteReview(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long reviewId){
+        User user = authUser.getUser();
+        reviewService.validateReviewByUser(user, reviewId);
+        reviewService.deleteReview(reviewId);
+        //TODO: 응답 형식 맞추기
+        return ResponseEntity.ok().build();
+    }
 }
