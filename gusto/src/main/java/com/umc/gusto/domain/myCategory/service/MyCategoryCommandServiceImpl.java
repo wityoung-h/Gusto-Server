@@ -14,6 +14,8 @@ import com.umc.gusto.global.common.BaseEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,8 +49,10 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
     @Override
     public List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategory(String nickname, Long myCategoryId, String dong) {
         User user = userRepository.findByNickname(nickname);
-        MyCategory existingMyCategory = myCategoryRepository.findByMyCategoryIdAndUser(myCategoryId, user);
-        List<Pin> pinList = pinRepository.findByMyCategoryOrderByPinIdDesc(existingMyCategory);
+        Optional<MyCategory> existingMyCategory = myCategoryRepository.findByMyCategoryIdAndUser(myCategoryId, user);
+        // 카테고리 별 가게 목록이 비어있으면 pinList도 비어 있음
+        List<Pin> pinList = existingMyCategory.map(pinRepository::findByMyCategoryOrderByPinIdDesc)
+                .orElse(Collections.emptyList());
 
         return pinList.stream()
                 .map(pin -> {
@@ -79,7 +83,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
             myCategoryOptional.setStatus(BaseEntity.Status.ACTIVE);
             myCategoryRepository.save(myCategoryOptional);
         } else {
-            throw new RuntimeException("MyCategory with the same name already exists and is in ACTIVE");
+            throw new RuntimeException("MyCategory is in ACTIVE");
         }
 
         MyCategory myCategory = MyCategory.builder()
