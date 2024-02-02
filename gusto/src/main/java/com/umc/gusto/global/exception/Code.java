@@ -12,6 +12,7 @@ public enum Code {
     NO_PERMISSION(HttpStatus.FORBIDDEN,403, "해당 권한이 없습니다."),
 
     //User 관련 에러 +0
+    USER_DUPLICATE_NICKNAME(HttpStatus.CONFLICT, 409101, "이미 사용중인 닉네임입니다."),
 
     //Store 관련 에러 +1
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND, 404101, "존재하지 않는 가게입니다."),
@@ -26,6 +27,10 @@ public enum Code {
     //Group 관련 에러 +4
 
     //myCategory 관련 에러 +5
+
+    // token 관련 에러 +6
+    INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, 401601, "유효하지 않은 토큰입니다."),
+
 
     FOR_TEST_ERROR(HttpStatus.BAD_REQUEST,49999, "테스트용 에러");
 
