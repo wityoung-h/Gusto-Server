@@ -8,17 +8,17 @@ import java.util.List;
 
 public interface MyCategoryCommandService {
 
-    List<MyCategoryResponse.MyCategoryDTO> getAllMyCategory(String nickname);
+    List<MyCategoryResponse.MyCategory> getAllMyCategory(String nickname);
 
-    List<MyCategoryResponse.MyCategoryDTO> getAllMyCategoryWithLocation(String townName);
+    List<MyCategoryResponse.MyCategory> getAllMyCategoryWithLocation(String townName);
 
-    List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategory(String nickname, Long myCategoryId);
+    List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategory(String nickname, Long myCategoryId);
 
-    List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategoryWithLocation(Long myCategoryId, String townName);
+    List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategoryWithLocation(Long myCategoryId, String townName);
 
-    void createMyCategory(MyCategoryRequest.createMyCategoryDTO createMyCategoryDTO);
+    void createMyCategory(MyCategoryRequest.createMyCategory createMyCategory);
 
-    void modifyMyCategory(Long myCategoryId, MyCategoryRequest.updateMyCategoryDTO updateMyCategoryDTO);
+    void modifyMyCategory(Long myCategoryId, MyCategoryRequest.updateMyCategory updateMyCategory);
 
     void deleteMyCategories(List<Long> myCategoryId);
 }

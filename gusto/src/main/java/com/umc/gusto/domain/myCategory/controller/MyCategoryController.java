@@ -18,10 +18,10 @@ public class MyCategoryController {
     private final MyCategoryCommandService myCategoryCommandService;
 
     @GetMapping("/{nickname}")
-    public ResponseEntity<List<MyCategoryResponse.MyCategoryDTO>> allMyCategory(
+    public ResponseEntity<List<MyCategoryResponse.MyCategory>> allMyCategory(
             @PathVariable String nickname) {
         try {
-            List<MyCategoryResponse.MyCategoryDTO> myCategoryList = myCategoryCommandService.getAllMyCategory(nickname);
+            List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryCommandService.getAllMyCategory(nickname);
             return ResponseEntity.ok(myCategoryList);
         } catch (Exception e) {
             // Handle the exception and return a failure response
@@ -30,10 +30,10 @@ public class MyCategoryController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<MyCategoryResponse.MyCategoryDTO>> allMyCategoryWithLocation(
+    public ResponseEntity<List<MyCategoryResponse.MyCategory>> allMyCategoryWithLocation(
             @RequestParam(name = "townName") String townName) {
         try {
-            List<MyCategoryResponse.MyCategoryDTO> myCategoryList = myCategoryCommandService.getAllMyCategoryWithLocation(townName);
+            List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryCommandService.getAllMyCategoryWithLocation(townName);
             return ResponseEntity.ok(myCategoryList);
         } catch (Exception e) {
             // Handle the exception and return a failure response
@@ -42,10 +42,10 @@ public class MyCategoryController {
     }
 
     @GetMapping("/pinStores/{nickname}")
-    public ResponseEntity<List<MyCategoryResponse.PinByMyCategoryDTO>> allPinByMyCategory(
+    public ResponseEntity<List<MyCategoryResponse.PinByMyCategory>> allPinByMyCategory(
             @RequestParam(name = "myCategoryId") Long myCategoryId, @PathVariable String nickname) {
         try {
-            List<MyCategoryResponse.PinByMyCategoryDTO> myStoreList = myCategoryCommandService.getAllPinByMyCategory(nickname, myCategoryId);
+            List<MyCategoryResponse.PinByMyCategory> myStoreList = myCategoryCommandService.getAllPinByMyCategory(nickname, myCategoryId);
             return ResponseEntity.ok(myStoreList);
         } catch (Exception e) {
             // Handle the exception and return a failure response
@@ -54,11 +54,11 @@ public class MyCategoryController {
     }
 
     @GetMapping("/pinStores")
-    public ResponseEntity<List<MyCategoryResponse.PinByMyCategoryDTO>> allPinByCategoryWithLocation(
+    public ResponseEntity<List<MyCategoryResponse.PinByMyCategory>> allPinByCategoryWithLocation(
             @RequestParam(name = "myCategoryId") Long myCategoryId,
             @RequestParam(name = "townName") String townName) {
         try {
-            List<MyCategoryResponse.PinByMyCategoryDTO> myCategoryList = myCategoryCommandService.getAllPinByMyCategoryWithLocation(myCategoryId,townName);
+            List<MyCategoryResponse.PinByMyCategory> myCategoryList = myCategoryCommandService.getAllPinByMyCategoryWithLocation(myCategoryId,townName);
             return ResponseEntity.ok(myCategoryList);
         } catch (Exception e) {
             // Handle the exception and return a failure response
@@ -68,11 +68,11 @@ public class MyCategoryController {
 
     @PostMapping("/create")
     public ResponseEntity<String> createMyCategory(
-            @RequestBody @Valid MyCategoryRequest.createMyCategoryDTO createMyCategoryDTO
+            @RequestBody @Valid MyCategoryRequest.createMyCategory createMyCategory
     ) {
         try {
             // 여기서 createMyCategoryDTO를 사용하여 새로운 MyCategory를 생성하는 로직을 구현합니다.
-            myCategoryCommandService.createMyCategory(createMyCategoryDTO);
+            myCategoryCommandService.createMyCategory(createMyCategory);
 
             return ResponseEntity.ok("success");
         } catch (Exception e) {
@@ -86,7 +86,7 @@ public class MyCategoryController {
     @PatchMapping("/{myCategoryId}/update")
     public ResponseEntity<String> modifyMyCategory(
             @PathVariable Long myCategoryId,
-            @RequestBody MyCategoryRequest.updateMyCategoryDTO request
+            @RequestBody MyCategoryRequest.updateMyCategory request
     ) {
         try {
             myCategoryCommandService.modifyMyCategory(myCategoryId, request);

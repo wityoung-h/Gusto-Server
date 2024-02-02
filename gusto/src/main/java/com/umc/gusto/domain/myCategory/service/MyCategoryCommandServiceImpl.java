@@ -36,14 +36,14 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
     private final TownRepository townRepository;
     private final ReviewRepository reviewRepository;
 
-    public List<MyCategoryResponse.MyCategoryDTO> getAllMyCategory(String nickname) {
+    public List<MyCategoryResponse.MyCategory> getAllMyCategory(String nickname) {
         User user = userRepository.findByNickname(nickname);
 
         List<MyCategory> myCategoryList = myCategoryRepository.findByStatusAndUser(BaseEntity.Status.ACTIVE, user);      // status가 ACTIVE인 카테고리 조회
 
         return myCategoryList.stream()
                 .filter(myCategory -> myCategory.getPublishCategory() != PublishStatus.PRIVATE)         // publishCategory가 PRIVATE이 아닌 경우만 FILTER
-                .map(myCategory -> MyCategoryResponse.MyCategoryDTO.builder()
+                .map(myCategory -> MyCategoryResponse.MyCategory.builder()
                         .myCategoryId(myCategory.getMyCategoryId())
                         .myCategoryName(myCategory.getMyCategoryName())
                         .myCategoryIcon(myCategory.getMyCategoryIcon())
@@ -53,7 +53,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
                 .collect(Collectors.toList());
     }
 
-    public List<MyCategoryResponse.MyCategoryDTO> getAllMyCategoryWithLocation(String townName) {
+    public List<MyCategoryResponse.MyCategory> getAllMyCategoryWithLocation(String townName) {
         List<MyCategory>myCategoryList = myCategoryRepository.findByStatus(BaseEntity.Status.ACTIVE);      // status가 ACTIVE인 카테고리 조회
         Optional<Town> town = townRepository.findByTownName(townName);
         List<Store> storesList = storeRepository.findByTown(town.orElse(null));                                         // 특정 townName인 storesList
@@ -66,7 +66,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
                             .filter(storesList::contains)                                                  // storesList에 포함된 store만 필터링!
                             .toList();
 
-                    return MyCategoryResponse.MyCategoryDTO.builder()
+                    return MyCategoryResponse.MyCategory.builder()
                             .myCategoryId(myCategory.getMyCategoryId())
                             .myCategoryName(myCategory.getMyCategoryName())
                             .myCategoryIcon(myCategory.getMyCategoryIcon())
@@ -79,7 +79,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
 
 
     @Override
-    public List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategory(String nickname, Long myCategoryId) {
+    public List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategory(String nickname, Long myCategoryId) {
         User user = userRepository.findByNickname(nickname);
         Optional<MyCategory> existingMyCategory = myCategoryRepository.findByMyCategoryIdAndUser(myCategoryId, user);
         // 카테고리 별 가게 목록이 비어있으면 pinList도 비어 있음
@@ -92,7 +92,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
                     String reviewImg = topReviewOptional.map(Review::getImg1).orElse(null);                               // 가장 좋아요가 많은 review 이미지
                     Integer reviewCnt = reviewRepository.countByStoreAndUser(pin.getStore(), user);                             // 내가 작성한 리뷰의 개수 == 방문 횟수
 
-                    return  MyCategoryResponse.PinByMyCategoryDTO.builder()
+                    return  MyCategoryResponse.PinByMyCategory.builder()
                                 .pinId(pin.getPinId())
                                 .storeName(pin.getStore().getStoreName())
                                 .address(pin.getStore().getAddress())
@@ -104,7 +104,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
     }
 
     @Override
-    public List<MyCategoryResponse.PinByMyCategoryDTO> getAllPinByMyCategoryWithLocation(Long myCategoryId, String townName) {
+    public List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategoryWithLocation(Long myCategoryId, String townName) {
         Optional<MyCategory> existingMyCategory = myCategoryRepository.findByMyCategoryId(myCategoryId);
         Optional<Town> town = townRepository.findByTownName(townName);
         List<Store> storesList = storeRepository.findByTown(town.orElse(null));
@@ -118,7 +118,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
                     String reviewImg = topReviewOptional.map(Review::getImg1).orElse(null);                               // 가장 좋아요가 많은 review 이미지
                     Integer reviewCnt = reviewRepository.countByStore(pin.getStore());                             // 내가 작성한 리뷰의 개수 == 방문 횟수
 
-                    return  MyCategoryResponse.PinByMyCategoryDTO.builder()
+                    return  MyCategoryResponse.PinByMyCategory.builder()
                             .pinId(pin.getPinId())
                             .storeName(pin.getStore().getStoreName())
                             .address(pin.getStore().getAddress())
@@ -131,7 +131,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
 
     // 동일 user가 작성한 카테고리 중 겹치는 NAME이 있다면 추가 X, 겹치는 name인데 status가 inactive면 active로 변경 => 토큰을 통해 nickname 가져올 것
     @Override
-    public void createMyCategory(MyCategoryRequest.createMyCategoryDTO createMyCategoryDTO) {
+    public void createMyCategory(MyCategoryRequest.createMyCategory createMyCategoryDTO) {
         // 중복 이름 체크
         MyCategory myCategoryOptional = myCategoryRepository.findByMyCategoryName(createMyCategoryDTO.getMyCategoryName())
                 .orElseThrow(() -> new RuntimeException("MyCategory with the same name does not exist"));
@@ -156,7 +156,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
 
 
 
-    public void modifyMyCategory(Long myCategoryId, MyCategoryRequest.updateMyCategoryDTO request) {
+    public void modifyMyCategory(Long myCategoryId, MyCategoryRequest.updateMyCategory request) {
         MyCategory existingMyCategory = myCategoryRepository.findById(myCategoryId)
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + myCategoryId));
             // status가 INACTIVE일 때 수정하는 경우 -> 프론트 상 그럴 경우 없어 보여 주석 처리

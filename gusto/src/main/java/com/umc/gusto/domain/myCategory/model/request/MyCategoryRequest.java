@@ -11,7 +11,7 @@ import lombok.Setter;
 public class MyCategoryRequest {
 
     @Getter
-    public static class createMyCategoryDTO {
+    public static class createMyCategory {
         @NotBlank
         String myCategoryName;
 
@@ -28,7 +28,7 @@ public class MyCategoryRequest {
     }
 
     @Getter
-    public static class updateMyCategoryDTO {
+    public static class updateMyCategory {
         String myCategoryName;
         String myCategoryScript;
         Integer myCategoryIcon;
@@ -37,7 +37,7 @@ public class MyCategoryRequest {
     }
 
     @Getter
-    public static class deleteMyCategoryDTO {
+    public static class deleteMyCategory {
         BaseEntity.Status status;
     }
 }
