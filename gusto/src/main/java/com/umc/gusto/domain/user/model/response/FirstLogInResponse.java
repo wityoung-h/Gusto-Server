@@ -1,8 +1,13 @@
 package com.umc.gusto.domain.user.model.response;
 
-public record FirstLogInResponse (
-    String nickname,
-    String profileImg,
-    String gender,
-    String age
-) { }
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
+@Builder
+@AllArgsConstructor
+public class FirstLogInResponse {
+    private String nickname;
+    private String profileImg;
+    private String gender;
+    private String age;
+}

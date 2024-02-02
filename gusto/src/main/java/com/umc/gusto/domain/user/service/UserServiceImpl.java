@@ -1,10 +1,12 @@
-package com.umc.gusto.domain.user;
+package com.umc.gusto.domain.user.service;
 
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.NicknameBucket;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
+import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.domain.user.repository.UserRepository;
+import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.global.auth.JwtService;
 import com.umc.gusto.global.auth.model.Tokens;
 import com.umc.gusto.global.config.secret.JwtConfig;
@@ -21,7 +23,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final SocialRepository socialRepository;
     private final JwtService jwtService;
