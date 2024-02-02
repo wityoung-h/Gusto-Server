@@ -24,7 +24,7 @@ public class UserController {
      * @return -
      */
     @PostMapping("/sign-up")
-    public ResponseEntity<Object> signUp(@RequestHeader("Temp-Token") String token,
+    public ResponseEntity signUp(@RequestHeader("Temp-Token") String token,
                          @RequestPart(name = "profileImg", required = false) MultipartFile multipartFile,
                          @RequestPart(name = "info") SignUpRequest signUpRequest) {
         // 에러 핸들러 작업 예정으로 try-catch 작성하지 않음
@@ -36,7 +36,7 @@ public class UserController {
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body("success"); // 임시 메세지
+                .build();
     }
 
     /**
@@ -46,11 +46,11 @@ public class UserController {
      * @return -
      */
     @PostMapping("/check-nickname/{nickname}")
-    public ResponseEntity<Object> checkNickname(@PathVariable("nickname")String nickname) {
+    public ResponseEntity checkNickname(@PathVariable("nickname")String nickname) {
         checkNickname(nickname);
 
         return ResponseEntity.ok()
-                .body("");
+                .build();
     }
 
     /**
@@ -60,10 +60,10 @@ public class UserController {
      * @return -
      */
     @PostMapping("/confirm-nickname/{nickname}")
-    public ResponseEntity<Object> confirmNickname(@PathVariable("nickname")String nickname) {
+    public ResponseEntity confirmNickname(@PathVariable("nickname")String nickname) {
         userService.confirmNickname(nickname);
 
         return ResponseEntity.ok()
-                .body("");
+                .build();
     }
 }
