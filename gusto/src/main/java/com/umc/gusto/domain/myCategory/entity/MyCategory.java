@@ -14,7 +14,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -44,4 +43,22 @@ public class MyCategory extends BaseEntity{
 
     @OneToMany(mappedBy = "myCategory", cascade = CascadeType.ALL)
     private final List<Pin> pinList = new ArrayList<>();
+
+    public void updateMyCategoryName(String myCategoryName) {
+        this.myCategoryName = myCategoryName;
+    }
+
+    public void updateMyCategoryIcon(Integer myCategoryIcon) {
+        this.myCategoryIcon = myCategoryIcon;
+    }
+
+    public void updateMyCategoryScript(String myCategoryScript) {
+        this.myCategoryScript = myCategoryScript;
+    }
+
+    public void updatePublishCategory(PublishStatus publishCategory) {
+        this.publishCategory = publishCategory;
+    }
+
+    public void updateStatus(BaseEntity.Status status) {this.status = status;}
 }

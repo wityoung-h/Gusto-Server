@@ -125,24 +125,24 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
         myCategoryRepository.findByMyCategoryNameAndUser(createMyCategory.getMyCategoryName(), user)
                 .ifPresent(existingCategory -> {
                     if (existingCategory.getStatus() == BaseEntity.Status.INACTIVE) {
-                        existingCategory.setStatus(BaseEntity.Status.ACTIVE);
+                        existingCategory.updateStatus(BaseEntity.Status.ACTIVE);
                         myCategoryRepository.save(existingCategory);
                     } else {
                         throw new RuntimeException("MyCategory is already present");
                     }
                 });
-//                .orElse(() -> {
-//                    // 중복된 이름이 없으면 새로운 MyCategory 생성
-//                    MyCategory myCategory = MyCategory.builder()
-//                            .myCategoryName(createMyCategory.getMyCategoryName())
-//                            .myCategoryIcon(createMyCategory.getMyCategoryIcon())
-//                            .myCategoryScript(createMyCategory.getMyCategoryScript())
-//                            .publishCategory(createMyCategory.getPublishCategory())
-//                            .user(user)
-//                            .build();
-//
-//                    myCategoryRepository.save(myCategory);
-//                });
+                .orElse(() -> {
+                    // 중복된 이름이 없으면 새로운 MyCategory 생성
+                    MyCategory myCategory = MyCategory.builder()
+                            .myCategoryName(createMyCategory.getMyCategoryName())
+                            .myCategoryIcon(createMyCategory.getMyCategoryIcon())
+                            .myCategoryScript(createMyCategory.getMyCategoryScript())
+                            .publishCategory(createMyCategory.getPublishCategory())
+                            .user(user)
+                            .build();
+
+                    myCategoryRepository.save(myCategory);
+                });
     }
 
 
@@ -157,19 +157,19 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
 
             // 변경하려는 필드만 업데이트
             if (request.getMyCategoryName() != null) {
-                existingMyCategory.setMyCategoryName(request.getMyCategoryName());
+                existingMyCategory.updateMyCategoryName(request.getMyCategoryName());
             }
 
             if (request.getMyCategoryIcon() != null) {
-                existingMyCategory.setMyCategoryIcon(request.getMyCategoryIcon());
+                existingMyCategory.updateMyCategoryIcon(request.getMyCategoryIcon());
             }
 
             if (request.getMyCategoryScript() != null) {
-                existingMyCategory.setMyCategoryScript(request.getMyCategoryScript());
+                existingMyCategory.updateMyCategoryScript(request.getMyCategoryScript());
             }
 
             if (request.getPublishCategory() != null) {
-                existingMyCategory.setPublishCategory(request.getPublishCategory());
+                existingMyCategory.updatePublishCategory(request.getPublishCategory());
             }
 
             myCategoryRepository.save(existingMyCategory);
@@ -184,7 +184,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
             MyCategory existingMyCategory = myCategoryRepository.findById(myCategoryId)
                     .orElseThrow(() -> new RuntimeException("Category not found with id: " + myCategoryId));
 
-            existingMyCategory.setStatus(BaseEntity.Status.INACTIVE);
+            existingMyCategory.updateStatus(BaseEntity.Status.INACTIVE);
 
             myCategoryRepository.save(existingMyCategory);
         }
