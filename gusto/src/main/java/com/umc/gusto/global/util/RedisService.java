@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -17,8 +18,8 @@ public class RedisService {
     }
 
     @Transactional(readOnly = true)
-    public String getValues(String key) {
-        return redisTemplate.opsForValue().get(key);
+    public Optional<String> getValues(String key) {
+        return Optional.ofNullable(redisTemplate.opsForValue().get(key));
     }
 
     public void deleteValues(String key) {
