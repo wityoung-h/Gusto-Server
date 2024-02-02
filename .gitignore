@@ -314,3 +314,6 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij,eclipse,windows,macos,linux,gradle
 
 /**/secret
+/.idea/deployment.xml
+/.idea/sshConfigs.xml
+/.idea/webServers.xml
