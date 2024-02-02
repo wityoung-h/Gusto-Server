@@ -46,7 +46,7 @@ public class RouteServiceImpl implements RouteService{
     public void deleteRoute(Long routeId) {
         Route route = routeRepository.findById(routeId).orElseThrow(() -> new RuntimeException("존재하지 않는 루트입니다."));
         //Route 삭제 시 RouteList 먼저 삭제
-        List<RouteList> routeLists = routeListRepository.findAllByRoute(routeId);
+        List<RouteList> routeLists = routeListRepository.findAllByRoute(route);
         if(routeLists != null){
             List<Long> routeListIds = routeLists.stream().map(RouteList::getRouteListId).toList();
             routeListRepository.deleteAllById(routeListIds);
@@ -65,7 +65,7 @@ public class RouteServiceImpl implements RouteService{
                 Route -> RouteResponse.RouteResponseDto.builder()
                         .routeId(Route.getRouteId())
                         .routeName(Route.getRouteName())
-                        .numStore(routeListRepository.countRouteListByRoute(Route.getRouteId()))
+                        .numStore(routeListRepository.countRouteListByRoute(Route))
                         .build())
                 .collect(Collectors.toList());
     }
