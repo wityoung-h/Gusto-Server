@@ -1,17 +1,20 @@
 package com.umc.gusto.global.auth.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
 import lombok.*;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class OAuthAttributes {
+    @JsonIgnore
     private String id;
     private String nickname;
     private String profileImg;
@@ -36,28 +39,31 @@ public class OAuthAttributes {
 
         // Gender & Age-range의 경우 provider에 따라 제공 방법이 다르므로 개별 파싱
         // 여러 provider 연결 이후 개선 예정
-        String providedGender = (String) response.get("gender");
+        Optional<String> providedGender = Optional.ofNullable((String) response.get("gender"));
+
         oAuthAttributes.gender = User.Gender.NONE;
-        if(providedGender.equals("F"))
-            oAuthAttributes.gender = User.Gender.FEMALE;
-        else if(providedGender.equals("M"))
-            oAuthAttributes.gender = User.Gender.MALE;
 
-        String providedAge = (String) response.get("age");
-        providedAge = providedAge.substring(0, providedAge.indexOf("-"));
+        providedGender.ifPresent(gender -> {
+            if(gender.equals("F"))
+                oAuthAttributes.gender = User.Gender.FEMALE;
+            else if(gender.equals("M"))
+                oAuthAttributes.gender = User.Gender.MALE;
+        });
 
-        switch (Integer.valueOf(providedAge)) {
-            case 10 -> oAuthAttributes.age = User.Age.TEEN;
-            case 20 -> oAuthAttributes.age = User.Age.TWENTIES;
-            case 30 -> oAuthAttributes.age = User.Age.THIRTIES;
-            case 40 -> oAuthAttributes.age = User.Age.FOURTIES;
-            case 50 -> oAuthAttributes.age = User.Age.FIFTIES;
-            default -> oAuthAttributes.age = User.Age.NONE;
-        }
+        Optional<String> providedAge = Optional.ofNullable((String) response.get("age"));
+        oAuthAttributes.age = User.Age.NONE;
 
-        if(Integer.valueOf(providedAge) >= 60) {
-            oAuthAttributes.age = User.Age.OLDER;
-        }
+        providedAge.ifPresent(age -> {
+            switch (Integer.valueOf(age.substring(0, age.indexOf("-")))) {
+                case 0 -> oAuthAttributes.age = User.Age.NONE;
+                case 10 -> oAuthAttributes.age = User.Age.TEEN;
+                case 20 -> oAuthAttributes.age = User.Age.TWENTIES;
+                case 30 -> oAuthAttributes.age = User.Age.THIRTIES;
+                case 40 -> oAuthAttributes.age = User.Age.FOURTIES;
+                case 50 -> oAuthAttributes.age = User.Age.FIFTIES;
+                default -> oAuthAttributes.age = User.Age.OLDER;
+            }
+        });
 
         return oAuthAttributes;
     }
