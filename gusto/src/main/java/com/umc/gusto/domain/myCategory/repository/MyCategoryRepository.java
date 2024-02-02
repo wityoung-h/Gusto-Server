@@ -16,11 +16,10 @@ public interface MyCategoryRepository extends JpaRepository<MyCategory, Long> {
     List<MyCategory> findByStatus(BaseEntity.Status status);
     Optional<MyCategory> findByMyCategoryId(Long myCategoryId);
     Optional<MyCategory> findByMyCategoryIdAndUser(Long myCategoryId, User user);
-    @Query("SELECT m FROM MyCategory m WHERE m.myCategoryName = :myCategoryName AND m.user = :user AND m.status = 'ACTIVE'")
+    @Query("SELECT m FROM MyCategory m WHERE m.myCategoryName = :myCategoryName AND m.user = :user")
     Optional<MyCategory> findByMyCategoryNameAndUser(String myCategoryName, User user);
-
-    @Query("SELECT m.user.nickname FROM MyCategory m WHERE m.status = :status AND m.user = :user AND m.publishCategory != :privateCategory")
-    List<MyCategory> findFilteredNicknames(BaseEntity.Status status, User user, PublishStatus privateCategory);
+    @Query("SELECT m FROM MyCategory m WHERE m.status = :status AND m.user = :user AND m.publishCategory = :publishStatus")
+    List<MyCategory> findFilteredNicknames(BaseEntity.Status status, User user, PublishStatus publishStatus);
 
 
 }

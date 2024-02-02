@@ -72,8 +72,6 @@ public class MyCategoryController {
 
     }
 
-
-
     @PatchMapping("/{myCategoryId}/update")
     public ResponseEntity<String> modifyMyCategory(
             @AuthenticationPrincipal AuthUser authUser,
