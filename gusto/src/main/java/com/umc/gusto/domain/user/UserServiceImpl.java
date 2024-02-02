@@ -2,6 +2,7 @@ package com.umc.gusto.domain.user;
 
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.model.NicknameBucket;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.auth.JwtService;
@@ -25,11 +26,14 @@ public class UserServiceImpl implements UserService{
     private final SocialRepository socialRepository;
     private final JwtService jwtService;
     private final RedisService redisService;
+
     private static final long NICKNAME_EXPIRED_TIME = 1000L * 60 * 15;
+    private int MAX_NICKNAME_NUMBER = 999;
+    private int MIN_NICKNAME_NUMBER = 1;
 
 
     @Value("${default.img.url.profile}")
-    private String DEFAULT_IMG;
+    private static String DEFAULT_IMG;
 
 
     @Override
@@ -97,5 +101,27 @@ public class UserServiceImpl implements UserService{
         redisService.setValuesWithTimeout(nickname, "null", NICKNAME_EXPIRED_TIME);
     }
 
+    public String generateRandomNickname() {
+        String nickname = null;
 
+        // 중복 없는 닉네임이 생성될 때까지 반복
+        while (true) {
+            try {
+                // 단어 두 개 선택
+                String[] nicknames = NicknameBucket.getNicknames();
+
+                // MIN_NICKNAME_NUMBER : 1 ~ MAX_NICKNAME_NUMBER : 999 까지 수 중 랜덤 수 생성
+                int random = (int) (Math.random() * (MAX_NICKNAME_NUMBER - MIN_NICKNAME_NUMBER) + MIN_NICKNAME_NUMBER);
+
+                nickname = nicknames[0] + " " + nicknames[1] + " " + String.valueOf(random);
+
+                checkNickname(nickname);
+            } catch (RuntimeException e) {
+                continue;
+            }
+            break;
+        }
+
+        return nickname;
+    }
 }
