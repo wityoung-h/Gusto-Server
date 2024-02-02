@@ -94,7 +94,7 @@ public class GroupServiceImpl implements GroupService{
         Group group = groupRepository.findGroupByGroupId(groupId)
                 .orElseThrow(()->new RuntimeException("Group not found"));
         if(group.getOwner().getUserid().equals(owner.getUserid())){
-            // 그룹의 가게, 루트 모두 삭제
+            // 그룹의 가게, 루트 모두 삭제 (추후 코드 추가 예정)
 
             // 그룹 삭제
             group.updateStatus(BaseEntity.Status.INACTIVE);

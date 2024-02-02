@@ -18,6 +18,10 @@ import java.util.List;
 public class GroupController {
     private final GroupService groupService;
 
+    /**
+     * 그룹 생성
+     * [POST] /groups
+     */
     @PostMapping
     public ResponseEntity<GroupResponseDto.PostGroupResponseDto> createGroup(@AuthenticationPrincipal AuthUser authUser, @RequestBody GroupRequestDto.CreateGroupDTO createGroupDTO){
         User owner = authUser.getUser();
@@ -25,12 +29,20 @@ public class GroupController {
         return ResponseEntity.ok().body(newGroup);
     }
 
+    /**
+     * 그룹 1건 조회
+     * [GET] /groups/{groupId}
+     */
     @GetMapping("/{groupId}")
     public ResponseEntity<GroupResponseDto.GetGroupResponseDto> getGroup(@PathVariable Long groupId){
         GroupResponseDto.GetGroupResponseDto getGroup = groupService.getGroup(groupId);
         return ResponseEntity.ok().body(getGroup);
     }
 
+    /**
+     * 그룹 수정
+     * [PATCH] /groups/{groupId}
+     */
     @PatchMapping("/{groupId}")
     public ResponseEntity<GroupResponseDto.UpdateGroupResponseDto> updateGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId, @RequestBody GroupRequestDto.UpdateGroupDTO updateGroupDTO){
         User owner = authUser.getUser();
@@ -38,6 +50,10 @@ public class GroupController {
         return ResponseEntity.ok().body(updatedGroup);
     }
 
+    /**
+     * 그룹 삭제
+     * [PATCH] /groups/{groupId}/delete
+     */
     @PatchMapping("/{groupId}/delete")
     public ResponseEntity<String> deleteGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId){
         User owner = authUser.getUser();
