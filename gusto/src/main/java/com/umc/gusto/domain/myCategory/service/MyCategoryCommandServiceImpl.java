@@ -40,11 +40,8 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
 
     @Transactional
     public List<MyCategoryResponse.MyCategory> getAllMyCategory(String nickname) {
-        User user = userRepository.findByNickname(nickname);
 
-        List<MyCategory> myCategoryList = myCategoryRepository.findFilteredNicknames(
-                BaseEntity.Status.ACTIVE, user, PublishStatus.PUBLIC
-        );
+        List<MyCategory> myCategoryList = myCategoryRepository.findByUserNickname(nickname);
 
         return myCategoryList.stream()
                 .map(myCategory -> MyCategoryResponse.MyCategory.builder()
@@ -58,25 +55,19 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
     }
 
     @Transactional
-    public List<MyCategoryResponse.MyCategory> getAllMyCategoryWithLocation(User user,String townName) {
-        List<MyCategory>myCategoryList = myCategoryRepository.findByStatus(BaseEntity.Status.ACTIVE);      // status가 ACTIVE인 카테고리 조회
-        Optional<Town> town = townRepository.findByTownName(townName);
-        List<Store> storesList = storeRepository.findByTown(town.orElse(null));                                         // 특정 townName인 storesList
+    public List<MyCategoryResponse.MyCategory> getAllMyCategoryWithLocation(User user, String townName) {
+        List<MyCategory>myCategoryList = myCategoryRepository.findByStatusAndPublishCategory();                                      // 특정 townName인 storesList
 
         return myCategoryList.stream()
                 .map(myCategory -> {
-                    List<Pin> pinList = pinRepository.findAllByMyCategoryOrderByPinIdDesc(myCategory);     // 먼저 카테고리로 구분
-                    List<Store> storesWithPins = pinList.stream()
-                            .map(Pin::getStore)
-                            .filter(storesList::contains)                                                  // storesList에 포함된 store만 필터링!
-                            .toList();
+                    List<Pin> pinList = pinRepository.findAllByUserAndMyCategoryOrderByPinIdDesc(myCategory, townName);     // 먼저 카테고리로 구분
 
                     return MyCategoryResponse.MyCategory.builder()
                             .myCategoryId(myCategory.getMyCategoryId())
                             .myCategoryName(myCategory.getMyCategoryName())
                             .myCategoryIcon(myCategory.getMyCategoryIcon())
                             .publishCategory(myCategory.getPublishCategory())
-                            .pinCnt(storesWithPins.size())            // pin 개수 받아오기로 변경
+                            .pinCnt(pinList.size())            // pin 개수 받아오기로 변경
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -84,8 +75,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
 
     @Transactional
     public List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategory(String nickname, Long myCategoryId) {
-        User user = userRepository.findByNickname(nickname);
-        Optional<MyCategory> existingMyCategory = myCategoryRepository.findByMyCategoryIdAndUser(myCategoryId, user);
+        Optional<MyCategory> existingMyCategory = myCategoryRepository.findByUserNicknameAndMyCategoryId(nickname, myCategoryId);
         // 카테고리 별 가게 목록이 비어있으면 pinList도 비어 있음
         List<Pin> pinList = existingMyCategory.map(pinRepository::findByMyCategoryOrderByPinIdDesc)
                 .orElse(Collections.emptyList());
@@ -94,7 +84,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
                 .map(pin -> {
                     Optional<Review> topReviewOptional = reviewRepository.findTopByStoreOrderByLikedDesc(pin.getStore());       // 가장 좋아요가 많은 review
                     String reviewImg = topReviewOptional.map(Review::getImg1).orElse(null);                               // 가장 좋아요가 많은 review 이미지
-                    Integer reviewCnt = reviewRepository.countByStoreAndUser(pin.getStore(), user);                             // 내가 작성한 리뷰의 개수 == 방문 횟수
+                    Integer reviewCnt = reviewRepository.countByStoreAndUserNickname(pin.getStore(), nickname);                             // 내가 작성한 리뷰의 개수 == 방문 횟수
 
                     return  MyCategoryResponse.PinByMyCategory.builder()
                                 .pinId(pin.getPinId())
@@ -108,19 +98,14 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
     }
 
     @Transactional
-    public List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategoryWithLocation(User user,Long myCategoryId, String townName) {
-        Optional<MyCategory> existingMyCategory = myCategoryRepository.findByMyCategoryId(myCategoryId);
-        Optional<Town> town = townRepository.findByTownName(townName);
-        List<Store> storesList = storeRepository.findByTown(town.orElse(null));
-        List<Pin> pinList = existingMyCategory.map(pinRepository::findByMyCategoryOrderByPinIdDesc)
-                .orElse(Collections.emptyList());
+    public List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townName) {
+        List<Pin> pinList = myCategoryRepository.findPinsByMyCategoryIdAndTownName(myCategoryId, townName);
 
-        return pinList.stream()
-                .filter(pin -> storesList.contains(pin.getStore()))             // townName을 기준으로 보일 수 있는 store가 포함된 pin만 보이기(핀은 화살표 오른쯕을 기준으로 형성)
+        return pinList.stream()                                     // townName을 기준으로 보일 수 있는 store가 포함된 pin만 보이기
                 .map(pin -> {
                     Optional<Review> topReviewOptional = reviewRepository.findTopByStoreOrderByLikedDesc(pin.getStore());       // 가장 좋아요가 많은 review
                     String reviewImg = topReviewOptional.map(Review::getImg1).orElse(null);                               // 가장 좋아요가 많은 review 이미지
-                    Integer reviewCnt = reviewRepository.countByStore(pin.getStore());                             // 내가 작성한 리뷰의 개수 == 방문 횟수
+                    Integer reviewCnt = reviewRepository.countByStore(pin.getStore());                                          // 내가 작성한 리뷰의 개수 == 방문 횟수
 
                     return  MyCategoryResponse.PinByMyCategory.builder()
                             .pinId(pin.getPinId())

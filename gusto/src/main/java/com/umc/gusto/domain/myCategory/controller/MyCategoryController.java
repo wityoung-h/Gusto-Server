@@ -43,7 +43,6 @@ public class MyCategoryController {
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "myCategoryId") Long myCategoryId,
             @PathVariable String nickname) {
-            User user = authUser.getUser();
             List<MyCategoryResponse.PinByMyCategory> myStoreList = myCategoryCommandService.getAllPinByMyCategory(nickname, myCategoryId);
             return ResponseEntity.ok().body(myStoreList);
     }
