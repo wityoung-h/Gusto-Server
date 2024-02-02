@@ -19,6 +19,7 @@ import java.io.IOException;
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private final ObjectMapper objectMapper;
     private final JwtService jwtService;
+    private final OAuthService oAuthService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -44,9 +45,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             response.setHeader("temp-token", String.valueOf(socialInfo.getTemporalToken()));
 
             // TODO: 차후 응답 코드 형태 맞춰 리팩토링할 것
-            String body = """
-                    { "isSuccess" : true, "code" : 302, "message" : "회원가입을 진행해야 합니다.", "result" : """
-                    + objectMapper.writeValueAsString(oAuth2User.getOAuthAttributes()) + "}";
+            String body = objectMapper.writeValueAsString(
+                    oAuthService.generateFirstLogInRes(oAuth2User.getOAuthAttributes())
+            );
 
             response.getWriter().write(body);
         }

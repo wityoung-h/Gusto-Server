@@ -10,6 +10,4 @@ public class SignUpRequest {
     String age;
     String gender;
     String profileImg;
-
-
 }
