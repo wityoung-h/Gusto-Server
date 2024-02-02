@@ -27,19 +27,20 @@ public class RouteServiceImpl implements RouteService{
 
     @Override
     public void createRoute(RouteRequest.createRouteDto request) {
-        //루트명은 내 루트명 중에서 중복 불가능
-        if(routeRepository.existsByRouteName(request.getRouteName())){
-            //루트 생성
-            Route route = Route.builder()
-                    .routeName(request.getRouteName())
-                    .group(groupRepository.findGroupByGroupId(request.getGroupId()).orElseThrow(() -> new RuntimeException("존재하지 않는 그룹입니다.")))
-                    .build();
-            routeRepository.save(route);
-
-            //루트리스트 생성 비지니스 로직 호출
-            routeListService.createRouteList(route,request.getRouteList());
+        // 루트명은 내 루트명 중에서 중복 불가능
+        if (routeRepository.existsByRouteName(request.getRouteName())) {
+            throw new RuntimeException("루트명은 중복 불가로 입력하신 루트명은 이미 사용중인 루트명입니다.");
         }
 
+        // 루트 생성
+        Route route = Route.builder()
+                .routeName(request.getRouteName())
+                .group(groupRepository.findGroupByGroupId(request.getGroupId()).orElse(null))
+                .build();
+        Route savedRoute = routeRepository.save(route);
+
+        // 루트리스트 생성 비지니스 로직 호출
+        routeListService.createRouteList(savedRoute, request.getRouteList());
     }
 
     @Override

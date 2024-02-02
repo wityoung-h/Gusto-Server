@@ -20,12 +20,15 @@ public class RouteListServiceImpl implements RouteListService{
     @Override
     public void createRouteList(Route route, List<RouteListRequest.createRouteListDto> request) {
         //루트리스트 생성
-        RouteList routeList = RouteList.builder()
-                .route(route)
-                .store(storeRepository.findById(request.get(0).getStoreId()).orElseThrow(()-> new RuntimeException("등록되어 있지 않은 가게입니다.")))
-                .build();
-
-        routeListRepository.save(routeList);
+        request.forEach(dto -> {
+                    RouteList routeList = RouteList.builder()
+                            .route(route)
+                            .store(storeRepository.findById(dto.getStoreId())
+                                    .orElseThrow(() -> new RuntimeException("등록되어 있지 않은 가게입니다.")))
+                            .ordinal(dto.getOrdinal())
+                            .build();
+            routeListRepository.save(routeList);
+        });
     }
 
     @Override

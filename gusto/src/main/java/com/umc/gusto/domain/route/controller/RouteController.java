@@ -1,6 +1,7 @@
 package com.umc.gusto.domain.route.controller;
 
 import com.umc.gusto.domain.route.model.request.RouteRequest;
+import com.umc.gusto.domain.route.model.response.RouteResponse;
 import com.umc.gusto.domain.route.service.RouteServiceImpl;
 import com.umc.gusto.global.auth.UserDetailsService;
 import jakarta.validation.Valid;
@@ -10,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("routes")
 @RequiredArgsConstructor
@@ -18,7 +21,7 @@ public class RouteController {
 
     // 루트 생성
     @PostMapping("")
-    public ResponseEntity<?> create(
+    public ResponseEntity<?> createRoute(
             @RequestBody @Valid RouteRequest.createRouteDto request)
     {
         routeService.createRoute(request);
@@ -38,8 +41,8 @@ public class RouteController {
     public ResponseEntity<?> allMyRoute(
             @PathVariable String nickname
     ){
-        routeService.getRoute(nickname);
-        return null;
+        List<RouteResponse.RouteResponseDto> route = routeService.getRoute(nickname);
+        return ResponseEntity.ok().body(route);
     }
 
 
