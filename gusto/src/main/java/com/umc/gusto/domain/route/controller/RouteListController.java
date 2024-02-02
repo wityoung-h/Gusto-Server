@@ -1,21 +1,23 @@
 package com.umc.gusto.domain.route.controller;
 
 import com.umc.gusto.domain.route.service.RouteListServiceImpl;
-import com.umc.gusto.domain.route.service.RouteServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("routes")
+@RequestMapping("routeLists")
 @RequiredArgsConstructor
 public class RouteListController {
 
     private final RouteListServiceImpl routeListService;
 
     // 루르리스트 항목 삭제
-    @DeleteMapping()
+    @DeleteMapping("/{routeListId}")
     public ResponseEntity<?> deleteRouteLis(
             @PathVariable Long routeListId
     ){
