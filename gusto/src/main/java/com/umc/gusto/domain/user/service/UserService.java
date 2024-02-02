@@ -1,4 +1,4 @@
-package com.umc.gusto.domain.user;
+package com.umc.gusto.domain.user.service;
 
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.global.auth.model.Tokens;
