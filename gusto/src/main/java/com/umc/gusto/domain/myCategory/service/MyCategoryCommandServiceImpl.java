@@ -16,9 +16,11 @@ import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.common.PublishStatus;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.beans.Transient;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -36,13 +38,15 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
     private final TownRepository townRepository;
     private final ReviewRepository reviewRepository;
 
+    @Transactional
     public List<MyCategoryResponse.MyCategory> getAllMyCategory(String nickname) {
         User user = userRepository.findByNickname(nickname);
 
-        List<MyCategory> myCategoryList = myCategoryRepository.findByStatusAndUser(BaseEntity.Status.ACTIVE, user);      // status가 ACTIVE인 카테고리 조회
+        List<MyCategory> myCategoryList = myCategoryRepository.findFilteredNicknames(
+                BaseEntity.Status.ACTIVE, user, PublishStatus.PRIVATE
+        );
 
         return myCategoryList.stream()
-                .filter(myCategory -> myCategory.getPublishCategory() != PublishStatus.PRIVATE)         // publishCategory가 PRIVATE이 아닌 경우만 FILTER
                 .map(myCategory -> MyCategoryResponse.MyCategory.builder()
                         .myCategoryId(myCategory.getMyCategoryId())
                         .myCategoryName(myCategory.getMyCategoryName())
@@ -53,7 +57,8 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
                 .collect(Collectors.toList());
     }
 
-    public List<MyCategoryResponse.MyCategory> getAllMyCategoryWithLocation(String townName) {
+    @Transactional
+    public List<MyCategoryResponse.MyCategory> getAllMyCategoryWithLocation(User user,String townName) {
         List<MyCategory>myCategoryList = myCategoryRepository.findByStatus(BaseEntity.Status.ACTIVE);      // status가 ACTIVE인 카테고리 조회
         Optional<Town> town = townRepository.findByTownName(townName);
         List<Store> storesList = storeRepository.findByTown(town.orElse(null));                                         // 특정 townName인 storesList
@@ -77,8 +82,7 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
                 .collect(Collectors.toList());
     }
 
-
-    @Override
+    @Transactional
     public List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategory(String nickname, Long myCategoryId) {
         User user = userRepository.findByNickname(nickname);
         Optional<MyCategory> existingMyCategory = myCategoryRepository.findByMyCategoryIdAndUser(myCategoryId, user);
@@ -103,8 +107,8 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategoryWithLocation(Long myCategoryId, String townName) {
+    @Transactional
+    public List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategoryWithLocation(User user,Long myCategoryId, String townName) {
         Optional<MyCategory> existingMyCategory = myCategoryRepository.findByMyCategoryId(myCategoryId);
         Optional<Town> town = townRepository.findByTownName(townName);
         List<Store> storesList = storeRepository.findByTown(town.orElse(null));
@@ -130,25 +134,21 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
     }
 
     // 동일 user가 작성한 카테고리 중 겹치는 NAME이 있다면 추가 X, 겹치는 name인데 status가 inactive면 active로 변경 => 토큰을 통해 nickname 가져올 것
-    @Override
-    public void createMyCategory(MyCategoryRequest.createMyCategory createMyCategoryDTO) {
+    @Transactional
+    public void createMyCategory(User user, MyCategoryRequest.createMyCategory createMyCategory) {
         // 중복 이름 체크
-        MyCategory myCategoryOptional = myCategoryRepository.findByMyCategoryName(createMyCategoryDTO.getMyCategoryName())
-                .orElseThrow(() -> new RuntimeException("MyCategory with the same name does not exist"));
+        myCategoryRepository.findByMyCategoryNameAndUser(createMyCategory.getMyCategoryName(), user)
+                .ifPresent(existingCategory -> {
+                    throw new RuntimeException("MyCategory is present");
+                });
 
-
-        if (myCategoryOptional.getStatus() == BaseEntity.Status.INACTIVE) {
-            myCategoryOptional.setStatus(BaseEntity.Status.ACTIVE);
-            myCategoryRepository.save(myCategoryOptional);
-        } else {
-            throw new RuntimeException("MyCategory is in ACTIVE");
-        }
-
+        // 중복된 이름이 없으면 새로운 MyCategory 생성
         MyCategory myCategory = MyCategory.builder()
-                .myCategoryName(createMyCategoryDTO.getMyCategoryName())
-                .myCategoryIcon(createMyCategoryDTO.getMyCategoryIcon())
-                .myCategoryScript(createMyCategoryDTO.getMyCategoryScript())
-                .publishCategory(createMyCategoryDTO.getPublishCategory())
+                .myCategoryName(createMyCategory.getMyCategoryName())
+                .myCategoryIcon(createMyCategory.getMyCategoryIcon())
+                .myCategoryScript(createMyCategory.getMyCategoryScript())
+                .publishCategory(createMyCategory.getPublishCategory())
+                .user(user)
                 .build();
 
         myCategoryRepository.save(myCategory);
@@ -156,7 +156,9 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
 
 
 
-    public void modifyMyCategory(Long myCategoryId, MyCategoryRequest.updateMyCategory request) {
+
+    @Transactional
+    public void modifyMyCategory(User user, Long myCategoryId, MyCategoryRequest.updateMyCategory request) {
         MyCategory existingMyCategory = myCategoryRepository.findById(myCategoryId)
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + myCategoryId));
             // status가 INACTIVE일 때 수정하는 경우 -> 프론트 상 그럴 경우 없어 보여 주석 처리
@@ -184,7 +186,8 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
 //        }
     }
 
-    public void deleteMyCategories(List<Long> myCategoryIds) {
+    @Transactional
+    public void deleteMyCategories(User user, List<Long> myCategoryIds) {
         for (Long myCategoryId : myCategoryIds) {
             MyCategory existingMyCategory = myCategoryRepository.findById(myCategoryId)
                     .orElseThrow(() -> new RuntimeException("Category not found with id: " + myCategoryId));

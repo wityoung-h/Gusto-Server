@@ -12,17 +12,10 @@ public class MyCategoryRequest {
 
     @Getter
     public static class createMyCategory {
-        @NotBlank
         String myCategoryName;
-
         String myCategoryScript;
-
-        @NotNull
         Integer myCategoryIcon;
-
-        @NotNull
         PublishStatus publishCategory;
-
         BaseEntity.Status status = BaseEntity.Status.ACTIVE;
 
     }
@@ -32,7 +25,7 @@ public class MyCategoryRequest {
         String myCategoryName;
         String myCategoryScript;
         Integer myCategoryIcon;
-        PublishStatus publishCategory;
+        PublishStatus publishCategory = PublishStatus.PUBLIC;
 
     }
 
