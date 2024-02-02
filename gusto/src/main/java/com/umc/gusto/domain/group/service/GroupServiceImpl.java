@@ -5,9 +5,11 @@ import com.umc.gusto.domain.group.entity.GroupMember;
 import com.umc.gusto.domain.group.model.request.GroupRequestDto;
 import com.umc.gusto.domain.group.model.response.GroupMemberResponseDto;
 import com.umc.gusto.domain.group.model.response.GroupResponseDto;
+import com.umc.gusto.domain.group.repository.GroupListRepository;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.global.common.BaseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -85,5 +87,18 @@ public class GroupServiceImpl implements GroupService{
                 .owner(ownerMemberId)
                 .notice(group.getNotice())
                 .build();
+    }
+
+    @Transactional
+    public void deleteGroup(User owner, Long groupId){
+        Group group = groupRepository.findGroupByGroupId(groupId)
+                .orElseThrow(()->new RuntimeException("Group not found"));
+        if(group.getOwner().getUserid().equals(owner.getUserid())){
+            // 그룹의 가게, 루트 모두 삭제
+
+            // 그룹 삭제
+            group.updateStatus(BaseEntity.Status.INACTIVE);
+            groupRepository.save(group);
+        }
     }
 }

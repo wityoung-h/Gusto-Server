@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/groups")
@@ -34,6 +36,13 @@ public class GroupController {
         User owner = authUser.getUser();
         GroupResponseDto.UpdateGroupResponseDto updatedGroup = groupService.updateGroup(owner, groupId, updateGroupDTO);
         return ResponseEntity.ok().body(updatedGroup);
+    }
+
+    @PatchMapping("/{groupId}/delete")
+    public ResponseEntity<String> deleteGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId){
+        User owner = authUser.getUser();
+        groupService.deleteGroup(owner, groupId);
+        return ResponseEntity.ok("DELETE SUCCESS");
     }
 
 }

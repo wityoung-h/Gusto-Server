@@ -43,4 +43,8 @@ public class Group extends BaseEntity {
     public void updateNotice(String notice){
         this.notice = notice;
     }
+
+    public void updateStatus(BaseEntity.Status status){
+        this.status = status;
+    }
 }
