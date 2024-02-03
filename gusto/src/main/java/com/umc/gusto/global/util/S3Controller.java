@@ -1,4 +1,4 @@
-package com.umc.gusto.global.s3;
+package com.umc.gusto.global.util;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

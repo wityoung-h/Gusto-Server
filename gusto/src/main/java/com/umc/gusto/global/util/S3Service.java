@@ -1,4 +1,4 @@
-package com.umc.gusto.global.s3;
+package com.umc.gusto.global.util;
 
 
 import com.amazonaws.services.s3.AmazonS3;
