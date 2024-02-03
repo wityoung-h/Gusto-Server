@@ -29,7 +29,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             response.setCharacterEncoding("utf-8");
 
             if(socialInfo.getSocialStatus() == Social.SocialStatus.CONNECTED){
-                String userUUID = String.valueOf(socialInfo.getUser().getUserid());
+                String userUUID = String.valueOf(socialInfo.getUser().getUserId());
 
                 Tokens tokens = jwtService.createAndSaveTokens(userUUID);
                 

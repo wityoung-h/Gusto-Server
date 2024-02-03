@@ -14,5 +14,4 @@ import java.util.Optional;
 public interface ReviewRepository extends JpaRepository<Review, Long > {
     Optional<Review> findTopByStoreOrderByLikedDesc(Store store);
     Integer countByStoreAndUserNickname(Store store, String nickname);
-    Integer countByStore(Store store);
 }

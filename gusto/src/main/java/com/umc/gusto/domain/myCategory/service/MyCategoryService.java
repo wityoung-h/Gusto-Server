@@ -14,9 +14,9 @@ public interface MyCategoryService {
 
     List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategory(String nickname, Long myCategoryId);
 
-    List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategoryWithLocation(User user,Long myCategoryId, String townName);
+    List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townName);
 
-    void createMyCategory(User user,MyCategoryRequest.createMyCategory createMyCategory);
+    void createMyCategory(User user, MyCategoryRequest.createMyCategory createMyCategory);
 
     void modifyMyCategory(User user,Long myCategoryId, MyCategoryRequest.updateMyCategory updateMyCategory);
 
