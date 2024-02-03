@@ -109,25 +109,24 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                 .collect(Collectors.toList());
     }
 
-    // 동일 user가 작성한 카테고리 중 겹치는 NAME이 있다면 추가 X, 겹치는 name인데 status가 inactive면 active로 변경 => 토큰을 통해 nickname 가져올 것
     @Transactional
     public void createMyCategory(User user, MyCategoryRequest.createMyCategory createMyCategory) {
         // 중복 이름 체크
         myCategoryRepository.findByMyCategoryNameAndUser(createMyCategory.getMyCategoryName(), user)
-                .ifPresent(existingCategory ->  {
+                .ifPresent(existingCategory -> {
                     throw new NotFoundException(Code.MYCATEGORY_DUPLICATE_NAME);
                 });
 
-                // 중복된 이름이 없으면 새로운 MyCategory 생성
-                MyCategory myCategory = MyCategory.builder()
-                        .myCategoryName(createMyCategory.getMyCategoryName())
-                        .myCategoryIcon(createMyCategory.getMyCategoryIcon())
-                        .myCategoryScript(createMyCategory.getMyCategoryScript())
-                        .publishCategory(createMyCategory.getPublishCategory())
-                        .user(user)
-                        .build();
+        // 중복된 이름이 없으면 새로운 MyCategory 생성
+        MyCategory myCategory = MyCategory.builder()
+                .myCategoryName(createMyCategory.getMyCategoryName())
+                .myCategoryIcon(createMyCategory.getMyCategoryIcon())
+                .myCategoryScript(createMyCategory.getMyCategoryScript())
+                .publishCategory(createMyCategory.getPublishCategory())
+                .user(user)
+                .build();
 
-                myCategoryRepository.save(myCategory);
+        myCategoryRepository.save(myCategory);
 
     }
 
@@ -138,7 +137,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     @Transactional
     public void modifyMyCategory(User user, Long myCategoryId, MyCategoryRequest.updateMyCategory request) {
         MyCategory existingMyCategory = myCategoryRepository.findById(myCategoryId)
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + myCategoryId));
+                .orElseThrow(() -> new NotFoundException(Code.MYCATEGORY_NOT_FOUND));
             // status가 INACTIVE일 때 수정하는 경우 -> 프론트 상 그럴 경우 없어 보여 주석 처리
 
             // 변경하려는 필드만 업데이트
@@ -168,7 +167,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     public void deleteMyCategories(User user, List<Long> myCategoryIds) {
         for (Long myCategoryId : myCategoryIds) {
             MyCategory existingMyCategory = myCategoryRepository.findById(myCategoryId)
-                    .orElseThrow(() -> new RuntimeException("Category not found with id: " + myCategoryId));
+                    .orElseThrow(() -> new NotFoundException(Code.MYCATEGORY_NOT_FOUND));
 
             existingMyCategory.updateStatus(BaseEntity.Status.INACTIVE);
 
