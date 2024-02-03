@@ -27,6 +27,9 @@ public enum Code {
     //Group 관련 에러 +4
 
     //myCategory 관련 에러 +5
+    MYCATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 404501, "존재하지 않는 카테고리입니다."),
+    MYCATEGORY_DUPLICATE_NAME(HttpStatus.CONFLICT, 404502, "이미 존재하는 카테고리입니다."),
+    USER_NO_PERMISSION_FOR_MYCATEGORY(HttpStatus.FORBIDDEN, 404503, "해당 유저는 해당 카테고리에 대한 권한이 없습니다."),
 
     // token 관련 에러 +6
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, 401601, "유효하지 않은 토큰입니다."),

@@ -25,6 +25,6 @@ public interface MyCategoryRepository extends JpaRepository<MyCategory, Long> {
             "WHERE p.myCategory.myCategoryId = :myCategoryId " +
             "AND t.townName = :townName")
     List<Pin> findPinsByMyCategoryIdAndTownName(Long myCategoryId, String townName);
-
+    @Query("SELECT m FROM MyCategory m WHERE m.status = 'ACTIVE'")
     Optional<MyCategory> findByMyCategoryNameAndUser(String myCategoryName, User user);
 }

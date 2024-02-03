@@ -1,13 +1,12 @@
 package com.umc.gusto.domain.myCategory.service;
 
-import com.umc.gusto.domain.myCategory.entity.MyCategory;
 import com.umc.gusto.domain.myCategory.model.request.MyCategoryRequest;
 import com.umc.gusto.domain.myCategory.model.response.MyCategoryResponse;
 import com.umc.gusto.domain.user.entity.User;
 
 import java.util.List;
 
-public interface MyCategoryCommandService {
+public interface MyCategoryService {
 
     List<MyCategoryResponse.MyCategory> getAllMyCategory(String nickname);
 

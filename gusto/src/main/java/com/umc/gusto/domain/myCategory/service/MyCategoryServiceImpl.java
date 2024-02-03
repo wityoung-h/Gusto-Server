@@ -7,21 +7,15 @@ import com.umc.gusto.domain.myCategory.model.response.MyCategoryResponse;
 import com.umc.gusto.domain.myCategory.repository.MyCategoryRepository;
 import com.umc.gusto.domain.myCategory.repository.PinRepository;
 import com.umc.gusto.domain.review.entity.Review;
-import com.umc.gusto.domain.review.repository.ReviewRepository;;
-import com.umc.gusto.domain.store.entity.Store;
-import com.umc.gusto.domain.store.entity.Town;
-import com.umc.gusto.domain.store.repository.StoreRepository;
-import com.umc.gusto.domain.store.repository.TownRepository;
+import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.user.entity.User;
-import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
-import com.umc.gusto.global.common.PublishStatus;
+import com.umc.gusto.global.exception.Code;
+import com.umc.gusto.global.exception.customException.NotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.beans.Transient;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -29,13 +23,10 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
+public class MyCategoryServiceImpl implements MyCategoryService {
 
     private final MyCategoryRepository myCategoryRepository;
     private final PinRepository pinRepository;
-    private final UserRepository userRepository;
-    private final StoreRepository storeRepository;
-    private final TownRepository townRepository;
     private final ReviewRepository reviewRepository;
 
     @Transactional
@@ -123,26 +114,21 @@ public class MyCategoryCommandServiceImpl implements MyCategoryCommandService{
     public void createMyCategory(User user, MyCategoryRequest.createMyCategory createMyCategory) {
         // 중복 이름 체크
         myCategoryRepository.findByMyCategoryNameAndUser(createMyCategory.getMyCategoryName(), user)
-                .ifPresent(existingCategory -> {
-                    if (existingCategory.getStatus() == BaseEntity.Status.INACTIVE) {
-                        existingCategory.updateStatus(BaseEntity.Status.ACTIVE);
-                        myCategoryRepository.save(existingCategory);
-                    } else {
-                        throw new RuntimeException("MyCategory is already present");
-                    }
+                .ifPresent(existingCategory ->  {
+                    throw new NotFoundException(Code.MYCATEGORY_DUPLICATE_NAME);
                 });
-                .orElse(() -> {
-                    // 중복된 이름이 없으면 새로운 MyCategory 생성
-                    MyCategory myCategory = MyCategory.builder()
-                            .myCategoryName(createMyCategory.getMyCategoryName())
-                            .myCategoryIcon(createMyCategory.getMyCategoryIcon())
-                            .myCategoryScript(createMyCategory.getMyCategoryScript())
-                            .publishCategory(createMyCategory.getPublishCategory())
-                            .user(user)
-                            .build();
 
-                    myCategoryRepository.save(myCategory);
-                });
+                // 중복된 이름이 없으면 새로운 MyCategory 생성
+                MyCategory myCategory = MyCategory.builder()
+                        .myCategoryName(createMyCategory.getMyCategoryName())
+                        .myCategoryIcon(createMyCategory.getMyCategoryIcon())
+                        .myCategoryScript(createMyCategory.getMyCategoryScript())
+                        .publishCategory(createMyCategory.getPublishCategory())
+                        .user(user)
+                        .build();
+
+                myCategoryRepository.save(myCategory);
+
     }
 
 

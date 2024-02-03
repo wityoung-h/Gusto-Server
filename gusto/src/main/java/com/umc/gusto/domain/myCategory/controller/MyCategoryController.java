@@ -2,13 +2,10 @@ package com.umc.gusto.domain.myCategory.controller;
 
 import com.umc.gusto.domain.myCategory.model.request.MyCategoryRequest;
 import com.umc.gusto.domain.myCategory.model.response.MyCategoryResponse;
-import com.umc.gusto.domain.myCategory.service.MyCategoryCommandService;
+import com.umc.gusto.domain.myCategory.service.MyCategoryService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
-import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.auth.AuthScheme;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/myCategories")
 public class MyCategoryController {
-    private final MyCategoryCommandService myCategoryCommandService;
+    private final MyCategoryService myCategoryCommandService;
 
     @GetMapping("/{nickname}")
     public ResponseEntity<List<MyCategoryResponse.MyCategory>> allMyCategory(
