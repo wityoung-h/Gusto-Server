@@ -112,11 +112,10 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     @Transactional
     public void createMyCategory(User user, MyCategoryRequest.createMyCategory createMyCategory) {
         // 중복 이름 체크
-        List<MyCategory> existingCategories = myCategoryRepository.findByMyCategoryNameAndUser(createMyCategory.getMyCategoryName(), user);
-
-        if (!existingCategories.isEmpty()) {
-            throw new NotFoundException(Code.MYCATEGORY_DUPLICATE_NAME);
-        }
+        myCategoryRepository.findByMyCategoryNameAndUser(createMyCategory.getMyCategoryName(), user)
+                .ifPresent(existingCategory -> {
+                    throw new NotFoundException(Code.MYCATEGORY_DUPLICATE_NAME);
+                });
 
         // 중복된 이름이 없으면 새로운 MyCategory 생성
         MyCategory myCategory = MyCategory.builder()
@@ -138,10 +137,10 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
         // 중복 이름 체크
         if (updateMyCategory.getMyCategoryName() != null && updateMyCategory.getMyCategoryName().equals(existingMyCategory.getMyCategoryName())) {
-            List<MyCategory> existingCategories = myCategoryRepository.findByMyCategoryNameAndUser(updateMyCategory.getMyCategoryName(), user);
-            if (!existingCategories.isEmpty()) {
+            myCategoryRepository.findByMyCategoryNameAndUser(updateMyCategory.getMyCategoryName(), user)
+                    .ifPresent(existingCategory -> {
                 throw new NotFoundException(Code.MYCATEGORY_DUPLICATE_NAME);
-            }
+            });
         }
 
             // 변경하려는 필드만 업데이트
