@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
 
         // user 생성
         User user = User.builder()
-                .userid(UUID.randomUUID())
+                .userId(UUID.randomUUID())
                 .nickname(request.getNickname())
                 .gender(User.Gender.valueOf(request.getGender()))
                 .age(User.Age.valueOf(request.getAge()))
@@ -79,8 +79,8 @@ public class UserServiceImpl implements UserService {
         socialRepository.save(socialInfo);
 
         // access-token 및 refresh-token 생성
-        Tokens tokens = jwtService.createToken(String.valueOf(user.getUserid()));
-        redisService.setValuesWithTimeout(tokens.getRefreshToken(), String.valueOf(user.getUserid()), JwtConfig.REFRESH_TOKEN_VALID_TIME);
+        Tokens tokens = jwtService.createToken(String.valueOf(user.getUserId()));
+        redisService.setValuesWithTimeout(tokens.getRefreshToken(), String.valueOf(user.getUserId()), JwtConfig.REFRESH_TOKEN_VALID_TIME);
 
         return tokens;
     }
