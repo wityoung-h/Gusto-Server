@@ -1,4 +1,4 @@
-package com.umc.gusto.domain.user;
+package com.umc.gusto.domain.user.service;
 
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
@@ -118,10 +118,6 @@ public class UserServiceImpl implements UserService{
                 int random = (int) (Math.random() * (MAX_NICKNAME_NUMBER - MIN_NICKNAME_NUMBER) + MIN_NICKNAME_NUMBER);
 
                 nickname = nicknames[0] + " " + nicknames[1] + " " + String.valueOf(random);
-    @Override
-    public ProfileRes getProfile(String nickname) {
-        User user = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
-                .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
 
                 checkNickname(nickname);
             } catch (RuntimeException e) {
@@ -132,6 +128,11 @@ public class UserServiceImpl implements UserService{
 
         return nickname;
     }
+
+    @Override
+    public ProfileRes getProfile(String nickname) {
+        User user = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
         return new ProfileRes(user.getNickname(), user.getReviewCnt(), user.getPinCnt(), user.getFollower());
     }
 }
