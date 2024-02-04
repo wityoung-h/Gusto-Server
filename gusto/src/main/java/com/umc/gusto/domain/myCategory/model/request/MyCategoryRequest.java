@@ -11,33 +11,26 @@ import lombok.Setter;
 public class MyCategoryRequest {
 
     @Getter
-    public static class createMyCategoryDTO {
-        @NotBlank
+    public static class createMyCategory {
         String myCategoryName;
-
         String myCategoryScript;
-
-        @NotNull
         Integer myCategoryIcon;
-
-        @NotNull
         PublishStatus publishCategory;
-
         BaseEntity.Status status = BaseEntity.Status.ACTIVE;
 
     }
 
     @Getter
-    public static class updateMyCategoryDTO {
+    public static class updateMyCategory {
         String myCategoryName;
         String myCategoryScript;
         Integer myCategoryIcon;
-        PublishStatus publishCategory;
+        PublishStatus publishCategory = PublishStatus.PUBLIC;
 
     }
 
     @Getter
-    public static class deleteMyCategoryDTO {
+    public static class deleteMyCategory {
         BaseEntity.Status status;
     }
 }
