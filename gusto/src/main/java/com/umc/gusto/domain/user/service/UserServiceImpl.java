@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Value("${default.img.url.profile}")
-    private static String DEFAULT_IMG;
+    private static String DEFAULT_PROFILE_IMG;
 
 
     @Override
@@ -49,8 +49,8 @@ public class UserServiceImpl implements UserService {
         redisService.deleteValues(request.getNickname());
         checkNickname(request.getNickname());
 
-        String profileImg = DEFAULT_IMG;
-        
+        String profileImg = DEFAULT_PROFILE_IMG;
+
         if(multipartFile != null) {
             // profileImg를 이미지 파일로 받았다면
             // TODO:
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
         } else if(request.getProfileImg() != null) {
             // profileImg를 이미지로 받지 않고, url로 받았다면
             profileImg = request.getProfileImg();
-        } // 그 외의 경우, default 이미지로 처리
+        }
 
         System.out.println(profileImg);
 
