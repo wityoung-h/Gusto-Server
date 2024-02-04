@@ -2,6 +2,7 @@ package com.umc.gusto.domain.user.controller;
 
 import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
+import com.umc.gusto.domain.user.model.response.ProfileRes;
 import com.umc.gusto.global.auth.model.Tokens;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -41,11 +42,11 @@ public class UserController {
 
     /**
      * 닉네임 중복 체크 API
-     * [POST] /users/check-nickname/{nickname}
+     * [GET] /users/check-nickname/{nickname}
      * @param nickname
      * @return -
      */
-    @PostMapping("/check-nickname/{nickname}")
+    @GetMapping("/check-nickname/{nickname}")
     public ResponseEntity checkNickname(@PathVariable("nickname")String nickname) {
         checkNickname(nickname);
 
@@ -65,5 +66,19 @@ public class UserController {
 
         return ResponseEntity.ok()
                 .build();
+    }
+
+    /**
+     * 먹스또 프로필 조회
+     * [GET] /users/{nickname}/profile
+     * @param nickname
+     * @return ProfileRes
+     */
+    @GetMapping("/{nickname}/profile")
+    public ResponseEntity<ProfileRes> retrieveProfile(@PathVariable("nickname") String nickname) {
+        ProfileRes profileRes = userService.getProfile(nickname);
+
+        return ResponseEntity.ok()
+                .body(profileRes);
     }
 }
