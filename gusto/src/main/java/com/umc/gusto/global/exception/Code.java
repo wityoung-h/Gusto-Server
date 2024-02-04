@@ -13,6 +13,7 @@ public enum Code {
 
     //User 관련 에러 +0
     USER_DUPLICATE_NICKNAME(HttpStatus.CONFLICT, 409101, "이미 사용중인 닉네임입니다."),
+    DONT_EXIST_USER(HttpStatus.NOT_FOUND, 404101, "존재하지 않는 유저입니다."),
 
     //Store 관련 에러 +1
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND, 404101, "존재하지 않는 가게입니다."),
@@ -35,7 +36,10 @@ public enum Code {
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, 401601, "유효하지 않은 토큰입니다."),
 
 
-    FOR_TEST_ERROR(HttpStatus.BAD_REQUEST,49999, "테스트용 에러");
+    FOR_TEST_ERROR(HttpStatus.BAD_REQUEST,49999, "테스트용 에러")
+
+
+    ;
 
     private final HttpStatus httpStatus;
     private final int code;
