@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,16 +20,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class S3Service {
 
     private final AmazonS3 amazonS3;
 
-
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
-
 
 
      // 파일 업로드 시 파일명을 난수화(중복 방지)하기 위해 random 으로 돌림
@@ -49,8 +49,28 @@ public class S3Service {
         }
     }
 
+    // MultipartFile 단일 이미지를 S3에 업로드
+    public String uploadImage(MultipartFile image) {
+        String fileName = createFileName(image.getOriginalFilename());
 
-     // MultipartFile 을 S3에 업로드
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(image.getSize());
+        objectMetadata.setContentType(image.getContentType());
+
+        try (InputStream inputStream = image.getInputStream()) {
+            amazonS3.putObject(
+                    new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
+                            .withCannedAcl(CannedAccessControlList.PublicRead));
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "파일 업로드에 실패했습니다.");
+        }
+        log.info("편리한 이미지 정보 확인 로그 :"+fileName);
+        return amazonS3.getUrl(bucket, fileName).toString();
+    }
+
+
+     // MultipartFile List 다수의 이미지를 S3에 업로드
      public List<String> uploadImages(List<MultipartFile> images) {
          List<String> fileUrlList = new ArrayList<>();
 
@@ -69,6 +89,7 @@ public class S3Service {
                          "파일 업로드에 실패했습니다.");
              }
              String fileUrl = amazonS3.getUrl(bucket, fileName).toString();
+             log.info("편리한 이미지 정보 확인 로그 :"+fileName);
              fileUrlList.add(fileUrl);
          });
 
@@ -78,7 +99,6 @@ public class S3Service {
     public void deleteImage(String fileName) {
         try {
             amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
-
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "파일 삭제에 실패하였습니다.");
