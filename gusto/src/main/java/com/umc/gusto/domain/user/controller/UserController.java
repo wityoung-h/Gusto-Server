@@ -41,11 +41,11 @@ public class UserController {
 
     /**
      * 닉네임 중복 체크 API
-     * [POST] /users/check-nickname/{nickname}
+     * [GET] /users/check-nickname/{nickname}
      * @param nickname
      * @return -
      */
-    @PostMapping("/check-nickname/{nickname}")
+    @GetMapping("/check-nickname/{nickname}")
     public ResponseEntity checkNickname(@PathVariable("nickname")String nickname) {
         checkNickname(nickname);
 
