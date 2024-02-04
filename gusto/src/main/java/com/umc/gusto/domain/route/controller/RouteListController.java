@@ -18,7 +18,7 @@ public class RouteListController {
 
     // 루르리스트 항목 삭제
     @DeleteMapping("/{routeListId}")
-    public ResponseEntity<?> deleteRouteLis(
+    public ResponseEntity deleteRouteLis(
             @PathVariable Long routeListId
     ){
         routeListService.deleteRouteList(routeListId);

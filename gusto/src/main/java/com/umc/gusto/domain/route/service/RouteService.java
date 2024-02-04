@@ -2,6 +2,7 @@ package com.umc.gusto.domain.route.service;
 
 import com.umc.gusto.domain.route.model.request.RouteRequest;
 import com.umc.gusto.domain.route.model.response.RouteResponse;
+import com.umc.gusto.domain.user.entity.User;
 
 import java.util.List;
 
@@ -13,6 +14,6 @@ public interface RouteService {
     void deleteRoute(Long routeId);
 
     // 내 루트 조회
-    List<RouteResponse.RouteResponseDto> getRoute(String nickname);
+    List<RouteResponse.RouteResponseDto> getRoute(User user);
 
 }

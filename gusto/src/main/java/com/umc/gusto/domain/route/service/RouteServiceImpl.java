@@ -8,7 +8,9 @@ import com.umc.gusto.domain.route.model.response.RouteResponse;
 import com.umc.gusto.domain.route.repository.RouteListRepository;
 import com.umc.gusto.domain.route.repository.RouteRepository;
 import com.umc.gusto.domain.user.entity.User;
-import com.umc.gusto.domain.user.repository.UserRepository;
+import com.umc.gusto.global.exception.Code;
+import com.umc.gusto.global.exception.GeneralException;
+import com.umc.gusto.global.exception.customException.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,13 +25,12 @@ public class RouteServiceImpl implements RouteService{
     private final GroupRepository groupRepository;
     private final RouteListRepository routeListRepository;
     private final RouteListServiceImpl routeListService;
-    private final UserRepository userRepository;
 
     @Override
     public void createRoute(RouteRequest.createRouteDto request) {
         // 루트명은 내 루트명 중에서 중복 불가능
         if (routeRepository.existsByRouteName(request.getRouteName())) {
-            throw new RuntimeException("루트명은 중복 불가로 입력하신 루트명은 이미 사용중인 루트명입니다.");
+            throw new GeneralException(Code.ROUTE_DUPLICATE_ROUTENAME);
         }
 
         // 루트 생성
@@ -45,7 +46,7 @@ public class RouteServiceImpl implements RouteService{
 
     @Override
     public void deleteRoute(Long routeId) {
-        Route route = routeRepository.findById(routeId).orElseThrow(() -> new RuntimeException("존재하지 않는 루트입니다."));
+        Route route = routeRepository.findById(routeId).orElseThrow(() -> new NotFoundException(Code.ROUTE_NOT_FOUND));
         //Route 삭제 시 RouteList 먼저 삭제
         List<RouteList> routeLists = routeListRepository.findAllByRoute(route);
         if(routeLists != null){
@@ -58,17 +59,15 @@ public class RouteServiceImpl implements RouteService{
     }
 
     @Override
-    public List<RouteResponse.RouteResponseDto> getRoute(String nickname) {
-        User user = userRepository.findByNicknameAndMemberStatus(nickname, User.MemberStatus.ACTIVE)
-                .orElseThrow(()-> new RuntimeException("존재하지 않는 회원입니다."));
+    public List<RouteResponse.RouteResponseDto> getRoute(User user) {
 
         List<Route> routes = routeRepository.findRouteByUser(user);
         return routes.stream().map(
-                Route -> RouteResponse.RouteResponseDto.builder()
-                        .routeId(Route.getRouteId())
-                        .routeName(Route.getRouteName())
-                        .numStore(routeListRepository.countRouteListByRoute(Route))
-                        .build())
+                        Route -> RouteResponse.RouteResponseDto.builder()
+                                .routeId(Route.getRouteId())
+                                .routeName(Route.getRouteName())
+                                .numStore(routeListRepository.countRouteListByRoute(Route))
+                                .build())
                 .collect(Collectors.toList());
     }
 
