@@ -46,6 +46,11 @@ public class OAuthService extends DefaultOAuth2UserService {
                      .socialStatus(Social.SocialStatus.WAITING_SIGN_UP)
                      .temporalToken(UUID.randomUUID())
                      .build());
+
+             if(oAuthAttributes.getNickname() == null) {
+                 oAuthAttributes.updateNickname(userService.generateRandomNickname());
+             }
+
         } else {
             info = socialInfo.get();
         }
@@ -58,21 +63,6 @@ public class OAuthService extends DefaultOAuth2UserService {
                 .delegate(oAuth2User)
                 .oAuthAttributes(oAuthAttributes)
                 .socialInfo(info)
-                .build();
-    }
-
-    public FirstLogInResponse generateFirstLogInRes(OAuthAttributes oAuthAttributes) {
-        String nickname = oAuthAttributes.getNickname();
-
-        if(nickname == null) {
-            nickname = userService.generateRandomNickname();
-        }
-
-        return FirstLogInResponse.builder()
-                .nickname(nickname)
-                .profileImg(oAuthAttributes.getProfileImg())
-                .gender(oAuthAttributes.getGender().name())
-                .age(oAuthAttributes.getAge().name())
                 .build();
     }
 }
