@@ -1,35 +1,34 @@
 package com.umc.gusto.global.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umc.gusto.domain.user.model.response.FirstLogInResponse;
-import jakarta.websocket.server.PathParam;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
+    private final ObjectMapper objectMapper;
 
     @GetMapping("/result/member")
-    public ResponseEntity returnLoginResult(@RequestHeader(name = "X-Auth-Token") String XAuthToken,
-                                            @RequestHeader(name = "refresh-Token") String refreshToken) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Auth-Token", XAuthToken);
-        headers.set("refresh-Token", refreshToken);
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .build();
+    public void returnLoginResult(HttpServletResponse response,
+                                  @RequestParam(name = "X-Auth-Token") String XAuthToken,
+                                  @RequestParam(name = "refresh-Token") String refreshToken) {
+        response.setHeader("X-Auth-Token", XAuthToken);
+        response.setHeader("refresh-Token", refreshToken);
     }
 
     @GetMapping("/result/new-user")
-    public ResponseEntity<FirstLogInResponse> returnLoginResult(@RequestHeader(name = "temp-token") String tempToken,
-                                                                @PathParam("nickname") String nickname,
-                                                                @PathParam("profileImg") String profileImg,
-                                                                @PathParam("gender") String gender,
-                                                                @PathParam("age") String age) {
-
+    public void returnLoginResult(HttpServletResponse response,
+                                  @RequestParam(name = "temp-token") String tempToken,
+                                  @RequestParam(value = "nickname") String nickname,
+                                  @RequestParam(value = "profileImg") String profileImg,
+                                  @RequestParam(value = "gender", required = false) String gender,
+                                  @RequestParam(value = "age", required = false) String age) throws IOException {
         FirstLogInResponse firstLogInResponse = FirstLogInResponse.builder()
                 .nickname(nickname)
                 .profileImg(profileImg)
@@ -37,8 +36,7 @@ public class AuthController {
                 .age(age)
                 .build();
 
-        return ResponseEntity.ok()
-                .header("temp-token", tempToken)
-                .body(firstLogInResponse);
+        response.setHeader("temp-token", tempToken);
+        response.getWriter().write(objectMapper.writeValueAsString(firstLogInResponse));
     }
 }
