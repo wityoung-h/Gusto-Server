@@ -7,6 +7,7 @@ import com.umc.gusto.global.auth.model.AuthUser;
 import com.umc.gusto.global.auth.model.Tokens;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -94,7 +95,7 @@ public class UserController {
     public ResponseEntity followUser(@AuthenticationPrincipal AuthUser authUser, @PathVariable("nickname") String nickname) {
         userService.followUser(authUser.getUser(), nickname);
 
-        return ResponseEntity.ok()
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .build();
     }
 
