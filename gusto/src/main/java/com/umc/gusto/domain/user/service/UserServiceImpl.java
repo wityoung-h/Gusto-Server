@@ -91,6 +91,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public void checkNickname(String nickname) {
         // redis 내 검색
         redisService.getValues(nickname).ifPresent(a -> {
@@ -109,6 +110,7 @@ public class UserServiceImpl implements UserService{
         redisService.setValuesWithTimeout(nickname, "null", NICKNAME_EXPIRED_TIME);
     }
 
+    @Override
     public String generateRandomNickname() {
         String nickname = null;
 
@@ -141,6 +143,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void followUser(User user, String nickname) {
         User target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
                 .orElseThrow(() -> new NotFoundException(Code.USER_NOT_FOUND));
