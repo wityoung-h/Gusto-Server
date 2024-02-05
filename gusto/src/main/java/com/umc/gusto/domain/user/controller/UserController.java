@@ -85,16 +85,17 @@ public class UserController {
     }
 
     /**
-     * 팔로잉
+     * 팔로우
      * [POST] /users/follow/{nickname}
      * @param nickname
-     * @return ProfileRes
+     * @return -
      */
-    @PostMapping("/users/follow/{nickname}")
+    @PostMapping("/follow/{nickname}")
     public ResponseEntity followUser(@AuthenticationPrincipal AuthUser authUser, @PathVariable("nickname") String nickname) {
         userService.followUser(authUser.getUser(), nickname);
 
         return ResponseEntity.ok()
                 .build();
     }
+
 }
