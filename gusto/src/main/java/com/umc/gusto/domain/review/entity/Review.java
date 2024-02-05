@@ -108,4 +108,21 @@ public class Review extends BaseEntity {
     public void updateStatus(Status status){
         this.status = status;
     }
+
+    //TODO: image를 리뷰엔티티가 아닌 file엔티티(photo)로 구분해서 만드는게 나을듯
+    public void updateImg1(String img1){
+        this.img1 = img1;
+    }
+
+    public void updateImg2(String img2){
+        this.img2 = img2;
+    }
+
+    public void updateImg3(String img3){
+        this.img3 = img3;
+    }
+
+    public void updateImg4(String img4){
+        this.img4 = img4;
+    }
 }

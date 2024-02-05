@@ -15,9 +15,13 @@ import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.customException.NoPermission;
 import com.umc.gusto.global.exception.customException.NotFoundException;
+import com.umc.gusto.global.util.S3Service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +29,7 @@ public class ReviewServiceImpl implements ReviewService{
     private final ReviewRepository reviewRepository;
     private final StoreRepository storeRepository;
     private final HashTagRepository hashTagRepository;
+    private final S3Service s3Service;
 
     public void validateReviewByUser(final User user, final Long reviewId){
         if(!reviewRepository.existsByReviewIdAndUser(reviewId, user)){
@@ -33,7 +38,7 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public void createReview(User user, CreateReviewRequest createReviewRequest) {
+    public void createReview(User user, List<MultipartFile> images, CreateReviewRequest createReviewRequest) {
         Store store= storeRepository.findById(createReviewRequest.getStoreId()).orElseThrow(()-> new NotFoundException(Code.STORE_NOT_FOUND));
 
         //리뷰 생성
@@ -50,6 +55,12 @@ public class ReviewServiceImpl implements ReviewService{
                 .comment(createReviewRequest.getComment())
                 .build();
 
+        //TODO: review 엔티티에서 이미지를 분리하거나 monogoDB를 쓰는게 나을 듯, 나머지 기능 개발 후 바꿀 예정
+        //s3에 이미지 저장
+        if(!images.isEmpty()){
+            updateImages(images, review);
+        }
+
         //리뷰와 해시태그 연결
         String[] hashTags = createReviewRequest.getHashTagId().split(",");
         connectHashTag(review, hashTags);
@@ -59,14 +70,13 @@ public class ReviewServiceImpl implements ReviewService{
 
     @Override
     @Transactional
-    public void updateReview(Long reviewId, UpdateReviewRequest updateReviewRequest) {
+    public void updateReview(Long reviewId, List<MultipartFile> images, UpdateReviewRequest updateReviewRequest) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
 
         //방문일자 변경
         if(updateReviewRequest.getVisitedAt()!=null){
             review.updateVisitedAt(updateReviewRequest.getVisitedAt());
         }
-        //TODO: 이미지 사진 변경
 
         //메뉴명 변경
         if(updateReviewRequest.getMenuName()!=null){
@@ -101,6 +111,10 @@ public class ReviewServiceImpl implements ReviewService{
         if(updateReviewRequest.getComment()!=null){
             review.updateComment(updateReviewRequest.getComment());
         }
+        if(!images.isEmpty()){
+            //TODO: review 엔티티에서 이미지를 분리하거나 monogoDB를 쓰는게 나을 듯, 나머지 기능 개발 후 바꿀 예정
+            updateImages(images, review);
+        }
 
         reviewRepository.save(review);
     }
@@ -128,6 +142,14 @@ public class ReviewServiceImpl implements ReviewService{
                     .build();
             review.connectHashTag(tagging);
         }
+    }
+
+    private void updateImages(List<MultipartFile> images, Review review){
+        List<String> imageUrls = s3Service.uploadImages(images);
+        review.updateImg1(imageUrls.get(0));
+        if(imageUrls.size()>1) review.updateImg2(imageUrls.get(1));
+        if(imageUrls.size()>2) review.updateImg3(imageUrls.get(2));
+        if(imageUrls.size()>3) review.updateImg4(imageUrls.get(3));
     }
 
 }
