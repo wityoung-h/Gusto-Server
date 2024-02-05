@@ -6,6 +6,7 @@ import com.umc.gusto.domain.group.service.GroupService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +26,8 @@ public class GroupController {
     @PostMapping
     public ResponseEntity<GroupResponseDto.PostGroupResponseDto> createGroup(@AuthenticationPrincipal AuthUser authUser, @RequestBody GroupRequestDto.CreateGroupDTO createGroupDTO){
         User owner = authUser.getUser();
-        GroupResponseDto.PostGroupResponseDto newGroup = groupService.createGroup(owner, createGroupDTO);
-        return ResponseEntity.ok().body(newGroup);
+        groupService.createGroup(owner, createGroupDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
