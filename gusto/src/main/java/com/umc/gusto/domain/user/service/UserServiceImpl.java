@@ -12,6 +12,7 @@ import com.umc.gusto.global.auth.model.Tokens;
 import com.umc.gusto.global.config.secret.JwtConfig;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
+import com.umc.gusto.global.exception.customException.NotFoundException;
 import com.umc.gusto.global.util.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -95,7 +96,7 @@ public class UserServiceImpl implements UserService{
 
         // DB 내 검색
         if(userRepository.countUsersByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE) > 0) {
-            throw new RuntimeException("이미 사용중인 닉네임입니다.");
+            throw new GeneralException(Code.USER_DUPLICATE_NICKNAME);
         }
     }
 
@@ -132,7 +133,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public ProfileRes getProfile(String nickname) {
         User user = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
-                .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
+                .orElseThrow(() -> new NotFoundException(Code.USER_NOT_FOUND));
         return new ProfileRes(user.getNickname(), user.getReviewCnt(), user.getPinCnt(), user.getFollower());
     }
 
