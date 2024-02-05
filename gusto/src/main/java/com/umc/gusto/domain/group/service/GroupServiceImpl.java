@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class GroupServiceImpl implements GroupService{
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
 
-    @Transactional
     public GroupResponseDto.PostGroupResponseDto createGroup(User owner, GroupRequestDto.CreateGroupDTO createGroupDTO){
         Group group = Group.builder()
                 .groupName(createGroupDTO.getGroupName())
@@ -63,7 +63,6 @@ public class GroupServiceImpl implements GroupService{
                 .build();
     }
 
-    @Transactional
     public GroupResponseDto.UpdateGroupResponseDto updateGroup(User owner, Long groupId, GroupRequestDto.UpdateGroupDTO updateGroupDTO){
         Group group = groupRepository.findGroupByGroupId(groupId)
                 .orElseThrow(()->new RuntimeException("Group not found"));
@@ -89,11 +88,10 @@ public class GroupServiceImpl implements GroupService{
                 .build();
     }
 
-    @Transactional
     public void deleteGroup(User owner, Long groupId){
         Group group = groupRepository.findGroupByGroupId(groupId)
                 .orElseThrow(()->new RuntimeException("Group not found"));
-        if(group.getOwner().getUserid().equals(owner.getUserid())){
+        if(group.getOwner().getUserId().equals(owner.getUserId())){
             // 그룹의 가게, 루트 모두 삭제 (추후 코드 추가 예정)
 
             // 그룹 삭제
