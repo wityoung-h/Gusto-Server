@@ -3,10 +3,12 @@ package com.umc.gusto.domain.user.controller;
 import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.response.ProfileRes;
+import com.umc.gusto.global.auth.model.AuthUser;
 import com.umc.gusto.global.auth.model.Tokens;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -80,5 +82,18 @@ public class UserController {
 
         return ResponseEntity.ok()
                 .body(profileRes);
+    }
+
+    /**
+     * 팔로잉
+     * [POST] /users/follow/{nickname}
+     * @param nickname
+     * @return ProfileRes
+     */
+    @PostMapping("/users/follow/{nickname}")
+    public ResponseEntity followUser(@AuthenticationPrincipal AuthUser authUser, @PathVariable("nickname") String nickname) {
+
+        return ResponseEntity.ok()
+                .build();
     }
 }

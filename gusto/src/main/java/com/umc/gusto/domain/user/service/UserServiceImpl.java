@@ -135,4 +135,9 @@ public class UserServiceImpl implements UserService{
                 .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
         return new ProfileRes(user.getNickname(), user.getReviewCnt(), user.getPinCnt(), user.getFollower());
     }
+
+    @Override
+    public void followUser(User user, String nickname) {
+
+    }
 }
