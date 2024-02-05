@@ -155,4 +155,9 @@ public class UserServiceImpl implements UserService{
 
         followRepository.save(newFollow);
     }
+
+    @Override
+    public void unfollowUser(User user, String nickname) {
+
+    }
 }

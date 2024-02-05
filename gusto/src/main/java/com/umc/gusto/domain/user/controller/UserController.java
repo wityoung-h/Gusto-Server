@@ -99,4 +99,17 @@ public class UserController {
                 .build();
     }
 
+
+    /**
+     * 언팔로우
+     * [DELETE] /users/unfollow/{nickname}
+     * @param nickname
+     * @return -
+     */
+    @DeleteMapping("/unfollow/{nickname}")
+    public ResponseEntity unfollow(@AuthenticationPrincipal AuthUser authUser, @PathVariable("nickname") String nickname) {
+
+        return ResponseEntity.status(HttpStatus.RESET_CONTENT)
+                .build();
+    }
 }

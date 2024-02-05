@@ -25,4 +25,7 @@ public interface UserService {
 
     // 팔로우
     void followUser(User user, String nickname);
+
+    // 언팔로우
+    void unfollowUser(User user, String nickname);
 }
