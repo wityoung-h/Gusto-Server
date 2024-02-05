@@ -108,6 +108,7 @@ public class UserController {
      */
     @DeleteMapping("/unfollow/{nickname}")
     public ResponseEntity unfollow(@AuthenticationPrincipal AuthUser authUser, @PathVariable("nickname") String nickname) {
+        userService.unfollowUser(authUser.getUser(), nickname);
 
         return ResponseEntity.status(HttpStatus.RESET_CONTENT)
                 .build();

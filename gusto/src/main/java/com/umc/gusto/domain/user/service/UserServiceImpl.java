@@ -158,6 +158,12 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void unfollowUser(User user, String nickname) {
+        User target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
+                .orElseThrow(() -> new NotFoundException(Code.USER_NOT_FOUND));
 
+        Follow followInfo = followRepository.findByFollower_UserIdAndFollowing_UserId(user.getUserId(), target.getUserId())
+                .orElseThrow(() -> new NotFoundException(Code.USER_FOLLOW_NOT_FOUND));
+
+        followRepository.delete(followInfo);
     }
 }
