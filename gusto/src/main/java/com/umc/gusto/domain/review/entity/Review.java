@@ -2,7 +2,7 @@ package com.umc.gusto.domain.review.entity;
 
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.user.entity.User;
-import com.umc.gusto.global.common.BaseTime;
+import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.common.PublishStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,7 +16,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Review extends BaseTime {
+public class Review extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -103,5 +103,9 @@ public class Review extends BaseTime {
 
     public void updateComment(String comment){
         this.comment = comment;
+    }
+
+    public void updateStatus(Status status){
+        this.status = status;
     }
 }

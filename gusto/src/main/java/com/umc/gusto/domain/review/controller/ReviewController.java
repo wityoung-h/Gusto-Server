@@ -48,7 +48,6 @@ public class ReviewController {
         User user = authUser.getUser();
         reviewService.validateReviewByUser(user, reviewId);
         reviewService.deleteReview(reviewId);
-        //TODO: 응답 형식 맞추기
         return ResponseEntity.ok().build();
     }
 
