@@ -1,6 +1,7 @@
 package com.umc.gusto.domain.review.controller;
 
-import com.umc.gusto.domain.review.model.request.ReviewRequest;
+import com.umc.gusto.domain.review.model.request.CreateReviewRequest;
+import com.umc.gusto.domain.review.model.request.UpdateReviewRequest;
 import com.umc.gusto.domain.review.service.ReviewService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
@@ -20,9 +21,9 @@ public class ReviewController {
      * 리뷰 생성
      */
     @PostMapping
-    public ResponseEntity<?> createReview(@AuthenticationPrincipal AuthUser authUser, @RequestPart(name = "img", required = false) MultipartFile multipartFile, @RequestBody @Valid ReviewRequest.createReviewDTO createReviewDTO){
+    public ResponseEntity<?> createReview(@AuthenticationPrincipal AuthUser authUser, @RequestPart(name = "img", required = false) MultipartFile multipartFile, @RequestBody @Valid CreateReviewRequest createReviewRequest){
         User user = authUser.getUser();
-        reviewService.createReview(user, createReviewDTO);
+        reviewService.createReview(user, createReviewRequest);
         //TODO: 응답 형식 맞추기
         return ResponseEntity.ok().build();
     }
@@ -31,10 +32,10 @@ public class ReviewController {
      * 리뷰 수정
      */
     @PatchMapping("{reviewId}")
-    public ResponseEntity<?> updateReview(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long reviewId, @RequestPart(name = "img", required = false) MultipartFile multipartFile, @RequestBody @Valid ReviewRequest.updateReviewDTO updateReviewDTO){
+    public ResponseEntity<?> updateReview(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long reviewId, @RequestPart(name = "img", required = false) MultipartFile multipartFile, @RequestBody @Valid UpdateReviewRequest updateReviewRequest){
         User user = authUser.getUser();
         reviewService.validateReviewByUser(user, reviewId);
-        reviewService.updateReview(reviewId, updateReviewDTO);
+        reviewService.updateReview(reviewId, updateReviewRequest);
         //TODO: 응답 형식 맞추기
         return ResponseEntity.ok().build();
     }
