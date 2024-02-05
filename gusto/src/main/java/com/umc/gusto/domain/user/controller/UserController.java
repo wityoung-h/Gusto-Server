@@ -92,6 +92,7 @@ public class UserController {
      */
     @PostMapping("/users/follow/{nickname}")
     public ResponseEntity followUser(@AuthenticationPrincipal AuthUser authUser, @PathVariable("nickname") String nickname) {
+        userService.followUser(authUser.getUser(), nickname);
 
         return ResponseEntity.ok()
                 .build();

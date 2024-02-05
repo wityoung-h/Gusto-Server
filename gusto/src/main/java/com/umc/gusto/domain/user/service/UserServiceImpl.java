@@ -1,10 +1,12 @@
 package com.umc.gusto.domain.user.service;
 
+import com.umc.gusto.domain.user.entity.Follow;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.NicknameBucket;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.response.ProfileRes;
+import com.umc.gusto.domain.user.repository.FollowRepository;
 import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.auth.JwtService;
@@ -31,6 +33,7 @@ public class UserServiceImpl implements UserService{
     private final SocialRepository socialRepository;
     private final JwtService jwtService;
     private final RedisService redisService;
+    private final FollowRepository followRepository;
 
     private static final long NICKNAME_EXPIRED_TIME = 1000L * 60 * 15;
     private int MAX_NICKNAME_NUMBER = 999;
@@ -139,6 +142,14 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void followUser(User user, String nickname) {
+        User target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
+                .orElseThrow(() -> new NotFoundException(Code.USER_NOT_FOUND));
 
+        Follow newFollow = Follow.builder()
+                .follower(user)
+                .following(target)
+                .build();
+
+        followRepository.save(newFollow);
     }
 }
