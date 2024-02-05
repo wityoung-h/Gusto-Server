@@ -19,6 +19,7 @@ import java.io.IOException;
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private final ObjectMapper objectMapper;
     private final JwtService jwtService;
+    private final OAuthService oAuthService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -28,7 +29,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             response.setCharacterEncoding("utf-8");
 
             if(socialInfo.getSocialStatus() == Social.SocialStatus.CONNECTED){
-                String userUUID = String.valueOf(socialInfo.getUser().getUserid());
+                String userUUID = String.valueOf(socialInfo.getUser().getUserId());
 
                 Tokens tokens = jwtService.createAndSaveTokens(userUUID);
                 
@@ -44,7 +45,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             response.setHeader("temp-token", String.valueOf(socialInfo.getTemporalToken()));
 
             // TODO: 차후 응답 코드 형태 맞춰 리팩토링할 것
-            String body = objectMapper.writeValueAsString(oAuth2User.getOAuthAttributes());
+            String body = objectMapper.writeValueAsString(
+                    oAuthService.generateFirstLogInRes(oAuth2User.getOAuthAttributes())
+            );
 
             response.getWriter().write(body);
         }

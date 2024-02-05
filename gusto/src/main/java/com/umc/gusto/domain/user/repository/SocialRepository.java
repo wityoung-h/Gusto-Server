@@ -1,4 +1,4 @@
-package com.umc.gusto.domain.user;
+package com.umc.gusto.domain.user.repository;
 
 import com.umc.gusto.domain.user.entity.Social;
 import org.springframework.data.jpa.repository.JpaRepository;

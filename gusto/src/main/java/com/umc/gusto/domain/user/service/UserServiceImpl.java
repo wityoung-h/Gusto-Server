@@ -1,12 +1,17 @@
-package com.umc.gusto.domain.user;
+package com.umc.gusto.domain.user.service;
 
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.model.NicknameBucket;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
+import com.umc.gusto.domain.user.model.response.ProfileRes;
+import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.auth.JwtService;
 import com.umc.gusto.global.auth.model.Tokens;
 import com.umc.gusto.global.config.secret.JwtConfig;
+import com.umc.gusto.global.exception.Code;
+import com.umc.gusto.global.exception.GeneralException;
 import com.umc.gusto.global.util.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +30,10 @@ public class UserServiceImpl implements UserService{
     private final SocialRepository socialRepository;
     private final JwtService jwtService;
     private final RedisService redisService;
+
     private static final long NICKNAME_EXPIRED_TIME = 1000L * 60 * 15;
+    private int MAX_NICKNAME_NUMBER = 999;
+    private int MIN_NICKNAME_NUMBER = 1;
 
 
     @Value("${default.img.url.profile}")
@@ -37,7 +45,7 @@ public class UserServiceImpl implements UserService{
     public Tokens createUser(String tempToken, MultipartFile multipartFile, SignUpRequest request) {
         // temp token을 사용하여 social 정보 가져오기
         UUID socialUID = UUID.fromString(tempToken);
-        Social socialInfo = socialRepository.findByTemporalToken(socialUID).orElseThrow(() -> new RuntimeException("유효하지 않은 토큰입니다."));
+        Social socialInfo = socialRepository.findByTemporalToken(socialUID).orElseThrow(() -> new GeneralException(Code.INVALID_ACCESS_TOKEN));
 
         redisService.deleteValues(request.getNickname());
         checkNickname(request.getNickname());
@@ -57,7 +65,7 @@ public class UserServiceImpl implements UserService{
 
         // user 생성
         User user = User.builder()
-                .userid(UUID.randomUUID())
+                .userId(UUID.randomUUID())
                 .nickname(request.getNickname())
                 .gender(User.Gender.valueOf(request.getGender()))
                 .age(User.Age.valueOf(request.getAge()))
@@ -72,8 +80,8 @@ public class UserServiceImpl implements UserService{
         socialRepository.save(socialInfo);
 
         // access-token 및 refresh-token 생성
-        Tokens tokens = jwtService.createToken(String.valueOf(user.getUserid()));
-        redisService.setValuesWithTimeout(tokens.getRefreshToken(), String.valueOf(user.getUserid()), JwtConfig.REFRESH_TOKEN_VALID_TIME);
+        Tokens tokens = jwtService.createToken(String.valueOf(user.getUserId()));
+        redisService.setValuesWithTimeout(tokens.getRefreshToken(), String.valueOf(user.getUserId()), JwtConfig.REFRESH_TOKEN_VALID_TIME);
 
         return tokens;
     }
@@ -82,7 +90,7 @@ public class UserServiceImpl implements UserService{
     public void checkNickname(String nickname) {
         // redis 내 검색
         redisService.getValues(nickname).ifPresent(a -> {
-            throw new RuntimeException("이미 사용중인 닉네임입니다.");
+            throw new GeneralException(Code.USER_DUPLICATE_NICKNAME);
         });
 
         // DB 내 검색
@@ -97,5 +105,34 @@ public class UserServiceImpl implements UserService{
         redisService.setValuesWithTimeout(nickname, "null", NICKNAME_EXPIRED_TIME);
     }
 
+    public String generateRandomNickname() {
+        String nickname = null;
 
+        // 중복 없는 닉네임이 생성될 때까지 반복
+        while (true) {
+            try {
+                // 단어 두 개 선택
+                String[] nicknames = NicknameBucket.getNicknames();
+
+                // MIN_NICKNAME_NUMBER : 1 ~ MAX_NICKNAME_NUMBER : 999 까지 수 중 랜덤 수 생성
+                int random = (int) (Math.random() * (MAX_NICKNAME_NUMBER - MIN_NICKNAME_NUMBER) + MIN_NICKNAME_NUMBER);
+
+                nickname = nicknames[0] + " " + nicknames[1] + " " + String.valueOf(random);
+
+                checkNickname(nickname);
+            } catch (RuntimeException e) {
+                continue;
+            }
+            break;
+        }
+
+        return nickname;
+    }
+
+    @Override
+    public ProfileRes getProfile(String nickname) {
+        User user = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
+        return new ProfileRes(user.getNickname(), user.getReviewCnt(), user.getPinCnt(), user.getFollower());
+    }
 }
