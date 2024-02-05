@@ -11,4 +11,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long > {
     Optional<Review> findTopByStoreOrderByLikedDesc(Store store);
     Integer countByStoreAndUser(Store store, User user);
     boolean existsByReviewIdAndUser(Long reviewId, User user);
+    Integer countByStoreAndUserNickname(Store store, String nickname);
 }

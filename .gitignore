@@ -80,6 +80,9 @@ local.properties
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.idea/**/deployment.xml
+.idea/**/sshConfigs.xml
+.idea/**/webServers.xml
 
 # AWS User-specific
 .idea/**/aws.xml

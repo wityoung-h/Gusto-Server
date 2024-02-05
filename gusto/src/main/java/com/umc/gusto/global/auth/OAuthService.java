@@ -1,7 +1,7 @@
 package com.umc.gusto.global.auth;
 
-import com.umc.gusto.domain.user.SocialRepository;
-import com.umc.gusto.domain.user.UserService;
+import com.umc.gusto.domain.user.repository.SocialRepository;
+import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.model.response.FirstLogInResponse;
 import com.umc.gusto.global.auth.model.CustomOAuth2User;
@@ -68,9 +68,11 @@ public class OAuthService extends DefaultOAuth2UserService {
             nickname = userService.generateRandomNickname();
         }
 
-        return new FirstLogInResponse(nickname,
-                oAuthAttributes.getProfileImg(),
-                oAuthAttributes.getGender().name(),
-                oAuthAttributes.getAge().name());
+        return FirstLogInResponse.builder()
+                .nickname(nickname)
+                .profileImg(oAuthAttributes.getProfileImg())
+                .gender(oAuthAttributes.getGender().name())
+                .age(oAuthAttributes.getAge().name())
+                .build();
     }
 }
