@@ -2,10 +2,12 @@ package com.umc.gusto.domain.group.service;
 
 import com.umc.gusto.domain.group.entity.Group;
 import com.umc.gusto.domain.group.entity.GroupMember;
-import com.umc.gusto.domain.group.model.request.GroupRequestDto;
-import com.umc.gusto.domain.group.model.response.GroupMemberResponseDto;
-import com.umc.gusto.domain.group.model.response.GroupResponseDto;
-import com.umc.gusto.domain.group.repository.GroupListRepository;
+import com.umc.gusto.domain.group.model.request.PostGroupRequest;
+import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
+import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
+import com.umc.gusto.domain.group.model.response.GetGroupResponse;
+import com.umc.gusto.domain.group.model.response.PostGroupResponse;
+import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.user.entity.User;
@@ -24,10 +26,10 @@ public class GroupServiceImpl implements GroupService{
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
 
-    public GroupResponseDto.PostGroupResponseDto createGroup(User owner, GroupRequestDto.CreateGroupDTO createGroupDTO){
+    public void createGroup(User owner, PostGroupRequest postGroupRequest){
         Group group = Group.builder()
-                .groupName(createGroupDTO.getGroupName())
-                .groupScript(createGroupDTO.getGroupScript())
+                .groupName(postGroupRequest.getGroupName())
+                .groupScript(postGroupRequest.getGroupScript())
                 .owner(owner)
                 .notice("멤버들에게 새로운 공지사항을 공유해보세요!")
                 .build();
@@ -37,23 +39,22 @@ public class GroupServiceImpl implements GroupService{
                 .user(owner)
                 .build();
         groupMemberRepository.save(ownerMember);
-        return new GroupResponseDto.PostGroupResponseDto(savedGroup.getGroupId(), savedGroup.getGroupName(), savedGroup.getGroupScript());
     }
 
     @Transactional(readOnly = true)
-    public GroupResponseDto.GetGroupResponseDto getGroup(Long groupId){
+    public GetGroupResponse getGroup(Long groupId){
         Group group = groupRepository.findGroupByGroupId(groupId)
                 .orElseThrow(()->new RuntimeException("Group not found"));
         Long ownerMemberId = groupMemberRepository.findGroupMemberIdByGroupAndUser(group, group.getOwner());
         List<GroupMember> groupMembers = groupMemberRepository.findGroupMembersByGroup(group);
-        List<GroupMemberResponseDto.GetGroupMemberResponseDto> groupMembersDto = groupMembers.stream()
-                .map(member -> new GroupMemberResponseDto.GetGroupMemberResponseDto(
+        List<GetGroupMemberResponse> groupMembersDto = groupMembers.stream()
+                .map(member -> new GetGroupMemberResponse(
                         member.getGroupMemberId(),
                         member.getUser().getNickname(),
                         member.getUser().getProfileImage()
                 ))
                 .collect(Collectors.toList());
-        return GroupResponseDto.GetGroupResponseDto.builder()
+        return GetGroupResponse.builder()
                 .groupId(group.getGroupId())
                 .groupName(group.getGroupName())
                 .groupScript(group.getGroupScript())
@@ -63,23 +64,23 @@ public class GroupServiceImpl implements GroupService{
                 .build();
     }
 
-    public GroupResponseDto.UpdateGroupResponseDto updateGroup(User owner, Long groupId, GroupRequestDto.UpdateGroupDTO updateGroupDTO){
+    public UpdateGroupResponse updateGroup(User owner, Long groupId, UpdateGroupRequest updateGroupRequest){
         Group group = groupRepository.findGroupByGroupId(groupId)
                 .orElseThrow(()->new RuntimeException("Group not found"));
         Long ownerMemberId = groupMemberRepository.findGroupMemberIdByGroupAndUser(group, group.getOwner());
 
         // 그룹 이름 수정 (owner만 수정 가능)
-        if(owner.equals(group.getOwner()) && updateGroupDTO.getGroupName() != null){
-            group.updateGroupName(updateGroupDTO.getGroupName());
+        if(owner.equals(group.getOwner()) && updateGroupRequest.getGroupName() != null){
+            group.updateGroupName(updateGroupRequest.getGroupName());
         }
 
         //그룹 공지 수정
-        if(updateGroupDTO.getNotice() != null){
-            group.updateNotice(updateGroupDTO.getNotice());
+        if(updateGroupRequest.getNotice() != null){
+            group.updateNotice(updateGroupRequest.getNotice());
         }
 
         groupRepository.save(group);
-        return GroupResponseDto.UpdateGroupResponseDto.builder()
+        return UpdateGroupResponse.builder()
                 .groupId(group.getGroupId())
                 .groupName(group.getGroupName())
                 .groupScript(group.getGroupScript())
