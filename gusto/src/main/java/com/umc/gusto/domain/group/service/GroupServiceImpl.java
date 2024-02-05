@@ -93,7 +93,7 @@ public class GroupServiceImpl implements GroupService{
     public void deleteGroup(User owner, Long groupId){
         Group group = groupRepository.findGroupByGroupId(groupId)
                 .orElseThrow(()->new RuntimeException("Group not found"));
-        if(group.getOwner().getUserid().equals(owner.getUserid())){
+        if(group.getOwner().getUserId().equals(owner.getUserId())){
             // 그룹의 가게, 루트 모두 삭제 (추후 코드 추가 예정)
 
             // 그룹 삭제
