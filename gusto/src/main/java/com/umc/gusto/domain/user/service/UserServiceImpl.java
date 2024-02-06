@@ -4,6 +4,7 @@ import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.NicknameBucket;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
+import com.umc.gusto.domain.user.model.response.ProfileRes;
 import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.auth.JwtService;
@@ -24,7 +25,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final SocialRepository socialRepository;
     private final JwtService jwtService;
@@ -36,8 +37,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Value("${default.img.url.profile}")
-    private static String DEFAULT_IMG;
-
+    private static String DEFAULT_PROFILE_IMG;
 
     @Override
     @Transactional
@@ -49,8 +49,8 @@ public class UserServiceImpl implements UserService {
         redisService.deleteValues(request.getNickname());
         checkNickname(request.getNickname());
 
-        String profileImg = DEFAULT_IMG;
-        
+        String profileImg = DEFAULT_PROFILE_IMG;
+
         if(multipartFile != null) {
             // profileImg를 이미지 파일로 받았다면
             // TODO:
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
         } else if(request.getProfileImg() != null) {
             // profileImg를 이미지로 받지 않고, url로 받았다면
             profileImg = request.getProfileImg();
-        } // 그 외의 경우, default 이미지로 처리
+        }
 
         System.out.println(profileImg);
 
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
 
         // DB 내 검색
         if(userRepository.countUsersByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE) > 0) {
-            throw new GeneralException(Code.USER_DUPLICATE_NICKNAME);
+            throw new RuntimeException("이미 사용중인 닉네임입니다.");
         }
     }
 
@@ -126,5 +126,12 @@ public class UserServiceImpl implements UserService {
         }
 
         return nickname;
+    }
+
+    @Override
+    public ProfileRes getProfile(String nickname) {
+        User user = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
+        return new ProfileRes(user.getNickname(), user.getReviewCnt(), user.getPinCnt(), user.getFollower());
     }
 }
