@@ -23,7 +23,11 @@ public class MyCategoryController {
     public ResponseEntity<List<MyCategoryResponse.MyCategory>> allMyCategory(
             @PathVariable String nickname) {
             List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryService.getAllMyCategory(nickname);
+<<<<<<< HEAD
             return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
+=======
+            return ResponseEntity.ok().body(myCategoryList);
+>>>>>>> 3643ab7f95b1bc8b34794edbee1c58b41b53f799
 
     }
 
@@ -33,7 +37,11 @@ public class MyCategoryController {
             @RequestParam(name = "townName") String townName) {
             User user = authUser.getUser();
             List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryService.getAllMyCategoryWithLocation(user, townName);
+<<<<<<< HEAD
             return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
+=======
+            return ResponseEntity.ok().body(myCategoryList);
+>>>>>>> 3643ab7f95b1bc8b34794edbee1c58b41b53f799
     }
 
     @GetMapping("/pins/{nickname}")
@@ -41,7 +49,11 @@ public class MyCategoryController {
             @RequestParam(name = "myCategoryId") Long myCategoryId,
             @PathVariable String nickname) {
             List<MyCategoryResponse.PinByMyCategory> myStoreList = myCategoryService.getAllPinByMyCategory(nickname, myCategoryId);
+<<<<<<< HEAD
             return ResponseEntity.status(HttpStatus.OK).body(myStoreList);
+=======
+            return ResponseEntity.ok().body(myStoreList);
+>>>>>>> 3643ab7f95b1bc8b34794edbee1c58b41b53f799
     }
 
     @GetMapping("/pins")
@@ -51,7 +63,11 @@ public class MyCategoryController {
             @RequestParam(name = "townName") String townName) {
             User user = authUser.getUser();
             List<MyCategoryResponse.PinByMyCategory> myCategoryList = myCategoryService.getAllPinByMyCategoryWithLocation(user, myCategoryId,townName);
+<<<<<<< HEAD
             return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
+=======
+            return ResponseEntity.ok().body(myCategoryList);
+>>>>>>> 3643ab7f95b1bc8b34794edbee1c58b41b53f799
     }
 
 
@@ -61,6 +77,10 @@ public class MyCategoryController {
             @RequestBody MyCategoryRequest.createMyCategory createMyCategory
     ) {
             User user = authUser.getUser();
+<<<<<<< HEAD
+=======
+            // 여기서 createMyCategoryDTO를 사용하여 새로운 MyCategory를 생성하는 로직을 구현합니다.
+>>>>>>> 3643ab7f95b1bc8b34794edbee1c58b41b53f799
             myCategoryService.createMyCategory(user, createMyCategory);
 
             return ResponseEntity.status(HttpStatus.CREATED).build();
