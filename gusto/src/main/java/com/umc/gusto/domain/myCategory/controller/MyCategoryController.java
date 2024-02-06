@@ -6,6 +6,8 @@ import com.umc.gusto.domain.myCategory.service.MyCategoryService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +24,7 @@ public class MyCategoryController {
     public ResponseEntity<List<MyCategoryResponse.MyCategory>> allMyCategory(
             @PathVariable String nickname) {
             List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryCommandService.getAllMyCategory(nickname);
-            return ResponseEntity.ok().body(myCategoryList);
+            return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
 
     }
 
@@ -32,7 +34,7 @@ public class MyCategoryController {
             @RequestParam(name = "townName") String townName) {
             User user = authUser.getUser();
             List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryCommandService.getAllMyCategoryWithLocation(user, townName);
-            return ResponseEntity.ok().body(myCategoryList);
+            return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
     }
 
     @GetMapping("/pins/{nickname}")
@@ -40,7 +42,7 @@ public class MyCategoryController {
             @RequestParam(name = "myCategoryId") Long myCategoryId,
             @PathVariable String nickname) {
             List<MyCategoryResponse.PinByMyCategory> myStoreList = myCategoryCommandService.getAllPinByMyCategory(nickname, myCategoryId);
-            return ResponseEntity.ok().body(myStoreList);
+            return ResponseEntity.status(HttpStatus.OK).body(myStoreList);
     }
 
     @GetMapping("/pins")
@@ -50,7 +52,7 @@ public class MyCategoryController {
             @RequestParam(name = "townName") String townName) {
             User user = authUser.getUser();
             List<MyCategoryResponse.PinByMyCategory> myCategoryList = myCategoryCommandService.getAllPinByMyCategoryWithLocation(user, myCategoryId,townName);
-            return ResponseEntity.ok().body(myCategoryList);
+            return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
     }
 
 
@@ -62,7 +64,7 @@ public class MyCategoryController {
             User user = authUser.getUser();
             myCategoryCommandService.createMyCategory(user, createMyCategory);
 
-            return ResponseEntity.ok().build();
+            return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
 
@@ -75,7 +77,7 @@ public class MyCategoryController {
         User user = authUser.getUser();
         myCategoryCommandService.modifyMyCategory(user, myCategoryId, request);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
     @DeleteMapping("")
@@ -85,7 +87,7 @@ public class MyCategoryController {
             User user = authUser.getUser();
             myCategoryCommandService.deleteMyCategories(user, myCategoryIds);
 
-            return ResponseEntity.ok().build();
+            return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 }
