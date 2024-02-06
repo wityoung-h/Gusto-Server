@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.sql.Time;
 import java.time.LocalTime;
 
 public class StoreResponse {
@@ -17,9 +19,9 @@ public class StoreResponse {
         Long storeId;
         String storeName;
         String address;
-        OpeningHours.BusinessDay businessDay;
-        LocalTime openedAt;
-        LocalTime closedAt;
+//        List<> businessDay;
+        Time openedAt;
+        Time closedAt;
         String contact;
 //        List<> reviewImg;
         Boolean pin;        // 찜 여부
