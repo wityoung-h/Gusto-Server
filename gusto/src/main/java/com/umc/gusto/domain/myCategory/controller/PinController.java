@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/myCategories")
@@ -32,4 +34,19 @@ public class PinController {
 
             return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    /**
+     * 찜 취소
+     * [DELETE] /myCategories/pins?pinId={pinId}&...
+     */
+    @DeleteMapping("/pins")
+    public ResponseEntity<?> deletePin(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam(name = "pinId") List<Long> pinIds) {
+            User user =  authUser.getUser();
+            pinService.deletePin(user, pinIds);
+
+            return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 }

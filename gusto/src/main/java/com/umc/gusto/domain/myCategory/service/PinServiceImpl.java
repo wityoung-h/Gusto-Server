@@ -13,8 +13,7 @@ import com.umc.gusto.global.exception.customException.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +36,18 @@ public class PinServiceImpl implements PinService{
                 .build();
 
         pinRepository.save(pin);
+
+    }
+
+    @Transactional
+    public void deletePin(User user, List<Long> pinIds) {
+        for (Long pinId : pinIds) {
+            Pin pin = pinRepository.findByUserAndPinId(user, pinId)
+                    .orElseThrow(() -> new NotFoundException(Code.PIN_NOT_FOUND));
+
+            pinRepository.delete(pin);
+
+        }
 
     }
 

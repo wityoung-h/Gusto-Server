@@ -20,4 +20,6 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
             "WHERE p.myCategory = :myCategory AND t.townName = :townName " +
             "ORDER BY p.pinId DESC")
     List<Pin> findAllByUserAndMyCategoryOrderByPinIdDesc(MyCategory myCategory, String townName);
+
+    Optional<Pin> findByUserAndPinId(User user, Long pinId);
 }

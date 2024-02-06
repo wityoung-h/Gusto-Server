@@ -7,7 +7,9 @@ public class PinRequest {
 
     @Getter
     public static class createPin {
+        @NotNull
         Long myCategoryId;
+        @NotNull
         Long storeId;
     }
 }
