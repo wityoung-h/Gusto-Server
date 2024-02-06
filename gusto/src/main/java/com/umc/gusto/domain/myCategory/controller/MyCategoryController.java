@@ -16,12 +16,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/myCategories")
 public class MyCategoryController {
-    private final MyCategoryService myCategoryCommandService;
+    private final MyCategoryService myCategoryService;
 
     @GetMapping("/{nickname}")
     public ResponseEntity<List<MyCategoryResponse.MyCategory>> allMyCategory(
             @PathVariable String nickname) {
-            List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryCommandService.getAllMyCategory(nickname);
+            List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryService.getAllMyCategory(nickname);
             return ResponseEntity.ok().body(myCategoryList);
 
     }
@@ -31,7 +31,7 @@ public class MyCategoryController {
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "townName") String townName) {
             User user = authUser.getUser();
-            List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryCommandService.getAllMyCategoryWithLocation(user, townName);
+            List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryService.getAllMyCategoryWithLocation(user, townName);
             return ResponseEntity.ok().body(myCategoryList);
     }
 
@@ -40,7 +40,7 @@ public class MyCategoryController {
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "myCategoryId") Long myCategoryId,
             @PathVariable String nickname) {
-            List<MyCategoryResponse.PinByMyCategory> myStoreList = myCategoryCommandService.getAllPinByMyCategory(nickname, myCategoryId);
+            List<MyCategoryResponse.PinByMyCategory> myStoreList = myCategoryService.getAllPinByMyCategory(nickname, myCategoryId);
             return ResponseEntity.ok().body(myStoreList);
     }
 
@@ -50,7 +50,7 @@ public class MyCategoryController {
             @RequestParam(name = "myCategoryId") Long myCategoryId,
             @RequestParam(name = "townName") String townName) {
             User user = authUser.getUser();
-            List<MyCategoryResponse.PinByMyCategory> myCategoryList = myCategoryCommandService.getAllPinByMyCategoryWithLocation(user, myCategoryId,townName);
+            List<MyCategoryResponse.PinByMyCategory> myCategoryList = myCategoryService.getAllPinByMyCategoryWithLocation(user, myCategoryId,townName);
             return ResponseEntity.ok().body(myCategoryList);
     }
 
@@ -62,7 +62,7 @@ public class MyCategoryController {
     ) {
             User user = authUser.getUser();
             // 여기서 createMyCategoryDTO를 사용하여 새로운 MyCategory를 생성하는 로직을 구현합니다.
-            myCategoryCommandService.createMyCategory(user, createMyCategory);
+            myCategoryService.createMyCategory(user, createMyCategory);
 
             return ResponseEntity.ok().build();
 
@@ -75,7 +75,7 @@ public class MyCategoryController {
             @RequestBody MyCategoryRequest.updateMyCategory request
     ) {
         User user = authUser.getUser();
-        myCategoryCommandService.modifyMyCategory(user, myCategoryId, request);
+        myCategoryService.modifyMyCategory(user, myCategoryId, request);
 
         return ResponseEntity.ok().build();
     }
@@ -85,7 +85,7 @@ public class MyCategoryController {
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "myCategoryId") List<Long> myCategoryIds) {
             User user = authUser.getUser();
-            myCategoryCommandService.deleteMyCategories(user, myCategoryIds);
+            myCategoryService.deleteMyCategories(user, myCategoryIds);
 
             return ResponseEntity.ok().build();
 
