@@ -35,16 +35,15 @@ public class MyCategoryController {
             return ResponseEntity.ok().body(myCategoryList);
     }
 
-    @GetMapping("/pinStores/{nickname}")
+    @GetMapping("/pins/{nickname}")
     public ResponseEntity<List<MyCategoryResponse.PinByMyCategory>> allPinByMyCategory(
-            @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "myCategoryId") Long myCategoryId,
             @PathVariable String nickname) {
             List<MyCategoryResponse.PinByMyCategory> myStoreList = myCategoryCommandService.getAllPinByMyCategory(nickname, myCategoryId);
             return ResponseEntity.ok().body(myStoreList);
     }
 
-    @GetMapping("/pinStores")
+    @GetMapping("/pins")
     public ResponseEntity<List<MyCategoryResponse.PinByMyCategory>> allPinByCategoryWithLocation(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "myCategoryId") Long myCategoryId,
@@ -55,20 +54,19 @@ public class MyCategoryController {
     }
 
 
-    @PostMapping("/create")
+    @PostMapping("")
     public ResponseEntity<String> createMyCategory(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestBody MyCategoryRequest.createMyCategory createMyCategory
     ) {
             User user = authUser.getUser();
-            // 여기서 createMyCategoryDTO를 사용하여 새로운 MyCategory를 생성하는 로직을 구현합니다.
             myCategoryCommandService.createMyCategory(user, createMyCategory);
 
             return ResponseEntity.ok().build();
 
     }
 
-    @PatchMapping("/{myCategoryId}/update")
+    @PatchMapping("/{myCategoryId}")
     public ResponseEntity<String> modifyMyCategory(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long myCategoryId,
@@ -80,7 +78,7 @@ public class MyCategoryController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/delete")
+    @PatchMapping("")
     public ResponseEntity<String> deleteMyCategory(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "myCategoryId") List<Long> myCategoryIds) {
