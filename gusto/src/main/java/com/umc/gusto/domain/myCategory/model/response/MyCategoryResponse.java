@@ -12,7 +12,7 @@ public class MyCategoryResponse {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class MyCategoryDTO{
+    public static class MyCategory{
         Long myCategoryId;
         String myCategoryName;
         Integer myCategoryIcon;
@@ -24,7 +24,7 @@ public class MyCategoryResponse {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PinByMyCategoryDTO{
+    public static class PinByMyCategory{
         Long pinId;
         String storeName;
         String address;

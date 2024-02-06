@@ -53,9 +53,10 @@ public class Store extends BaseTime {
     @Column(columnDefinition = "VARCHAR(20)")
     private String contact;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 10)
-    private final StoreStatus storeStatus = StoreStatus.ACTIVE;
+    private StoreStatus storeStatus = StoreStatus.ACTIVE;
 
     public enum StoreStatus {
         ACTIVE, INACTIVE, CLOSED

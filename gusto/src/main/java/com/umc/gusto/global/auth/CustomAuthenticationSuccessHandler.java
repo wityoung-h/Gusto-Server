@@ -1,25 +1,28 @@
 package com.umc.gusto.global.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.global.auth.model.CustomOAuth2User;
+import com.umc.gusto.global.auth.model.OAuthAttributes;
 import com.umc.gusto.global.auth.model.Tokens;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-    private final ObjectMapper objectMapper;
     private final JwtService jwtService;
     private final OAuthService oAuthService;
+    @Value("${default.login.redirect.url}")
+    private String redirectUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -29,27 +32,30 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             response.setCharacterEncoding("utf-8");
 
             if(socialInfo.getSocialStatus() == Social.SocialStatus.CONNECTED){
-                String userUUID = String.valueOf(socialInfo.getUser().getUserid());
+                String userUUID = String.valueOf(socialInfo.getUser().getUserId());
 
                 Tokens tokens = jwtService.createAndSaveTokens(userUUID);
-                
-                response.setHeader("X-AUTH-TOKEN", tokens.getAccessToken());
-                response.setHeader("refresh-token", tokens.getRefreshToken());
-                response.getWriter();
+
+                String uri = UriComponentsBuilder.fromUriString(redirectUrl + "/member")
+                        .queryParam("X-Auth-Token", tokens.getAccessToken())
+                        .queryParam("refresh-Token", tokens.getRefreshToken())
+                        .toUriString();
+
+                response.sendRedirect(uri);
                 return;
             }
 
-            // social temporal token 및 OAuthAttributes return
-            response.setContentType("application/json");
-            response.setHeader("Location", "http://{domain}/sign-in");
-            response.setHeader("temp-token", String.valueOf(socialInfo.getTemporalToken()));
+            OAuthAttributes attributes = oAuth2User.getOAuthAttributes();
+            String uri = UriComponentsBuilder.fromUriString(redirectUrl + "/new-user")
+                    .queryParam("temp-token", String.valueOf(socialInfo.getTemporalToken()))
+                    .queryParam("nickname", attributes.getNickname())
+                    .queryParam("profileImg", attributes.getProfileImg())
+                    .queryParam("gender", attributes.getGender().name())
+                    .queryParam("age", attributes.getAge().name())
+                    .toUriString();
 
-            // TODO: 차후 응답 코드 형태 맞춰 리팩토링할 것
-            String body = objectMapper.writeValueAsString(
-                    oAuthService.generateFirstLogInRes(oAuth2User.getOAuthAttributes())
-            );
-
-            response.getWriter().write(body);
+            response.sendRedirect(uri);
         }
     }
+
 }

@@ -80,6 +80,9 @@ local.properties
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.idea/**/deployment.xml
+.idea/**/sshConfigs.xml
+.idea/**/webServers.xml
 
 # AWS User-specific
 .idea/**/aws.xml
@@ -314,6 +317,3 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij,eclipse,windows,macos,linux,gradle
 
 /**/secret
-/.idea/deployment.xml
-/.idea/sshConfigs.xml
-/.idea/webServers.xml
