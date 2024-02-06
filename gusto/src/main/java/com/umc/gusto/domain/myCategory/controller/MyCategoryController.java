@@ -78,7 +78,7 @@ public class MyCategoryController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("")
+    @DeleteMapping("")
     public ResponseEntity<String> deleteMyCategory(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "myCategoryId") List<Long> myCategoryIds) {
