@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService{
 
         // DB 내 검색
         if(userRepository.countUsersByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE) > 0) {
-            throw new RuntimeException("이미 사용중인 닉네임입니다.");
+            throw new GeneralException(Code.USER_DUPLICATE_NICKNAME);
         }
     }
 
