@@ -75,4 +75,7 @@ public class User extends BaseTime {
         ACTIVE, INACTIVE, PAUSE
     }
 
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

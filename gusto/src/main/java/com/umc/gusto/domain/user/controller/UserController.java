@@ -100,6 +100,7 @@ public class UserController {
      */
     @PatchMapping("/update-nickname")
     public ResponseEntity updateNickname(@AuthenticationPrincipal AuthUser authUser, @RequestParam("nickname") String nickname) {
+        userService.updateNickname(authUser.getUser(), nickname);
 
         return ResponseEntity.ok()
                 .build();

@@ -153,7 +153,13 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void updateNickname(User user, String nickname) {
+        redisService.deleteValues(nickname);
+        checkNickname(nickname);
 
+        user.updateNickname(nickname);
+
+        userRepository.save(user);
     }
 }
