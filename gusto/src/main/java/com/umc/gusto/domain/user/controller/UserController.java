@@ -1,12 +1,15 @@
 package com.umc.gusto.domain.user.controller;
 
+import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.response.ProfileRes;
+import com.umc.gusto.global.auth.model.AuthUser;
 import com.umc.gusto.global.auth.model.Tokens;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -75,8 +78,15 @@ public class UserController {
      * @return ProfileRes
      */
     @GetMapping("/{nickname}/profile")
-    public ResponseEntity<ProfileRes> retrieveProfile(@PathVariable("nickname") String nickname) {
-        ProfileRes profileRes = userService.getProfile(nickname);
+    public ResponseEntity<ProfileRes> retrieveProfile(@AuthenticationPrincipal AuthUser authUser,
+                                                      @PathVariable("nickname") String nickname) {
+        User user = null;
+
+        if(authUser != null) {
+            user = authUser.getUser();
+        }
+
+        ProfileRes profileRes = userService.getProfile(user, nickname);
 
         return ResponseEntity.ok()
                 .body(profileRes);

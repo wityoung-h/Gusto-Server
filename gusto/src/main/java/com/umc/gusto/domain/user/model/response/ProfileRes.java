@@ -4,6 +4,7 @@ public record ProfileRes(
         String nickname,
         int review,
         int pin,
-        long follower
+        long follower,
+        boolean follwed
 ) {
 }

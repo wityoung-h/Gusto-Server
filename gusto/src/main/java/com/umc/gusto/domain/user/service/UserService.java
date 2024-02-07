@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.user.service;
 
+import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.response.ProfileRes;
 import com.umc.gusto.global.auth.model.Tokens;
@@ -20,5 +21,5 @@ public interface UserService {
     String generateRandomNickname();
 
     // 먹스또 프로필 조회
-    ProfileRes getProfile(String nickname);
+    ProfileRes getProfile(User user, String nickname);
 }
