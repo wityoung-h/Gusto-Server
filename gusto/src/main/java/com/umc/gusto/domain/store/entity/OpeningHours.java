@@ -7,6 +7,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -26,9 +27,12 @@ public class OpeningHours extends BaseTime {
     @JoinColumn(name = "storeId")
     private Store store;
 
+    // businessDay 복수 처리
+    @ElementCollection
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 9)
-    private BusinessDay businessDay;
+    @CollectionTable(name = "business_day", joinColumns = @JoinColumn(name = "opHoursId"))
+    @Column(nullable = false)
+    private List<BusinessDay> businessDay;
 
     private LocalTime openedAt;
 

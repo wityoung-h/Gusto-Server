@@ -21,10 +21,10 @@ public class StoreResponse {
         String storeName;
         String address;
         List<OpeningHours.BusinessDay> businessDay;
-        Time openedAt;
-        Time closedAt;
+        LocalTime openedAt;
+        LocalTime closedAt;
         String contact;
-//        List<> reviewImg;
+        List<String> reviewImg;
         Boolean pin;        // 찜 여부
 
     }
