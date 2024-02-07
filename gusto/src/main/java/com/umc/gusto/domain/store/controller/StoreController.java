@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/store")
+@RequestMapping("/stores")
 public class StoreController {
     private final StoreService storeService;
 
@@ -23,8 +23,10 @@ public class StoreController {
      */
     @GetMapping("/{storeId}")
     public ResponseEntity<StoreResponse.getStore> getStore(
+            @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long storeId) {
-        StoreResponse.getStore getStore = storeService.getStore(storeId);
+        User user = authUser.getUser();
+        StoreResponse.getStore getStore = storeService.getStore(user, storeId);
         return ResponseEntity.status(HttpStatus.OK).body(getStore);
     }
 

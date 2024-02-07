@@ -2,12 +2,10 @@ package com.umc.gusto.domain.myCategory.repository;
 
 import com.umc.gusto.domain.myCategory.entity.MyCategory;
 import com.umc.gusto.domain.myCategory.entity.Pin;
-import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,4 +20,5 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
     List<Pin> findAllByUserAndMyCategoryOrderByPinIdDesc(MyCategory myCategory, String townName);
 
     Optional<Pin> findByUserAndPinId(User user, Long pinId);
+    boolean findByUserAndStoreStoreId(User user, Long storeId);
 }
