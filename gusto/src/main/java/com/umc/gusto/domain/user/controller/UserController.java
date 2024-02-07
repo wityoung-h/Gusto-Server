@@ -48,7 +48,7 @@ public class UserController {
      */
     @GetMapping("/check-nickname/{nickname}")
     public ResponseEntity checkNickname(@PathVariable("nickname")String nickname) {
-        checkNickname(nickname);
+        userService.checkNickname(nickname);
 
         return ResponseEntity.ok()
                 .build();
