@@ -154,6 +154,11 @@ public class UserServiceImpl implements UserService{
         User target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
                 .orElseThrow(() -> new NotFoundException(Code.USER_NOT_FOUND));
 
+        // 이미 follow한 내역이 있는지 check
+        followRepository.findByFollower_UserIdAndFollowing_UserId(user.getUserId(), target.getUserId())
+                .ifPresent(follow -> {
+                    throw new GeneralException(Code.USER_FOLLOW_ALREADY);
+                });
 
         Follow newFollow = Follow.builder()
                 .follower(user)
