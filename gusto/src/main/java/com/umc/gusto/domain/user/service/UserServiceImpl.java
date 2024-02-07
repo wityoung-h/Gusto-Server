@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -41,8 +40,8 @@ public class UserServiceImpl implements UserService{
     private final FollowRepository followRepository;
 
     private static final long NICKNAME_EXPIRED_TIME = 1000L * 60 * 15;
-    private int MAX_NICKNAME_NUMBER = 999;
-    private int MIN_NICKNAME_NUMBER = 1;
+    private static final int MAX_NICKNAME_NUMBER = 999;
+    private static final int MIN_NICKNAME_NUMBER = 1;
     private static final int FOLLOW_LIST_PAGE = 30;
 
 
@@ -111,6 +110,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void confirmNickname(String nickname) {
         checkNickname(nickname);
         redisService.setValuesWithTimeout(nickname, "null", NICKNAME_EXPIRED_TIME);
@@ -118,7 +118,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public String generateRandomNickname() {
-        String nickname = null;
+        String nickname;
 
         // 중복 없는 닉네임이 생성될 때까지 반복
         while (true) {
@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService{
                 // MIN_NICKNAME_NUMBER : 1 ~ MAX_NICKNAME_NUMBER : 999 까지 수 중 랜덤 수 생성
                 int random = (int) (Math.random() * (MAX_NICKNAME_NUMBER - MIN_NICKNAME_NUMBER) + MIN_NICKNAME_NUMBER);
 
-                nickname = nicknames[0] + " " + nicknames[1] + " " + String.valueOf(random);
+                nickname = nicknames[0] + " " + nicknames[1] + " " + random;
 
                 checkNickname(nickname);
             } catch (RuntimeException e) {
