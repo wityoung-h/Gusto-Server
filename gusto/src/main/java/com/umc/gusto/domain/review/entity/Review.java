@@ -2,7 +2,7 @@ package com.umc.gusto.domain.review.entity;
 
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.user.entity.User;
-import com.umc.gusto.global.common.BaseTime;
+import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.common.PublishStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,7 +16,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Review extends BaseTime {
+public class Review extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -103,5 +103,26 @@ public class Review extends BaseTime {
 
     public void updateComment(String comment){
         this.comment = comment;
+    }
+
+    public void updateStatus(Status status){
+        this.status = status;
+    }
+
+    //TODO: image를 리뷰엔티티가 아닌 file엔티티(photo)로 구분해서 만드는게 나을듯
+    public void updateImg1(String img1){
+        this.img1 = img1;
+    }
+
+    public void updateImg2(String img2){
+        this.img2 = img2;
+    }
+
+    public void updateImg3(String img3){
+        this.img3 = img3;
+    }
+
+    public void updateImg4(String img4){
+        this.img4 = img4;
     }
 }
