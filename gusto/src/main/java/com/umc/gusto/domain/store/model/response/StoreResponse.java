@@ -41,7 +41,7 @@ public class StoreResponse {
         String address;
         Boolean pin;        // 찜 여부
         List<String> reviewImg4;
-        List<Review> reviews;
+        List<getReviews> reviews;
 
     }
 

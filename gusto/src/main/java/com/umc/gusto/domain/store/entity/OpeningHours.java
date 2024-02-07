@@ -28,11 +28,8 @@ public class OpeningHours extends BaseTime {
     private Store store;
 
     // businessDay 복수 처리
-    @ElementCollection
-    @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "business_day", joinColumns = @JoinColumn(name = "opHoursId"))
-    @Column(nullable = false)
-    private List<BusinessDay> businessDay;
+    @Column(name = "business_day", nullable = false, columnDefinition = "json")
+    private BusinessDay businessDay;
 
     private LocalTime openedAt;
 

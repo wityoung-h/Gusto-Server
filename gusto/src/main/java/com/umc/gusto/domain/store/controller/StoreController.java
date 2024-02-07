@@ -34,5 +34,14 @@ public class StoreController {
      * 가게 1건 상세 조회
      * [GET] /stores/{storeId}/detail?reviewId={reviewId}
      */
+    @GetMapping("/{storeId}/detail")
+    public ResponseEntity<StoreResponse.getStoreDetail> getStoreDetail(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long storeId,
+            @RequestParam(name = "reviewId", required = false) Long reviewId) {
+                User user = authUser.getUser();
+                StoreResponse.getStoreDetail getStoreDetail = storeService.getStoreDetail(user, storeId);
+                return  ResponseEntity.status(HttpStatus.OK).body(getStoreDetail);
+    }
 
 }
