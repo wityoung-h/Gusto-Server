@@ -7,10 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 @Getter
-public class ProfileResponse {
-    private String nickname;
-    private int review;
-    private int pin;
-    private long follower;
-    private boolean followed;
+public class PublishingInfoResponse {
+    private boolean publishReview;
+    private boolean publishPin;
 }

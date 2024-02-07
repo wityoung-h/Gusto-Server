@@ -4,6 +4,7 @@ import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
 import com.umc.gusto.domain.user.model.response.ProfileResponse;
+import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
 import com.umc.gusto.global.auth.model.Tokens;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,4 +30,7 @@ public interface UserService {
 
     // 프로필 정보 갱신
     void updateProfile(User user, MultipartFile profileImg, UpdateProfileRequest request);
+
+    // 콘텐츠 공개 여부 검색
+    PublishingInfoResponse getPublishingInfo(User user);
 }

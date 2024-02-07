@@ -6,11 +6,13 @@ import com.umc.gusto.domain.user.model.NicknameBucket;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
 import com.umc.gusto.domain.user.model.response.ProfileResponse;
+import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
 import com.umc.gusto.domain.user.repository.FollowRepository;
 import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.auth.JwtService;
 import com.umc.gusto.global.auth.model.Tokens;
+import com.umc.gusto.global.common.PublishStatus;
 import com.umc.gusto.global.config.secret.JwtConfig;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
@@ -186,5 +188,13 @@ public class UserServiceImpl implements UserService{
         }
 
         userRepository.save(user);
+    }
+
+    @Override
+    public PublishingInfoResponse getPublishingInfo(User user) {
+        return PublishingInfoResponse.builder()
+                .publishReview((user.getPublishReview() == PublishStatus.PUBLIC) ? true : false)
+                .publishPin((user.getPublishPin() == PublishStatus.PUBLIC) ? true : false)
+                .build();
     }
 }
