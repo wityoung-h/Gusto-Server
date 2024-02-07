@@ -5,4 +5,5 @@ import com.umc.gusto.domain.user.entity.User;
 
 public interface StoreService {
     StoreResponse.getStore getStore(User user, Long storeId);
+    StoreResponse.getStoreDetail getStoreDetail(User user, Long storeId);
 }

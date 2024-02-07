@@ -14,6 +14,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long > {
     Optional<Review> findTopByStoreOrderByLikedDesc(Store store);
     @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIC'")
     List<Review> findTop3ByStoreOrderByLikedDesc(Store store);
+    @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIC'")
+    List<Review> findTop4ByStoreOrderByLikedDesc(Store store);
     boolean existsByReviewIdAndUser(Long reviewId, User user);
     Integer countByStoreAndUserNickname(Store store, String nickname);      // 방문횟수는 리뷰 공개여부과 상관 X
 

@@ -28,8 +28,6 @@ public class StoreServiceImpl implements StoreService{
     public StoreResponse.getStore getStore(User user, Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND));
-        Category category = storeRepository.findCategoryByStoreId(storeId)
-                .orElseThrow(() -> new NotFoundException(Code.CATEGORY_NOT_FOUND));
         OpeningHours openingHours = storeRepository.findOpeningHoursByStoreId(storeId)
                 .orElseThrow(() -> new NotFoundException(Code.OPENINGHOURS_NOT_FOUND));
 
@@ -43,19 +41,40 @@ public class StoreServiceImpl implements StoreService{
 
         return StoreResponse.getStore.builder()
                 .storeId(storeId)
-                .categoryName(category.getCategoryName())
                 .storeName(store.getStoreName())
                 .address(store.getAddress())
                 .businessDay(openingHours.getBusinessDay())
                 .openedAt(openingHours.getOpenedAt())
                 .closedAt(openingHours.getClosedAt())
                 .contact(store.getContact())
-                .reviewImg(reviewImg)
+                .reviewImg3(reviewImg)
                 .pin(isPinned)
                 .build();
 
     }
 
-//    @Transactional(readOnly = true)
-//    public Store
+    @Transactional(readOnly = true)
+    public StoreResponse.getStoreDetail getStoreDetail(User user, Long storeId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND));
+        Category category = storeRepository.findCategoryByStoreId(storeId)
+                .orElseThrow(() -> new NotFoundException(Code.CATEGORY_NOT_FOUND));
+
+        List<Review> top4Reviews = reviewRepository.findTop4ByStoreOrderByLikedDesc(store);
+
+        List<String> reviewImg = top4Reviews.stream()
+                .map(Review::getImg1)
+                .collect(Collectors.toList());
+
+        boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
+
+        return StoreResponse.getStoreDetail.builder()
+                .storeId(storeId)
+                .categoryName(category.getCategoryName())
+                .storeName(store.getStoreName())
+                .address(store.getAddress())
+                .reviewImg4(reviewImg)
+                .pin(isPinned)
+                .build();
+    }
 }
