@@ -5,7 +5,7 @@ import lombok.Builder;
 
 @AllArgsConstructor
 @Builder
-public class ProfileRes {
+public class ProfileResponse {
     private String nickname;
     private int review;
     private int pin;

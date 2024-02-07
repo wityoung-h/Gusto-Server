@@ -1,13 +1,15 @@
 package com.umc.gusto.domain.user.controller;
 
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
 import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
-import com.umc.gusto.domain.user.model.response.ProfileRes;
+import com.umc.gusto.domain.user.model.response.ProfileResponse;
 import com.umc.gusto.global.auth.model.AuthUser;
 import com.umc.gusto.global.auth.model.Tokens;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -78,15 +80,15 @@ public class UserController {
      * @return ProfileRes
      */
     @GetMapping("/{nickname}/profile")
-    public ResponseEntity<ProfileRes> retrieveProfile(@AuthenticationPrincipal AuthUser authUser,
-                                                      @PathVariable("nickname") String nickname) {
+    public ResponseEntity<ProfileResponse> retrieveProfile(@AuthenticationPrincipal AuthUser authUser,
+                                                           @PathVariable("nickname") String nickname) {
         User user = null;
 
         if(authUser != null) {
             user = authUser.getUser();
         }
 
-        ProfileRes profileRes = userService.getProfile(user, nickname);
+        ProfileResponse profileRes = userService.getProfile(user, nickname);
 
         return ResponseEntity.ok()
                 .body(profileRes);
@@ -103,6 +105,21 @@ public class UserController {
         userService.updateNickname(authUser.getUser(), nickname);
 
         return ResponseEntity.ok()
+                .build();
+    }
+
+    /**
+     * 프로필 정보 수정
+     * [PATCH] /users/my-info
+     * @param -
+     * @return -
+     */
+    @PatchMapping("/my-info")
+    public ResponseEntity updateProfile(@AuthenticationPrincipal AuthUser authUser,
+                                        @RequestPart(required = false, name = "profileImg") MultipartFile profileImg,
+                                        @RequestPart(required = false, name = "setting") UpdateProfileRequest setting) {
+
+        return ResponseEntity.status(HttpStatus.RESET_CONTENT)
                 .build();
     }
 }

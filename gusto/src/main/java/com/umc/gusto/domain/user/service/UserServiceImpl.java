@@ -4,7 +4,8 @@ import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.NicknameBucket;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
-import com.umc.gusto.domain.user.model.response.ProfileRes;
+import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
+import com.umc.gusto.domain.user.model.response.ProfileResponse;
 import com.umc.gusto.domain.user.repository.FollowRepository;
 import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.domain.user.repository.UserRepository;
@@ -14,6 +15,7 @@ import com.umc.gusto.global.config.secret.JwtConfig;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import com.umc.gusto.global.util.RedisService;
+import com.umc.gusto.global.util.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -132,7 +134,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public ProfileRes getProfile(User user, String nickname) {
+    public ProfileResponse getProfile(User user, String nickname) {
         User target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
                 .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
 
@@ -143,7 +145,7 @@ public class UserServiceImpl implements UserService{
                 followed.set(true);});
         }
 
-        return ProfileRes.builder()
+        return ProfileResponse.builder()
                 .nickname(target.getNickname())
                 .review(target.getReviewCnt())
                 .pin(target.getPinCnt())
@@ -161,5 +163,11 @@ public class UserServiceImpl implements UserService{
         user.updateNickname(nickname);
 
         userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void updateProfile(User user, MultipartFile profileImg, UpdateProfileRequest request) {
+
     }
 }
