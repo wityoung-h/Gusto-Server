@@ -104,4 +104,20 @@ public class S3Service {
                     "파일 삭제에 실패하였습니다.");
         }
     }
+
+    public String getFileName(String url) {
+        if(url.contains(bucket)) {
+            return url.substring(url.lastIndexOf('/') + 1);
+        }
+
+        return null;
+    }
+
+    public void deleteImageFromUrl(String url) {
+        String fileName = getFileName(url);
+
+        if(fileName != null) {
+            deleteImage(fileName);
+        }
+    }
 }
