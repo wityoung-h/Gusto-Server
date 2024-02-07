@@ -91,4 +91,17 @@ public class UserController {
         return ResponseEntity.ok()
                 .body(profileRes);
     }
+
+    /**
+     * 닉네임 수정
+     * [PATCH] /users/update-nickname?nickname={new_nickname}
+     * @param nickname
+     * @return
+     */
+    @PatchMapping("/update-nickname")
+    public ResponseEntity updateNickname(@AuthenticationPrincipal AuthUser authUser, @RequestParam("nickname") String nickname) {
+
+        return ResponseEntity.ok()
+                .build();
+    }
 }

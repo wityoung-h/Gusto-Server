@@ -22,4 +22,7 @@ public interface UserService {
 
     // 먹스또 프로필 조회
     ProfileRes getProfile(User user, String nickname);
+
+    // 닉네임 갱신
+    void updateNickname(User user, String nickname);
 }

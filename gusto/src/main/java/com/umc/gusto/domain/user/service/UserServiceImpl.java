@@ -151,4 +151,9 @@ public class UserServiceImpl implements UserService{
                 .followed(followed.get())
                 .build();
     }
+
+    @Override
+    public void updateNickname(User user, String nickname) {
+
+    }
 }
