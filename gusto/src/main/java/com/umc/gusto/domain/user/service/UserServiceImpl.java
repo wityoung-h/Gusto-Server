@@ -222,6 +222,26 @@ public class UserServiceImpl implements UserService{
             followId = 0L;
         }
 
-        return null;
+        List<Follow> followList = followRepository.findFollwerList(user, followId, Pageable.ofSize(FOLLOW_LIST_PAGE));
+
+        // 반환할 목록이 없음 throw Exception
+        if(followList.size() == 0) {
+            throw new NotFoundException(Code.USER_FOLLOW_NO_MORE_CONTENT);
+        }
+
+        // res mapping
+        List<FollowResponse> response = followList.stream()
+                .map(follow -> {
+                    FollowResponse item = FollowResponse.builder()
+                            .followId(follow.getFollowId())
+                            .nickname(follow.getFollowing().getNickname())
+                            .profileImg(follow.getFollowing().getProfileImage())
+                            .build();
+
+                    return item;
+                })
+                .collect(Collectors.toList());
+
+        return response;
     }
 }
