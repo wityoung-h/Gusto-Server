@@ -131,4 +131,19 @@ public class UserController {
         return ResponseEntity.ok()
                 .body(followResponses);
     }
+
+    /**
+     * 팔로워 리스트 조회
+     * [GET] /users/follower?followId={followId}
+     * @param followId
+     * @return List<>
+     */
+    @GetMapping("/follower")
+    public ResponseEntity<List<FollowResponse>> followerList(@AuthenticationPrincipal AuthUser authUser,
+                                                           @RequestParam(required = false, name = "followId") Long followId) {
+        List<FollowResponse> followResponses = null;
+
+        return ResponseEntity.ok()
+                .body(followResponses);
+    }
 }

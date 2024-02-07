@@ -214,4 +214,14 @@ public class UserServiceImpl implements UserService{
 
         return response;
     }
+
+    @Override
+    @Transactional
+    public List<FollowResponse> getFollwerList(User user, Long followId) {
+        if(followId == null) {
+            followId = 0L;
+        }
+
+        return null;
+    }
 }

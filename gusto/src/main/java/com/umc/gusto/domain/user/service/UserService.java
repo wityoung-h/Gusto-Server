@@ -34,4 +34,7 @@ public interface UserService {
 
     // 팔로우 목록
     List<FollowResponse> getFollowList(User user, Long followId);
+
+    // 팔로워 목록
+    List<FollowResponse> getFollwerList(User user, Long followId);
 }
