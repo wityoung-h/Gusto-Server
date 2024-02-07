@@ -3,6 +3,7 @@ package com.umc.gusto.domain.user.service;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.NicknameBucket;
+import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
 import com.umc.gusto.domain.user.model.response.ProfileResponse;
@@ -196,5 +197,16 @@ public class UserServiceImpl implements UserService{
                 .publishReview((user.getPublishReview() == PublishStatus.PUBLIC) ? true : false)
                 .publishPin((user.getPublishPin() == PublishStatus.PUBLIC) ? true : false)
                 .build();
+    }
+
+    @Override
+    public void updatePublishingInfo(User user, PublishingInfoRequest request) {
+        PublishStatus reviewStatus = (request.getPublishReview()) ?PublishStatus.PUBLIC : PublishStatus.PRIVATE;
+        PublishStatus pinStatus = (request.getPublishPin()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;;
+
+        user.updatePublishReview(reviewStatus);
+        user.updatePublishPin(pinStatus);
+
+        userRepository.save(user);
     }
 }

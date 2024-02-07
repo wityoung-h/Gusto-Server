@@ -1,6 +1,7 @@
 package com.umc.gusto.domain.user.controller;
 
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
 import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
 import com.umc.gusto.domain.user.service.UserService;
@@ -138,4 +139,19 @@ public class UserController {
         return ResponseEntity.ok()
                 .body(pir);
     }
+
+    /**
+     * 콘텐츠 공개 여부 수정
+     * [PATCH] /users/my-info/publishing
+     * @param -
+     * @return -
+     */
+    @PatchMapping("/my-i정nfo/publishing")
+    public ResponseEntity updatePublishingInfo(@AuthenticationPrincipal AuthUser authUser, @RequestBody PublishingInfoRequest request) {
+        userService.updatePublishingInfo(authUser.getUser(), request);
+
+        return ResponseEntity.ok()
+                .build();
+    }
+
 }

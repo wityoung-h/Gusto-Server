@@ -1,6 +1,7 @@
 package com.umc.gusto.domain.user.service;
 
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
 import com.umc.gusto.domain.user.model.response.ProfileResponse;
@@ -33,4 +34,7 @@ public interface UserService {
 
     // 콘텐츠 공개 여부 검색
     PublishingInfoResponse getPublishingInfo(User user);
+
+    // 콘텐츠 공개 여부 갱신
+    void updatePublishingInfo(User user, PublishingInfoRequest request);
 }

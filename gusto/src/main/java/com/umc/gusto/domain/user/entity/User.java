@@ -90,4 +90,12 @@ public class User extends BaseTime {
     public void updateGender(User.Gender gender) {
         this.gender = gender;
     }
+
+    public void updatePublishReview(PublishStatus status) {
+        this.publishReview = status;
+    }
+
+    public void updatePublishPin(PublishStatus status) {
+        this.publishPin = status;
+    }
 }
