@@ -160,7 +160,7 @@ public class UserServiceImpl implements UserService{
         }
 
         // 이미 follow한 내역이 있는지 check
-        followRepository.findByFollower_UserIdAndFollowing_UserId(user.getUserId(), target.getUserId())
+        followRepository.findByFollowerAndFollowing(user, target)
                 .ifPresent(follow -> {
                     throw new GeneralException(Code.USER_FOLLOW_ALREADY);
                 });
@@ -178,7 +178,7 @@ public class UserServiceImpl implements UserService{
         User target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
                 .orElseThrow(() -> new NotFoundException(Code.USER_NOT_FOUND));
 
-        Follow followInfo = followRepository.findByFollower_UserIdAndFollowing_UserId(user.getUserId(), target.getUserId())
+        Follow followInfo = followRepository.findByFollowerAndFollowing(user, target)
                 .orElseThrow(() -> new NotFoundException(Code.USER_FOLLOW_NOT_FOUND));
 
         followRepository.delete(followInfo);

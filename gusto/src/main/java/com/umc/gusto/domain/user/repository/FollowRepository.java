@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface FollowRepository extends JpaRepository<Follow, Long> {
-    Optional<Follow> findByFollower_UserIdAndFollowing_UserId(UUID follower, UUID following);
+    Optional<Follow> findByFollowerAndFollowing(User follower, User following);
 
     @Query("SELECT f FROM Follow f WHERE f.follower = :follower AND f.followId > :followId ORDER BY f.createdAt DESC")
     List<Follow> findFollowList(@Param("follower") User follower, @Param("followId") Long followId, Pageable pageable);
