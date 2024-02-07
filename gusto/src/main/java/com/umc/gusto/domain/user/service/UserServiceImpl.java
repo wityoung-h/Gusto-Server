@@ -13,6 +13,7 @@ import com.umc.gusto.global.config.secret.JwtConfig;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import com.umc.gusto.global.util.RedisService;
+import com.umc.gusto.global.util.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,7 @@ public class UserServiceImpl implements UserService{
     private final SocialRepository socialRepository;
     private final JwtService jwtService;
     private final RedisService redisService;
+    private final S3Service s3Service;
 
     private static final long NICKNAME_EXPIRED_TIME = 1000L * 60 * 15;
     private int MAX_NICKNAME_NUMBER = 999;
@@ -50,18 +52,14 @@ public class UserServiceImpl implements UserService{
         checkNickname(request.getNickname());
 
         String profileImg = DEFAULT_PROFILE_IMG;
-        System.out.println(DEFAULT_PROFILE_IMG);
 
         if(multipartFile != null) {
             // profileImg를 이미지 파일로 받았다면
-            // TODO:
-            //  s3 이미지 업로드 후 생성 된 url로 profileImg url 변경
+            profileImg = s3Service.uploadImage(multipartFile);
         } else if(request.getProfileImg() != null) {
             // profileImg를 이미지로 받지 않고, url로 받았다면
             profileImg = request.getProfileImg();
         }
-
-        System.out.println(profileImg);
 
         // user 생성
         User user = User.builder()
