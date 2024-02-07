@@ -48,6 +48,10 @@ public class UserServiceImpl implements UserService{
         UUID socialUID = UUID.fromString(tempToken);
         Social socialInfo = socialRepository.findByTemporalToken(socialUID).orElseThrow(() -> new GeneralException(Code.INVALID_ACCESS_TOKEN));
 
+        if(socialInfo.getSocialStatus() == Social.SocialStatus.CONNECTED) {
+            throw new GeneralException(Code.USER_ALREADY_SIGNUP);
+        }
+
         redisService.deleteValues(request.getNickname());
         checkNickname(request.getNickname());
 
