@@ -27,7 +27,7 @@ public class OpeningHours extends BaseTime {
     private Store store;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 9)
+    @Column(nullable = false, length = 9)
     private BusinessDay businessDay;
 
     private LocalTime openedAt;

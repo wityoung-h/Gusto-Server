@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Time;
 import java.time.LocalTime;
+import java.util.List;
 
 public class StoreResponse {
 
@@ -19,7 +20,7 @@ public class StoreResponse {
         Long storeId;
         String storeName;
         String address;
-//        List<> businessDay;
+        List<OpeningHours.BusinessDay> businessDay;
         Time openedAt;
         Time closedAt;
         String contact;
