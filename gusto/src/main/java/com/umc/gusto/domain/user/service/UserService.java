@@ -2,9 +2,12 @@ package com.umc.gusto.domain.user.service;
 
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
+import com.umc.gusto.domain.user.model.response.FollowResponse;
 import com.umc.gusto.domain.user.model.response.ProfileRes;
 import com.umc.gusto.global.auth.model.Tokens;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface UserService {
     
@@ -28,4 +31,7 @@ public interface UserService {
 
     // 언팔로우
     void unfollowUser(User user, String nickname);
+
+    // 팔로우 목록
+    List<FollowResponse> getFollowList(User user, Long followId);
 }

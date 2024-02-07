@@ -5,6 +5,7 @@ import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.NicknameBucket;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
+import com.umc.gusto.domain.user.model.response.FollowResponse;
 import com.umc.gusto.domain.user.model.response.ProfileRes;
 import com.umc.gusto.domain.user.repository.FollowRepository;
 import com.umc.gusto.domain.user.repository.SocialRepository;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -165,5 +167,11 @@ public class UserServiceImpl implements UserService{
                 .orElseThrow(() -> new NotFoundException(Code.USER_FOLLOW_NOT_FOUND));
 
         followRepository.delete(followInfo);
+    }
+
+    @Override
+    public List<FollowResponse> getFollowList(User user, Long followId) {
+
+        return null;
     }
 }

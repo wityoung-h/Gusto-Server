@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.user.controller;
 
+import com.umc.gusto.domain.user.model.response.FollowResponse;
 import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.response.ProfileRes;
@@ -12,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -112,5 +115,19 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.RESET_CONTENT)
                 .build();
+    }
+
+    /**
+     * 팔로우 리스트 조회
+     * [GET] /users/following?followId={followId}
+     * @param followId
+     * @return List<>
+     */
+    @GetMapping("/following")
+    public ResponseEntity<List<FollowResponse>> followList(@AuthenticationPrincipal AuthUser authUser,
+                                                           @RequestParam(required = false, name = "followId") Long followId) {
+
+        return ResponseEntity.ok()
+                .body(null);
     }
 }
