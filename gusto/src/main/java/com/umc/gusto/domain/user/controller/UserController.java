@@ -118,6 +118,7 @@ public class UserController {
     public ResponseEntity updateProfile(@AuthenticationPrincipal AuthUser authUser,
                                         @RequestPart(required = false, name = "profileImg") MultipartFile profileImg,
                                         @RequestPart(required = false, name = "setting") UpdateProfileRequest setting) {
+        userService.updateProfile(authUser.getUser(), profileImg, setting);
 
         return ResponseEntity.status(HttpStatus.RESET_CONTENT)
                 .build();

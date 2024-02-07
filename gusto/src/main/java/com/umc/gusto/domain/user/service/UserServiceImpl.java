@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService{
     private final JwtService jwtService;
     private final RedisService redisService;
     private final FollowRepository followRepository;
+    private final S3Service s3Service;
 
     private static final long NICKNAME_EXPIRED_TIME = 1000L * 60 * 15;
     private int MAX_NICKNAME_NUMBER = 999;
@@ -166,8 +167,24 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    @Transactional
     public void updateProfile(User user, MultipartFile profileImg, UpdateProfileRequest request) {
+        if(profileImg != null) {
+            s3Service.deleteImageFromUrl(user.getProfileImage());
+            String newProfile = s3Service.uploadImage(profileImg);
 
+            user.updateProfile(newProfile);
+        }
+
+        if(request != null) {
+            if(request.getAge() != null) {
+                user.updateAge(User.Age.valueOf(request.getAge()));
+            }
+
+            if(request.getGender() != null) {
+                user.updateGender(User.Gender.valueOf(request.getGender()));
+            }
+        }
+
+        userRepository.save(user);
     }
 }

@@ -78,4 +78,16 @@ public class User extends BaseTime {
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    public void updateProfile(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    public void updateAge(User.Age age) {
+        this.age = age;
+    }
+
+    public void updateGender(User.Gender gender) {
+        this.gender = gender;
+    }
 }
