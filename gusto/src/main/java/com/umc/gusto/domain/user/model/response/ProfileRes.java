@@ -1,10 +1,14 @@
 package com.umc.gusto.domain.user.model.response;
 
-public record ProfileRes(
-        String nickname,
-        int review,
-        int pin,
-        long follower,
-        boolean follwed
-) {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
+@AllArgsConstructor
+@Builder
+public class ProfileRes {
+    private String nickname;
+    private int review;
+    private int pin;
+    private long follower;
+    private boolean followed;
 }

@@ -143,6 +143,12 @@ public class UserServiceImpl implements UserService{
                 followed.set(true);});
         }
 
-        return new ProfileRes(target.getNickname(), target.getReviewCnt(), target.getPinCnt(), target.getFollower(), followed.get());
+        return ProfileRes.builder()
+                .nickname(target.getNickname())
+                .review(target.getReviewCnt())
+                .pin(target.getPinCnt())
+                .follower(target.getFollower())
+                .followed(followed.get())
+                .build();
     }
 }
