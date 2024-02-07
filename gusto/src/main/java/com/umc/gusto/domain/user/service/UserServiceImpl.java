@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService{
 
 
     @Value("${default.img.url.profile}")
-    private static String DEFAULT_PROFILE_IMG;
+    private String DEFAULT_PROFILE_IMG;
 
     @Override
     @Transactional
@@ -50,6 +50,7 @@ public class UserServiceImpl implements UserService{
         checkNickname(request.getNickname());
 
         String profileImg = DEFAULT_PROFILE_IMG;
+        System.out.println(DEFAULT_PROFILE_IMG);
 
         if(multipartFile != null) {
             // profileImg를 이미지 파일로 받았다면
