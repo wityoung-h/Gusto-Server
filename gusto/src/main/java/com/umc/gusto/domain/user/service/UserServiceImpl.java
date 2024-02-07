@@ -145,8 +145,7 @@ public class UserServiceImpl implements UserService{
         AtomicBoolean followed = new AtomicBoolean(false);
 
         if(user != null) {
-            followRepository.findByFollowerAndFollowing(user, target).ifPresent(a -> {
-                followed.set(true);});
+            followRepository.findByFollowerAndFollowing(user, target).ifPresent(a -> followed.set(true));
         }
 
         return ProfileResponse.builder()
@@ -194,15 +193,15 @@ public class UserServiceImpl implements UserService{
     @Override
     public PublishingInfoResponse getPublishingInfo(User user) {
         return PublishingInfoResponse.builder()
-                .publishReview((user.getPublishReview() == PublishStatus.PUBLIC) ? true : false)
-                .publishPin((user.getPublishPin() == PublishStatus.PUBLIC) ? true : false)
+                .publishReview(user.getPublishReview() == PublishStatus.PUBLIC)
+                .publishPin(user.getPublishPin() == PublishStatus.PUBLIC)
                 .build();
     }
 
     @Override
     public void updatePublishingInfo(User user, PublishingInfoRequest request) {
         PublishStatus reviewStatus = (request.getPublishReview()) ?PublishStatus.PUBLIC : PublishStatus.PRIVATE;
-        PublishStatus pinStatus = (request.getPublishPin()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;;
+        PublishStatus pinStatus = (request.getPublishPin()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
 
         user.updatePublishReview(reviewStatus);
         user.updatePublishPin(pinStatus);
