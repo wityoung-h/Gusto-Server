@@ -20,6 +20,13 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
             "ORDER BY p.pinId DESC")
     List<Pin> findAllByUserAndMyCategoryOrderByPinIdDesc(MyCategory myCategory, String townName);
 
+    @Query("SELECT p FROM Pin p " +
+            "JOIN p.store s " +
+            "JOIN s.town t " +
+            "WHERE p.myCategory.myCategoryId = :myCategoryId " +
+            "AND t.townName = :townName " +
+            "ORDER BY p.pinId DESC")
+    List<Pin> findPinsByMyCategoryIdAndTownNameAndPinIdDESC(Long myCategoryId, String townName);
     Optional<Pin> findByUserAndPinId(User user, Long pinId);
     boolean existsByUserAndStoreStoreId(User user, Long storeId);       // 존재 여부
 }

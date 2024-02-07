@@ -93,19 +93,20 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
     @Transactional(readOnly = true)
     public List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townName) {
-        List<Pin> pinList = myCategoryRepository.findPinsByMyCategoryIdAndTownName(myCategoryId, townName);
+        List<Pin> pinList = pinRepository.findPinsByMyCategoryIdAndTownNameAndPinIdDESC(myCategoryId, townName);
 
         return pinList.stream()                                     // townName을 기준으로 보일 수 있는 store가 포함된 pin만 보이기
                 .map(pin -> {
-                    Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(pin.getStore());       // 가장 좋아요가 많은 review
+                    Store store = pin.getStore();
+                    Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(store);       // 가장 좋아요가 많은 review
                     String reviewImg = topReviewOptional.map(Review::getImg1).orElse(null);                               // 가장 좋아요가 많은 review 이미지
-                    Integer reviewCnt = reviewRepository.countByStoreAndUserNickname(pin.getStore(), user.getNickname());                        // 내가 작성한 리뷰의 개수 == 방문 횟수
+                    Integer reviewCnt = reviewRepository.countByStoreAndUserNickname(store, user.getNickname());                        // 내가 작성한 리뷰의 개수 == 방문 횟수
 
                     return  MyCategoryResponse.PinByMyCategory.builder()
                             .pinId(pin.getPinId())
-                            .storeId(pin.getStore().getStoreId())
-                            .storeName(pin.getStore().getStoreName())
-                            .address(pin.getStore().getAddress())
+                            .storeId(store.getStoreId())
+                            .storeName(store.getStoreName())
+                            .address(store.getAddress())
                             .reviewImg(reviewImg)
                             .reviewCnt(reviewCnt)
                             .build();
