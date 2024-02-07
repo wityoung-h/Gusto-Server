@@ -67,7 +67,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
     @Transactional(readOnly = true)
     public List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategory(String nickname, Long myCategoryId) {
-        Optional<MyCategory> existingMyCategory = myCategoryRepository.findById(myCategoryId);
+        Optional<MyCategory> existingMyCategory = myCategoryRepository.findByMyCategoryIdAndUserNickname(nickname, myCategoryId);
         // 카테고리 별 가게 목록이 비어있으면 pinList도 비어 있음
         List<Pin> pinList = existingMyCategory.map(pinRepository::findByMyCategoryOrderByPinIdDesc)
                 .orElse(Collections.emptyList());
@@ -93,7 +93,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
     @Transactional(readOnly = true)
     public List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townName) {
-        List<Pin> pinList = pinRepository.findPinsByMyCategoryIdAndTownNameAndPinIdDESC(myCategoryId, townName);
+        List<Pin> pinList = pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName);
 
         return pinList.stream()                                     // townName을 기준으로 보일 수 있는 store가 포함된 pin만 보이기
                 .map(pin -> {

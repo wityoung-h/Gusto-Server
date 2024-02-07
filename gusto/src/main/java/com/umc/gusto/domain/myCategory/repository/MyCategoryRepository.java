@@ -12,6 +12,8 @@ public interface MyCategoryRepository extends JpaRepository<MyCategory, Long> {
 
     @Query("SELECT m FROM MyCategory m WHERE m.status = 'ACTIVE' AND m.user.nickname = :nickname AND m.publishCategory = 'PUBLIC'")
     List<MyCategory> findByUserNickname(String nickname);
+    @Query("SELECT m FROM MyCategory m WHERE m.status = 'ACTIVE' AND m.user.nickname = :nickname AND m.myCategoryId = :myCategoryId AND m.publishCategory = 'PUBLIC'")
+    Optional<MyCategory> findByMyCategoryIdAndUserNickname(String nickname, Long myCategoryId);
     @Query("SELECT m FROM MyCategory m WHERE m.status = 'ACTIVE' AND m.publishCategory = 'PUBLIC' AND m.user = :user")
     List<MyCategory> findByStatusAndPublishCategoryAndUser(User user);
     @Query("SELECT m FROM MyCategory m WHERE m.status = 'ACTIVE' AND m.myCategoryName = :myCategoryName AND m.user = :user")

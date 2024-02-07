@@ -23,10 +23,12 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
     @Query("SELECT p FROM Pin p " +
             "JOIN p.store s " +
             "JOIN s.town t " +
-            "WHERE p.myCategory.myCategoryId = :myCategoryId " +
+            "JOIN p.user u " +
+            "WHERE p.user = :user " +
+            "AND p.myCategory.myCategoryId = :myCategoryId " +
             "AND t.townName = :townName " +
             "ORDER BY p.pinId DESC")
-    List<Pin> findPinsByMyCategoryIdAndTownNameAndPinIdDESC(Long myCategoryId, String townName);
+    List<Pin> findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(User user, Long myCategoryId, String townName);
     Optional<Pin> findByUserAndPinId(User user, Long pinId);
     boolean existsByUserAndStoreStoreId(User user, Long storeId);       // 존재 여부
 }
