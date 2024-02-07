@@ -28,8 +28,8 @@ public class OpeningHours extends BaseTime {
     private Store store;
 
     // businessDay 복수 처리
-    @Column(name = "business_day", nullable = false, columnDefinition = "json")
-    private BusinessDay businessDay;
+    @Column(name = "business_day")
+    private String businessDay;
 
     private LocalTime openedAt;
 

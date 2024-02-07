@@ -15,8 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalTime;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,11 +40,13 @@ public class StoreServiceImpl implements StoreService{
 
         boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
+        List<String> businessDays = Arrays.asList(openingHours.getBusinessDay().split(","));
+
         return StoreResponse.getStore.builder()
                 .storeId(storeId)
                 .storeName(store.getStoreName())
                 .address(store.getAddress())
-                .businessDay(Collections.singletonList(openingHours.getBusinessDay()))
+                .businessDay(businessDays)
                 .openedAt(openingHours.getOpenedAt())
                 .closedAt(openingHours.getClosedAt())
                 .contact(store.getContact())
@@ -68,23 +69,26 @@ public class StoreServiceImpl implements StoreService{
                 .map(Review::getImg1)
                 .collect(Collectors.toList());
 
+        boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
+
         List<Review> reviews = reviewRepository.findByStoreOrderByReviewIdDesc(store);
         List<StoreResponse.getReviews> getReviews = reviews.stream()
-                .map(review -> StoreResponse.getReviews.builder()
+                .map(review -> {
+                    User reviewer = review.getUser();
+                    return StoreResponse.getReviews.builder()
                         .reviewId(review.getReviewId())
-                        .visitedAt(LocalTime.from(review.getVisitedAt()))
-                        .profileImage(user.getProfileImage())
-                        .nickname(user.getNickname())
+                        .visitedAt(review.getVisitedAt())
+                        .profileImage(reviewer.getProfileImage())
+                        .nickname(reviewer.getNickname())
                         .liked(review.getLiked())
                         .comment(review.getComment())
                         .img1(review.getImg1())
                         .img2(review.getImg2())
                         .img3(review.getImg3())
                         .img4(review.getImg4())
-                        .build())
+                        .build();
+                })
                 .toList();
-
-        boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
         return StoreResponse.getStoreDetail.builder()
                 .storeId(storeId)

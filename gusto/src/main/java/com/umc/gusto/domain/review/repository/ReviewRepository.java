@@ -9,14 +9,14 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface ReviewRepository extends JpaRepository<Review, Long > {
-    @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIC'")
-    Optional<Review> findTopByStoreOrderByLikedDesc(Store store);
-    @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIC'")
+public interface ReviewRepository extends JpaRepository<Review, Long> {
+    @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIC' ORDER BY r.liked DESC LIMIT 1")
+    Optional<Review> findFirstByStoreOrderByLikedDesc(Store store);
+    @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIC' ORDER BY r.liked DESC LIMIT 3")
     List<Review> findTop3ByStoreOrderByLikedDesc(Store store);
-    @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIC'")
+    @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIC' ORDER BY r.liked DESC LIMIT 4")
     List<Review> findTop4ByStoreOrderByLikedDesc(Store store);
-    @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIE'")
+    @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIC' ORDER BY r.reviewId DESC")
     List<Review> findByStoreOrderByReviewIdDesc(Store store);
     boolean existsByReviewIdAndUser(Long reviewId, User user);
     Integer countByStoreAndUserNickname(Store store, String nickname);      // 방문횟수는 리뷰 공개여부과 상관 X

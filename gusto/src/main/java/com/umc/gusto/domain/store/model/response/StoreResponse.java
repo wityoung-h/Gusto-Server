@@ -1,13 +1,11 @@
 package com.umc.gusto.domain.store.model.response;
 
-import com.umc.gusto.domain.review.entity.Review;
-import com.umc.gusto.domain.store.entity.OpeningHours;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.sql.Time;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -21,7 +19,7 @@ public class StoreResponse {
         Long storeId;
         String storeName;
         String address;
-        List<OpeningHours.BusinessDay> businessDay;
+        List<String> businessDay;
         LocalTime openedAt;
         LocalTime closedAt;
         String contact;
@@ -51,7 +49,7 @@ public class StoreResponse {
     @AllArgsConstructor
     public static class getReviews{         // review public 여부 확인
         Long reviewId;                      // 리뷰 id로 페이징 처리
-        LocalTime visitedAt;
+        LocalDate visitedAt;
         String profileImage;
         String nickname;
         Integer liked;

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PinRepository extends JpaRepository<Pin, Long> {
+    @Query("SELECT p FROM Pin p ORDER BY p.pinId DESC")
     List<Pin> findByMyCategoryOrderByPinIdDesc(MyCategory myCategory);
 
     @Query("SELECT p FROM Pin p " +
