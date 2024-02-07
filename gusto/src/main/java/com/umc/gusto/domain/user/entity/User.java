@@ -75,4 +75,7 @@ public class User extends BaseTime {
         ACTIVE, INACTIVE, PAUSE
     }
 
+    public void updateFollower(long follower) {
+        this.follower = follower;
+    }
 }

@@ -171,9 +171,14 @@ public class UserServiceImpl implements UserService{
                 .build();
 
         followRepository.save(newFollow);
+
+        // target의 팔로워 수 1 증가
+        target.updateFollower(target.getFollower() + 1);
+        userRepository.save(target);
     }
 
     @Override
+    @Transactional
     public void unfollowUser(User user, String nickname) {
         User target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
                 .orElseThrow(() -> new NotFoundException(Code.USER_NOT_FOUND));
@@ -182,6 +187,10 @@ public class UserServiceImpl implements UserService{
                 .orElseThrow(() -> new NotFoundException(Code.USER_FOLLOW_NOT_FOUND));
 
         followRepository.delete(followInfo);
+
+        // target의 팔로워 수 1 감소
+        target.updateFollower(target.getFollower() - 1);
+        userRepository.save(target);
     }
 
     @Override
