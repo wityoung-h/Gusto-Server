@@ -30,4 +30,9 @@ public class StoreController {
         return ResponseEntity.status(HttpStatus.OK).body(getStore);
     }
 
+    /**
+     * 가게 1건 상세 조회
+     * [GET] /stores/{storeId}/detail?reviewId={reviewId}
+     */
+
 }

@@ -3,6 +3,7 @@ package com.umc.gusto.domain.store.service;
 import com.umc.gusto.domain.myCategory.repository.PinRepository;
 import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
+import com.umc.gusto.domain.store.entity.Category;
 import com.umc.gusto.domain.store.entity.OpeningHours;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.model.response.StoreResponse;
@@ -27,6 +28,8 @@ public class StoreServiceImpl implements StoreService{
     public StoreResponse.getStore getStore(User user, Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND));
+        Category category = storeRepository.findCategoryByStoreId(storeId)
+                .orElseThrow(() -> new NotFoundException(Code.CATEGORY_NOT_FOUND));
         OpeningHours openingHours = storeRepository.findOpeningHoursByStoreId(storeId)
                 .orElseThrow(() -> new NotFoundException(Code.OPENINGHOURS_NOT_FOUND));
 
@@ -40,6 +43,7 @@ public class StoreServiceImpl implements StoreService{
 
         return StoreResponse.getStore.builder()
                 .storeId(storeId)
+                .categoryName(category.getCategoryName())
                 .storeName(store.getStoreName())
                 .address(store.getAddress())
                 .businessDay(openingHours.getBusinessDay())
@@ -51,4 +55,7 @@ public class StoreServiceImpl implements StoreService{
                 .build();
 
     }
+
+//    @Transactional(readOnly = true)
+//    public Store
 }

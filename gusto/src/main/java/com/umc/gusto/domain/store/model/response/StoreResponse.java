@@ -18,6 +18,7 @@ public class StoreResponse {
     @AllArgsConstructor
     public static class getStore{
         Long storeId;
+        String categoryName;
         String storeName;
         String address;
         List<OpeningHours.BusinessDay> businessDay;
@@ -28,4 +29,5 @@ public class StoreResponse {
         Boolean pin;        // 찜 여부
 
     }
+
 }
