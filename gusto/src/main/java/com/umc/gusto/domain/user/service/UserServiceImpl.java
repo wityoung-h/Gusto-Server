@@ -20,12 +20,15 @@ import com.umc.gusto.global.util.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +43,7 @@ public class UserServiceImpl implements UserService{
     private static final long NICKNAME_EXPIRED_TIME = 1000L * 60 * 15;
     private int MAX_NICKNAME_NUMBER = 999;
     private int MIN_NICKNAME_NUMBER = 1;
+    private static final int FOLLOW_LIST_PAGE = 30;
 
 
     @Value("${default.img.url.profile}")
@@ -150,6 +154,7 @@ public class UserServiceImpl implements UserService{
         User target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
                 .orElseThrow(() -> new NotFoundException(Code.USER_NOT_FOUND));
 
+
         Follow newFollow = Follow.builder()
                 .follower(user)
                 .following(target)
@@ -170,8 +175,33 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public List<FollowResponse> getFollowList(User user, Long followId) {
+        if(followId == null) {
+            followId = 0L;
+        }
 
-        return null;
+        //follow 목록 조회
+        List<Follow> followList = followRepository.findFollowList(user, followId, Pageable.ofSize(FOLLOW_LIST_PAGE));
+
+        // 반환할 목록이 없음 throw Exception
+        if(followList.size() == 0) {
+            throw new NotFoundException(Code.USER_FOLLOW_NO_MORE_CONTENT);
+        }
+
+        // res mapping
+        List<FollowResponse> response = followList.stream()
+                .map(follow -> {
+                    FollowResponse item = FollowResponse.builder()
+                            .followId(follow.getFollowId())
+                            .nickname(follow.getFollowing().getNickname())
+                            .profileImg(follow.getFollowing().getProfileImage())
+                            .build();
+
+                    return item;
+                })
+                .collect(Collectors.toList());
+
+        return response;
     }
 }

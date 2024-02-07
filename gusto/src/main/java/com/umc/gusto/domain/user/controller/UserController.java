@@ -126,8 +126,9 @@ public class UserController {
     @GetMapping("/following")
     public ResponseEntity<List<FollowResponse>> followList(@AuthenticationPrincipal AuthUser authUser,
                                                            @RequestParam(required = false, name = "followId") Long followId) {
+        List<FollowResponse> followResponses = userService.getFollowList(authUser.getUser(), followId);
 
         return ResponseEntity.ok()
-                .body(null);
+                .body(followResponses);
     }
 }
