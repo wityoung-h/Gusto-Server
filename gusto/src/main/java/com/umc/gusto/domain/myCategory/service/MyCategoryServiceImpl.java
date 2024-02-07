@@ -75,11 +75,9 @@ public class MyCategoryServiceImpl implements MyCategoryService {
         return pinList.stream()
                 .map(pin -> {
                     Store store = pin.getStore();
-                    Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(store); // 가장 좋아요가 많은 review
-                    String reviewImg = topReviewOptional.filter(review -> review.getStore().equals(store)) // 특정 가게에 대한 리뷰만 필터링
-                            .map(Review::getImg1)
-                            .orElse("");                   // 해당 가게 중 가장 좋아요가 많은 review 이미지
-                    Integer reviewCnt = reviewRepository.countByStoreAndUserNickname(store, nickname);                             // 내가 작성한 리뷰의 개수 == 방문 횟수
+                    Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(store);
+                    String reviewImg = topReviewOptional.map(Review::getImg1).orElse(null);
+                    Integer reviewCnt = reviewRepository.countByStoreAndUserNickname(store, nickname);
 
                     return  MyCategoryResponse.PinByMyCategory.builder()
                             .pinId(pin.getPinId())
