@@ -32,7 +32,7 @@ public class StoreServiceImpl implements StoreService{
         OpeningHours openingHours = storeRepository.findOpeningHoursByStoreId(storeId)
                 .orElseThrow(() -> new NotFoundException(Code.OPENINGHOURS_NOT_FOUND));
 
-        List<Review> top3Reviews = reviewRepository.findTop3ByStoreOrderByLikedDesc(store);
+        List<Review> top3Reviews = reviewRepository.findFirst3ByStoreOrderByLikedDesc(store);
 
         List<String> reviewImg = top3Reviews.stream()
                 .map(Review::getImg1)
@@ -63,7 +63,7 @@ public class StoreServiceImpl implements StoreService{
         Category category = storeRepository.findCategoryByStoreId(storeId)
                 .orElseThrow(() -> new NotFoundException(Code.CATEGORY_NOT_FOUND));
 
-        List<Review> top4Reviews = reviewRepository.findTop4ByStoreOrderByLikedDesc(store);
+        List<Review> top4Reviews = reviewRepository.findFirst4ByStoreOrderByLikedDesc(store);
 
         List<String> reviewImg = top4Reviews.stream()
                 .map(Review::getImg1)

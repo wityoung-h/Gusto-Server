@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIC' ORDER BY r.liked DESC LIMIT 1")
+    @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIC' AND r.store = :store ORDER BY r.liked DESC LIMIT 1")
     Optional<Review> findFirstByStoreOrderByLikedDesc(Store store);
     @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIC' ORDER BY r.liked DESC LIMIT 3")
-    List<Review> findTop3ByStoreOrderByLikedDesc(Store store);
+    List<Review> findFirst3ByStoreOrderByLikedDesc(Store store);
     @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIC' ORDER BY r.liked DESC LIMIT 4")
-    List<Review> findTop4ByStoreOrderByLikedDesc(Store store);
+    List<Review> findFirst4ByStoreOrderByLikedDesc(Store store);
     @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIC' ORDER BY r.reviewId DESC")
     List<Review> findByStoreOrderByReviewIdDesc(Store store);
     boolean existsByReviewIdAndUser(Long reviewId, User user);

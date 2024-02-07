@@ -8,6 +8,7 @@ import com.umc.gusto.domain.myCategory.repository.MyCategoryRepository;
 import com.umc.gusto.domain.myCategory.repository.PinRepository;
 import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
+import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
@@ -73,17 +74,21 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
         return pinList.stream()
                 .map(pin -> {
-                    Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(pin.getStore());       // 가장 좋아요가 많은 review
-                    String reviewImg = topReviewOptional.map(Review::getImg1).orElse(null);                               // 가장 좋아요가 많은 review 이미지
-                    Integer reviewCnt = reviewRepository.countByStoreAndUserNickname(pin.getStore(), nickname);                             // 내가 작성한 리뷰의 개수 == 방문 횟수
+                    Store store = pin.getStore();
+                    Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(store); // 가장 좋아요가 많은 review
+                    String reviewImg = topReviewOptional.filter(review -> review.getStore().equals(store)) // 특정 가게에 대한 리뷰만 필터링
+                            .map(Review::getImg1)
+                            .orElse("");                   // 해당 가게 중 가장 좋아요가 많은 review 이미지
+                    Integer reviewCnt = reviewRepository.countByStoreAndUserNickname(store, nickname);                             // 내가 작성한 리뷰의 개수 == 방문 횟수
 
                     return  MyCategoryResponse.PinByMyCategory.builder()
-                                .pinId(pin.getPinId())
-                                .storeName(pin.getStore().getStoreName())
-                                .address(pin.getStore().getAddress())
-                                .reviewImg(reviewImg)
-                                .reviewCnt(reviewCnt)
-                                .build();
+                            .pinId(pin.getPinId())
+                            .storeId(store.getStoreId())
+                            .storeName(store.getStoreName())
+                            .address(store.getAddress())
+                            .reviewImg(reviewImg)
+                            .reviewCnt(reviewCnt)
+                            .build();
                 })
                 .collect(Collectors.toList());
     }
@@ -100,6 +105,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
                     return  MyCategoryResponse.PinByMyCategory.builder()
                             .pinId(pin.getPinId())
+                            .storeId(pin.getStore().getStoreId())
                             .storeName(pin.getStore().getStoreName())
                             .address(pin.getStore().getAddress())
                             .reviewImg(reviewImg)
