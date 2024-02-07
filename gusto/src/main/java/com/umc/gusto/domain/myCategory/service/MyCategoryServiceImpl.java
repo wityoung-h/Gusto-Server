@@ -96,7 +96,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                 .map(pin -> {
                     Optional<Review> topReviewOptional = reviewRepository.findTopByStoreOrderByLikedDesc(pin.getStore());       // 가장 좋아요가 많은 review
                     String reviewImg = topReviewOptional.map(Review::getImg1).orElse(null);                               // 가장 좋아요가 많은 review 이미지
-                    Integer reviewCnt = reviewRepository.countByStoreAndUserNickname(pin.getStore(), user.getNickname());                                          // 내가 작성한 리뷰의 개수 == 방문 횟수
+                    Integer reviewCnt = reviewRepository.countByStoreAndUserNickname(pin.getStore(), user.getNickname());                        // 내가 작성한 리뷰의 개수 == 방문 횟수
 
                     return  MyCategoryResponse.PinByMyCategory.builder()
                             .pinId(pin.getPinId())
