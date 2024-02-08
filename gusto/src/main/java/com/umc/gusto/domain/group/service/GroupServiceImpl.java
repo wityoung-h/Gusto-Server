@@ -2,14 +2,17 @@ package com.umc.gusto.domain.group.service;
 
 import com.umc.gusto.domain.group.entity.Group;
 import com.umc.gusto.domain.group.entity.GroupMember;
-import com.umc.gusto.domain.group.model.request.GroupRequestDto;
-import com.umc.gusto.domain.group.model.response.GroupMemberResponseDto;
-import com.umc.gusto.domain.group.model.response.GroupResponseDto;
-import com.umc.gusto.domain.group.repository.GroupListRepository;
+import com.umc.gusto.domain.group.model.request.PostGroupRequest;
+import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
+import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
+import com.umc.gusto.domain.group.model.response.GetGroupResponse;
+import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
+import com.umc.gusto.global.exception.Code;
+import com.umc.gusto.global.exception.GeneralException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,15 +22,15 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class GroupServiceImpl implements GroupService{
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
 
-    @Transactional
-    public GroupResponseDto.PostGroupResponseDto createGroup(User owner, GroupRequestDto.CreateGroupDTO createGroupDTO){
+    public void createGroup(User owner, PostGroupRequest postGroupRequest){
         Group group = Group.builder()
-                .groupName(createGroupDTO.getGroupName())
-                .groupScript(createGroupDTO.getGroupScript())
+                .groupName(postGroupRequest.getGroupName())
+                .groupScript(postGroupRequest.getGroupScript())
                 .owner(owner)
                 .notice("멤버들에게 새로운 공지사항을 공유해보세요!")
                 .build();
@@ -37,23 +40,22 @@ public class GroupServiceImpl implements GroupService{
                 .user(owner)
                 .build();
         groupMemberRepository.save(ownerMember);
-        return new GroupResponseDto.PostGroupResponseDto(savedGroup.getGroupId(), savedGroup.getGroupName(), savedGroup.getGroupScript());
     }
 
     @Transactional(readOnly = true)
-    public GroupResponseDto.GetGroupResponseDto getGroup(Long groupId){
-        Group group = groupRepository.findGroupByGroupId(groupId)
-                .orElseThrow(()->new RuntimeException("Group not found"));
+    public GetGroupResponse getGroup(Long groupId){
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
         Long ownerMemberId = groupMemberRepository.findGroupMemberIdByGroupAndUser(group, group.getOwner());
         List<GroupMember> groupMembers = groupMemberRepository.findGroupMembersByGroup(group);
-        List<GroupMemberResponseDto.GetGroupMemberResponseDto> groupMembersDto = groupMembers.stream()
-                .map(member -> new GroupMemberResponseDto.GetGroupMemberResponseDto(
+        List<GetGroupMemberResponse> groupMembersDto = groupMembers.stream()
+                .map(member -> new GetGroupMemberResponse(
                         member.getGroupMemberId(),
                         member.getUser().getNickname(),
                         member.getUser().getProfileImage()
                 ))
                 .collect(Collectors.toList());
-        return GroupResponseDto.GetGroupResponseDto.builder()
+        return GetGroupResponse.builder()
                 .groupId(group.getGroupId())
                 .groupName(group.getGroupName())
                 .groupScript(group.getGroupScript())
@@ -63,24 +65,27 @@ public class GroupServiceImpl implements GroupService{
                 .build();
     }
 
-    @Transactional
-    public GroupResponseDto.UpdateGroupResponseDto updateGroup(User owner, Long groupId, GroupRequestDto.UpdateGroupDTO updateGroupDTO){
-        Group group = groupRepository.findGroupByGroupId(groupId)
-                .orElseThrow(()->new RuntimeException("Group not found"));
+    public UpdateGroupResponse updateGroup(User owner, Long groupId, UpdateGroupRequest updateGroupRequest){
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
         Long ownerMemberId = groupMemberRepository.findGroupMemberIdByGroupAndUser(group, group.getOwner());
 
         // 그룹 이름 수정 (owner만 수정 가능)
-        if(owner.equals(group.getOwner()) && updateGroupDTO.getGroupName() != null){
-            group.updateGroupName(updateGroupDTO.getGroupName());
+        if(updateGroupRequest.getGroupName() != null){
+            if(group.getOwner().getUserId().equals(owner.getUserId())){
+                group.updateGroupName(updateGroupRequest.getGroupName());
+            } else{
+                throw new GeneralException(Code.UNAUTHORIZED_MODIFY_GROUP_NAME);
+            }
         }
 
         //그룹 공지 수정
-        if(updateGroupDTO.getNotice() != null){
-            group.updateNotice(updateGroupDTO.getNotice());
+        if(updateGroupRequest.getNotice() != null){
+            group.updateNotice(updateGroupRequest.getNotice());
         }
 
         groupRepository.save(group);
-        return GroupResponseDto.UpdateGroupResponseDto.builder()
+        return UpdateGroupResponse.builder()
                 .groupId(group.getGroupId())
                 .groupName(group.getGroupName())
                 .groupScript(group.getGroupScript())
@@ -89,16 +94,18 @@ public class GroupServiceImpl implements GroupService{
                 .build();
     }
 
-    @Transactional
     public void deleteGroup(User owner, Long groupId){
-        Group group = groupRepository.findGroupByGroupId(groupId)
-                .orElseThrow(()->new RuntimeException("Group not found"));
-        if(group.getOwner().getUserId().equals(owner.getUserId())){
-            // 그룹의 가게, 루트 모두 삭제 (추후 코드 추가 예정)
 
-            // 그룹 삭제
-            group.updateStatus(BaseEntity.Status.INACTIVE);
-            groupRepository.save(group);
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+
+        // 그룹 소유자가 아닌 경우 권한 예외 처리
+        if(!group.getOwner().getUserId().equals(owner.getUserId())){
+            throw new GeneralException(Code.UNAUTHORIZED_DELETE_GROUP);
         }
+
+        // 그룹 삭제
+        group.updateStatus(BaseEntity.Status.INACTIVE);
+        groupRepository.save(group);
     }
 }
