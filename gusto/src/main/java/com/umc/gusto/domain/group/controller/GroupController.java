@@ -48,7 +48,7 @@ public class GroupController {
     public ResponseEntity<UpdateGroupResponse> updateGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId, @RequestBody UpdateGroupRequest updateGroupRequest){
         User owner = authUser.getUser();
         UpdateGroupResponse updatedGroup = groupService.updateGroup(owner, groupId, updateGroupRequest);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedGroup);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedGroup);
     }
 
     /**

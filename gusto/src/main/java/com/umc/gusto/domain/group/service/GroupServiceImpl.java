@@ -1,18 +1,14 @@
 package com.umc.gusto.domain.group.service;
 
 import com.umc.gusto.domain.group.entity.Group;
-import com.umc.gusto.domain.group.entity.GroupList;
 import com.umc.gusto.domain.group.entity.GroupMember;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
-import com.umc.gusto.domain.group.repository.GroupListRepository;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
-import com.umc.gusto.domain.route.entity.Route;
-import com.umc.gusto.domain.route.repository.RouteRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
@@ -30,8 +26,6 @@ import java.util.stream.Collectors;
 public class GroupServiceImpl implements GroupService{
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
-    private final GroupListRepository groupListRepository;
-    private final RouteRepository routeRepository;
 
     public void createGroup(User owner, PostGroupRequest postGroupRequest){
         Group group = Group.builder()
