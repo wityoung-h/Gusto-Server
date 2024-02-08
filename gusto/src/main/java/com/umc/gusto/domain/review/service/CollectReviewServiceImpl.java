@@ -1,9 +1,9 @@
 package com.umc.gusto.domain.review.service;
 
 import com.umc.gusto.domain.review.entity.Review;
+import com.umc.gusto.domain.review.model.request.ReviewCalViewRequest;
 import com.umc.gusto.domain.review.model.request.ReviewViewRequest;
-import com.umc.gusto.domain.review.model.response.CollectReviewsOfInstaResponse;
-import com.umc.gusto.domain.review.model.response.InstaViewResponse;
+import com.umc.gusto.domain.review.model.response.*;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.exception.Code;
@@ -23,22 +23,43 @@ public class CollectReviewServiceImpl implements CollectReviewService{
 
     @Override
     public CollectReviewsOfInstaResponse getReviewOfInstaView(User user, ReviewViewRequest reviewViewRequest) {
+        //페이징해서 가져오기
+        Page<Review> reviews = pagingReview(user, reviewViewRequest.getReviewId(), reviewViewRequest);
+
+        //다음에 조회될 리뷰가 있는지 확인하기
+        boolean checkNext = hasNext(user, reviews);
+
+        List<BasicViewResponse> basicViewResponse = reviews.map(BasicViewResponse::of).toList();
+        return CollectReviewsOfInstaResponse.of(basicViewResponse, checkNext);
+    }
+
+    @Override
+    public CollectReviewsOfCalResponse getReviewOfCalView(User user, ReviewCalViewRequest reviewCalViewRequest) {
+//        List<Review> reviews = reviewRepository.searchAllByUserAndVisitedAtStartsWith(user, reviewCalViewRequest.getDate());
+//                .orElseThrow(()-> new NotFoundException(Code.REVIEW_NOT_FOUND));
+
+//        List<BasicViewResponse> basicViewRespons = reviews.stream().map(BasicViewResponse::of).toList();
+//        return CollectReviewsOfCalResponse.builder().reviews(basicViewRespons).build();
+        return CollectReviewsOfCalResponse.builder().build();
+    }
+
+    @Override
+    public CollectReviewsOfTimelineResponse getReviewOfTimeView(User user, ReviewViewRequest reviewViewRequest) {
+        //페이징해서 가져오기
+        Page<Review> reviews = pagingReview(user, reviewViewRequest.getReviewId(), reviewViewRequest);
+
+        //다음에 조회될 리뷰가 있는지 확인하기
+        boolean checkNext = hasNext(user, reviews);
+
+        List<TimelineViewResponse> timelineViewResponses = reviews.map(TimelineViewResponse::of).toList();
+        return CollectReviewsOfTimelineResponse.of(timelineViewResponses, checkNext);
+    }
+
+    private Page<Review> pagingReview(User user, Long cursorId, ReviewViewRequest reviewViewRequest){
+        //최신순 날짜로 정렬
         Sort sort = Sort.by("visitedAt").descending();
         PageRequest pageRequest = PageRequest.of(0, reviewViewRequest.getSize(), sort);
 
-        //페이징해서 가져오기
-        Page<Review> reviews = getReviews(user, reviewViewRequest.getReviewId(), pageRequest);
-
-        //다음에 조회될 리뷰가 있는지 확인하기
-        List<Review> reviewList = reviews.toList();
-        Long lastReviewId = reviewList.get(reviewList.size()-1).getReviewId();
-        boolean checkNext = hasNext(user, lastReviewId);
-
-        List<InstaViewResponse> instaViewResponses = reviews.map(InstaViewResponse::of).toList();
-        return CollectReviewsOfInstaResponse.of(instaViewResponses, checkNext);
-    }
-
-    public Page<Review> getReviews(User user, Long cursorId, PageRequest pageRequest){
         //최초로 조회한 경우
         if(cursorId==null){
             return reviewRepository.findAllByUser(user, pageRequest).orElseThrow(()-> new NotFoundException(Code.REVIEW_NOT_FOUND));
@@ -48,8 +69,11 @@ public class CollectReviewServiceImpl implements CollectReviewService{
         }
     }
 
-    public boolean hasNext(User user, Long reviewId){
-        if(reviewId==null) return false;
-        return reviewRepository.existsByUserAndReviewIdLessThan(user, reviewId);
+    private boolean hasNext(User user, Page<Review> reviews){
+        List<Review> reviewList = reviews.toList();
+        Long lastReviewId = reviewList.get(reviewList.size()-1).getReviewId();
+
+        if(lastReviewId==null) return false;
+        return reviewRepository.existsByUserAndReviewIdLessThan(user, lastReviewId);
     }
 }

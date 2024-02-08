@@ -16,5 +16,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long > {
     Integer countByStoreAndUserNickname(Store store, String nickname);
     Optional<Page<Review>> findAllByUser(User user, PageRequest pageRequest);
     Optional<Page<Review>> findAllByUserAndReviewIdLessThan(User user, Long reviewId,PageRequest pageRequest);
+//    @Query(value = "SELECT r FROM Review r where r.user=:user AND date_format(r.visitedAt, \"%Y%m\") like %:date%", nativeQuery = true)
+//    List<Review> searchAllByUserAndVisitedAtStartsWith(@Param("user") User user, @Param("date") String date);
+
     boolean existsByUserAndReviewIdLessThan(User user, Long reviewId);
 }

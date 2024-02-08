@@ -7,12 +7,12 @@ import java.util.List;
 
 @Builder
 @Getter
-public class CollectReviewsOfInstaResponse {
-    List<BasicViewResponse> reviews;
+public class CollectReviewsOfTimelineResponse {
+    List<TimelineViewResponse> reviews;
     boolean hasNext;
 
-    public static CollectReviewsOfInstaResponse of(List<BasicViewResponse> reviews, boolean hasNext){
-        return CollectReviewsOfInstaResponse.builder()
+    public static CollectReviewsOfTimelineResponse of(List<TimelineViewResponse> reviews, boolean hasNext){
+        return CollectReviewsOfTimelineResponse.builder()
                 .reviews(reviews)
                 .hasNext(hasNext)
                 .build();

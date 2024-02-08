@@ -1,6 +1,7 @@
 package com.umc.gusto.domain.review.controller;
 
 import com.umc.gusto.domain.review.model.request.CreateReviewRequest;
+import com.umc.gusto.domain.review.model.request.ReviewCalViewRequest;
 import com.umc.gusto.domain.review.model.request.ReviewViewRequest;
 import com.umc.gusto.domain.review.model.request.UpdateReviewRequest;
 import com.umc.gusto.domain.review.service.CollectReviewService;
@@ -66,9 +67,27 @@ public class ReviewController {
     /**
      * 리뷰 모아보기 - 인스타 뷰
      */
-    @GetMapping("/InstaView")
+    @GetMapping("/instaView")
     public ResponseEntity<?> getReviewOfInstaView(@AuthenticationPrincipal AuthUser authUser, @RequestBody ReviewViewRequest reviewViewRequest){
         User user = authUser.getUser();
         return ResponseEntity.ok().body(collectReviewService.getReviewOfInstaView(user, reviewViewRequest));
+    }
+
+    /**
+     * 리뷰 모아보기 - 캘린더 뷰
+     */
+    @GetMapping("/calView")
+    public ResponseEntity<?> getReviewOfCalView(@AuthenticationPrincipal AuthUser authUser, @RequestBody ReviewCalViewRequest reviewCalViewRequest){
+        User user = authUser.getUser();
+        return ResponseEntity.ok().body(collectReviewService.getReviewOfCalView(user, reviewCalViewRequest));
+    }
+
+    /**
+     * 리뷰 모아보기 - 타임라인 뷰
+     */
+    @GetMapping("/timelineView")
+    public ResponseEntity<?> getReviewOfTimeView(@AuthenticationPrincipal AuthUser authUser, @RequestBody ReviewViewRequest reviewViewRequest){
+        User user = authUser.getUser();
+        return ResponseEntity.ok().body(collectReviewService.getReviewOfTimeView(user, reviewViewRequest));
     }
 }

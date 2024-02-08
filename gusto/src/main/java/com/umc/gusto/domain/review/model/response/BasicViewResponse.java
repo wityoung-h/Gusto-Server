@@ -8,12 +8,12 @@ import java.util.List;
 
 @Builder
 @Getter
-public class InstaViewResponse {
+public class BasicViewResponse {
     Long reviewId;
     List<String> images;
 
-    public static InstaViewResponse of(Review review){
-        return InstaViewResponse.builder()
+    public static BasicViewResponse of(Review review){
+        return BasicViewResponse.builder()
                 .reviewId(review.getReviewId())
                 .images(review.getImageList())
                 .build();
