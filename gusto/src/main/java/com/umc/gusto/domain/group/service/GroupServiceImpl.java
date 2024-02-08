@@ -1,18 +1,24 @@
 package com.umc.gusto.domain.group.service;
 
 import com.umc.gusto.domain.group.entity.Group;
+import com.umc.gusto.domain.group.entity.GroupList;
 import com.umc.gusto.domain.group.entity.GroupMember;
+import com.umc.gusto.domain.group.model.request.GroupListRequest;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
+import com.umc.gusto.domain.group.model.response.GroupListResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
+import com.umc.gusto.domain.group.repository.GroupListRepository;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
+import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
+import com.umc.gusto.global.exception.customException.NotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +32,8 @@ import java.util.stream.Collectors;
 public class GroupServiceImpl implements GroupService{
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final GroupListRepository groupListRepository;
+    private final StoreRepository storeRepository;
 
     public void createGroup(User owner, PostGroupRequest postGroupRequest){
         Group group = Group.builder()
@@ -107,5 +115,45 @@ public class GroupServiceImpl implements GroupService{
         // 그룹 삭제
         group.updateStatus(BaseEntity.Status.INACTIVE);
         groupRepository.save(group);
+    }
+
+    @Override
+    public void createGroupList(Long groupId,GroupListRequest request,User user) {
+        // 그룹 존재 여부 확인
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.FIND_FAIL_GROUP));
+        // 그룹 구성원인지 확인
+        if(!groupMemberRepository.existsGroupMemberByGroupAndUser(group,user))
+            throw new GeneralException(Code.USER_NO_PERMISSION_FOR_GROUP);
+
+        GroupList groupList =GroupList.builder()
+                .group(group)
+                .store(storeRepository.findById(request.getStoreId()).orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND)))
+                .user(user)
+                .build();
+
+        // 그룹리스트 저장
+        groupListRepository.save(groupList);
+
+    }
+
+    @Override
+    public void deleteGroupList(List<Long> groupListId,User user) {
+        for (Long gl : groupListId) {
+            GroupList groupList = groupListRepository.findGroupListByGroupListId(gl).orElseThrow(() -> new GeneralException(Code.GROUPLIST_NOT_FROUND));
+            // 그룹 구성원인지 확인
+            if(!groupMemberRepository.existsGroupMemberByGroupAndUser(groupList.getGroup(),user))
+                throw new GeneralException(Code.USER_NO_PERMISSION_FOR_GROUP);
+            // 그룹리스트 삭제
+            groupListRepository.delete(groupList);
+        }
+
+    }
+
+    @Override
+    public GroupListResponse getAllGroupList() {
+
+
+        return null;
     }
 }

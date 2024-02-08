@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.group.controller;
 
+import com.umc.gusto.domain.group.model.request.GroupListRequest;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -62,4 +65,28 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+
+    /**
+     * 그룹리스트 추가
+     * [POST] /group/{groupId}/groupList
+     */
+    @PostMapping("/{groupId}/groupList")
+    public ResponseEntity<?> createGroupList(
+            @AuthenticationPrincipal AuthUser authUser,@PathVariable Long groupId, @RequestBody GroupListRequest request){
+        User user = authUser.getUser();
+        groupService.createGroupList(groupId,request,user);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /**
+     * 그룹 리스트 삭제
+     * [DELETE] /groups/groupListId
+     */
+    @DeleteMapping("")
+    public ResponseEntity<?> deleteGroupList(
+            @AuthenticationPrincipal AuthUser authUser, @RequestParam(name = "groupListId") List<Long> groupListId){
+        User user = authUser.getUser();
+        groupService.deleteGroupList(groupListId,user);
+        return ResponseEntity.ok().build();
+    }
 }
