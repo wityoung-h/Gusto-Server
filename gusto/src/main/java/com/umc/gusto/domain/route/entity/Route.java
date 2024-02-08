@@ -33,6 +33,7 @@ public class Route extends BaseEntity {
     @Column(nullable = false, columnDefinition = "VARCHAR(10)")
     private String routeName;
 
+
     public void updateStatus(BaseEntity.Status status) {this.status = status;}
 
 }
