@@ -4,8 +4,11 @@ import com.umc.gusto.domain.store.model.response.StoreResponse;
 import com.umc.gusto.domain.user.entity.User;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 
 public interface StoreService {
     StoreResponse.getStore getStore(User user, Long storeId);
     StoreResponse.getStoreDetail getStoreDetail(User user, Long storeId, Long reviewId, Pageable pageable);
+    List<StoreResponse.getStoresInMap> getStoresInMap(User user, String townName, Long myCategoryId);
 }

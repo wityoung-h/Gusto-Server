@@ -12,16 +12,13 @@ import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.customException.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +27,7 @@ public class StoreServiceImpl implements StoreService{
     private final StoreRepository storeRepository;
     private final ReviewRepository reviewRepository;
     private final PinRepository pinRepository;
+
     @Transactional(readOnly = true)
     public StoreResponse.getStore getStore(User user, Long storeId) {
         Store store = storeRepository.findById(storeId)
@@ -74,7 +72,7 @@ public class StoreServiceImpl implements StoreService{
                 .map(Review::getImg1)
                 .collect(Collectors.toList());
 
-        // TODO : reviews 페이징 처리 (3,6,6...)
+        // reviews 페이징 처리 (3,6,6...)
         int pageSize;
         int pageNumber = pageable.getPageNumber();
         List<Review> reviews;
@@ -117,4 +115,30 @@ public class StoreServiceImpl implements StoreService{
                 .reviews(getReviews)
                 .build();
     }
+
+    @Transactional(readOnly = true)
+    public List<StoreResponse.getStoresInMap> getStoresInMap(User user, String townName, Long myCategoryId) {
+        List<Long> storeIds;
+        List<Store> stores;
+
+        if (myCategoryId == null) {
+            storeIds = pinRepository.findStoreIdsByUser(user);
+        } else {
+            storeIds = pinRepository.findStoreIdsByUserAndMyCategoryId(user, myCategoryId);      // 내 카테고리 별 내가 찜한 가게의 id 리스트
+        }
+
+        stores = storeRepository.findByTownNameAndStoreIds(townName, storeIds);
+
+
+        return stores.stream()
+                .map(store -> StoreResponse.getStoresInMap.builder()
+                        .storeId(store.getStoreId())
+                        .storeName(store.getStoreName())
+                        .longitude(store.getLongitude())
+                        .latitude(store.getLatitude())
+                        .build())
+                .collect(Collectors.toList());
+
+    }
+
 }

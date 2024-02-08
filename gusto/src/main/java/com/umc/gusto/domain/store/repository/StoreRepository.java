@@ -6,6 +6,7 @@ import com.umc.gusto.domain.store.entity.Store;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface StoreRepository extends JpaRepository<Store, Long> {
@@ -13,4 +14,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     Optional<OpeningHours> findOpeningHoursByStoreId(Long storeId);
     @Query("SELECT c FROM Category c WHERE c.store.storeId = :storeId")
     Optional<Category> findCategoryByStoreId(Long storeId);
+    @Query("SELECT s FROM Store s WHERE s.town.townName = :townName AND s.storeId IN :storeIds")
+    List<Store> findByTownNameAndStoreIds(String townName, List<Long> storeIds);
 }

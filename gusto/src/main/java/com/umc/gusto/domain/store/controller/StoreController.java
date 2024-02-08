@@ -6,7 +6,6 @@ import com.umc.gusto.domain.store.service.StoreService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -14,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.*;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,14 +48,23 @@ public class StoreController {
 
         // 상점 세부 정보 가져오기
         StoreResponse.getStoreDetail getStoreDetail = storeService.getStoreDetail(user, storeId, reviewId, pageable);
-        return  ResponseEntity.status(HttpStatus.OK).body(getStoreDetail);
+        return ResponseEntity.status(HttpStatus.OK).body(getStoreDetail);
     }
 
     /**
      * 현 지역의 카테고리 별 찜한 가게 목록 조회
      * [GET] /stores/map?townName={townName}&myCategoryId={myCategoryId}
      */
-//    @GetMapping("/map")
-//    public ResponseEntity<StoreResponse.>
+    @GetMapping("/map")
+    public ResponseEntity<List<StoreResponse.getStoresInMap>> getStoresInMap(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam(name = "townName") String townName,
+            @RequestParam(name = "myCategoryId", required = false) Long myCategoryId) {
+
+        User user = authUser.getUser();
+        List<StoreResponse.getStoresInMap> getStoresInMaps = storeService.getStoresInMap(user, townName, myCategoryId);
+        return  ResponseEntity.status(HttpStatus.OK).body(getStoresInMaps);
+
+    }
 
 }
