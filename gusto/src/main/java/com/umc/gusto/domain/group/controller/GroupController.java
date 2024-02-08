@@ -3,6 +3,7 @@ package com.umc.gusto.domain.group.controller;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
+import com.umc.gusto.domain.group.model.response.GetInvitationCodeResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.service.GroupService;
 import com.umc.gusto.domain.user.entity.User;
@@ -60,6 +61,16 @@ public class GroupController {
         User owner = authUser.getUser();
         groupService.deleteGroup(owner, groupId);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * 초대 코드 조회
+     * [GET] /groups/{groupId}/invitationCode
+     */
+    @GetMapping("/{groupId}/invitationCode")
+    public ResponseEntity<GetInvitationCodeResponse> getInvitationCode(@PathVariable Long groupId){
+        GetInvitationCodeResponse getInvitationCode = groupService.getInvitationCode(groupId);
+        return ResponseEntity.status(HttpStatus.OK).body(getInvitationCode);
     }
 
 }

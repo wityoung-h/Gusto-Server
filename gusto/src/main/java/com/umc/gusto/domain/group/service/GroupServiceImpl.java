@@ -7,6 +7,7 @@ import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
+import com.umc.gusto.domain.group.model.response.GetInvitationCodeResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
@@ -123,5 +124,18 @@ public class GroupServiceImpl implements GroupService{
         // 그룹 삭제
         group.updateStatus(BaseEntity.Status.INACTIVE);
         groupRepository.save(group);
+    }
+    @Transactional(readOnly = true)
+    public GetInvitationCodeResponse getInvitationCode(Long groupId){
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+        InvitationCode invitationCode = invitationCodeRepository.findInvitationCodeByGroup(group)
+                .orElseThrow(()->new GeneralException(Code.INVITATION_CODE_NOT_FOUND));
+
+        return GetInvitationCodeResponse.builder()
+                .invitationCodeId(invitationCode.getInvitationCodeId())
+                .groupId(invitationCode.getGroup().getGroupId())
+                .code(invitationCode.getCode())
+                .build();
     }
 }
