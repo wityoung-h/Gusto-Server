@@ -5,6 +5,7 @@ import com.umc.gusto.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RouteRepository extends JpaRepository<Route,Long> {
 
@@ -13,4 +14,7 @@ public interface RouteRepository extends JpaRepository<Route,Long> {
 
     // 유저의 루트 목록 조회
     List<Route> findRouteByUser(User user);
+
+    // rootId PK값으로 루트 찾기
+    Optional<Route> findRouteByRouteId(Long routeId);
 }

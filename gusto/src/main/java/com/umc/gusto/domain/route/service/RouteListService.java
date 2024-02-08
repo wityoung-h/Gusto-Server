@@ -2,6 +2,7 @@ package com.umc.gusto.domain.route.service;
 
 import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.route.model.request.RouteListRequest;
+import com.umc.gusto.domain.route.model.response.RouteListResponse;
 
 import java.util.List;
 
@@ -15,7 +16,8 @@ public interface RouteListService {
     void deleteRouteList(Long routeListId);
 
     // 리스트 거리 조회
-
+    List<RouteListResponse.RouteList> getRouteListDistance(Long routeId);
 
     // 루트 상세 조회
+    RouteListResponse.RouteListResponseDto getRouteListDetail(Long routeId);
 }
