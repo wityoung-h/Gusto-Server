@@ -1,12 +1,14 @@
 package com.umc.gusto.domain.review.service;
 
 import com.umc.gusto.domain.review.entity.HashTag;
+import com.umc.gusto.domain.review.entity.Liked;
 import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.review.entity.Tagging;
 import com.umc.gusto.domain.review.model.request.CreateReviewRequest;
 import com.umc.gusto.domain.review.model.request.UpdateReviewRequest;
 import com.umc.gusto.domain.review.model.response.ReviewDetailResponse;
 import com.umc.gusto.domain.review.repository.HashTagRepository;
+import com.umc.gusto.domain.review.repository.LikedRepository;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.repository.StoreRepository;
@@ -30,6 +32,7 @@ public class ReviewServiceImpl implements ReviewService{
     private final ReviewRepository reviewRepository;
     private final StoreRepository storeRepository;
     private final HashTagRepository hashTagRepository;
+    private final LikedRepository likedRepository;
     private final S3Service s3Service;
 
     public void validateReviewByUser(final User user, final Long reviewId){
@@ -147,6 +150,9 @@ public class ReviewServiceImpl implements ReviewService{
 
         review.updateLiked();
         reviewRepository.save(review);
+
+        Liked liked = Liked.builder().user(user).review(review).build();
+        likedRepository.save(liked);
     }
 
     private void connectHashTag(Review review, String[] hashTags){
