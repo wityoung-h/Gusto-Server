@@ -52,14 +52,7 @@ public class GroupServiceImpl implements GroupService{
         Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
                 .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
         Long ownerMemberId = groupMemberRepository.findGroupMemberIdByGroupAndUser(group, group.getOwner());
-        List<GroupMember> groupMembers = groupMemberRepository.findGroupMembersByGroup(group);
-        List<GetGroupMemberResponse> groupMembersDto = groupMembers.stream()
-                .map(member -> new GetGroupMemberResponse(
-                        member.getGroupMemberId(),
-                        member.getUser().getNickname(),
-                        member.getUser().getProfileImage()
-                ))
-                .collect(Collectors.toList());
+        List<GetGroupMemberResponse> groupMembersDto = getGroupMembers(groupId);
         return GetGroupResponse.builder()
                 .groupId(group.getGroupId())
                 .groupName(group.getGroupName())
@@ -131,6 +124,20 @@ public class GroupServiceImpl implements GroupService{
                             .numRoutes(numRoutes)
                             .build();
                 })
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<GetGroupMemberResponse> getGroupMembers(Long groupId){
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+        List<GroupMember> groupMembers = groupMemberRepository.findGroupMembersByGroup(group);
+        return groupMembers.stream()
+                .map(groupMember -> GetGroupMemberResponse.builder()
+                        .groupMemberId(groupMember.getGroupMemberId())
+                        .nickname(groupMember.getUser().getNickname())
+                        .profileImg(groupMember.getUser().getProfileImage())
+                        .build())
                 .collect(Collectors.toList());
     }
 }

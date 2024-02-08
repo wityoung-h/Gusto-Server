@@ -2,6 +2,7 @@ package com.umc.gusto.domain.group.controller;
 
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
+import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupsResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
@@ -72,8 +73,18 @@ public class GroupController {
     @GetMapping
     public ResponseEntity<List<GetGroupsResponse>> getGroups(@AuthenticationPrincipal AuthUser authUser){
         User user = authUser.getUser();
-        List<GetGroupsResponse> groups = groupService.getUserGroups(user);
-        return ResponseEntity.status(HttpStatus.OK).body(groups);
+        List<GetGroupsResponse> getGroups = groupService.getUserGroups(user);
+        return ResponseEntity.status(HttpStatus.OK).body(getGroups);
+    }
+
+    /**
+     * 그룹 구성원 조회
+     * [GET] /groups/{groupId}/members
+     */
+    @GetMapping("/{groupId}/members")
+    public ResponseEntity<List<GetGroupMemberResponse>> getGroupMembers (@PathVariable Long groupId){
+        List<GetGroupMemberResponse> getGroupMembers = groupService.getGroupMembers(groupId);
+        return ResponseEntity.status(HttpStatus.OK).body(getGroupMembers);
     }
 
 }
