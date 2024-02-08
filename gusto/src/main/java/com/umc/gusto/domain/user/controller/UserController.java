@@ -32,7 +32,7 @@ public class UserController {
         Tokens tokens = userService.createUser(token, multipartFile, signUpRequest);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-AUTH-TOKEN", tokens.getAccessToken());
+        headers.set("X-Auth-Token", tokens.getAccessToken());
         headers.set("refresh-token", tokens.getRefreshToken());
 
         return ResponseEntity.ok()
