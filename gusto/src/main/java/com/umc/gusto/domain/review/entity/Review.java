@@ -137,7 +137,8 @@ public class Review extends BaseEntity {
         this.img4 = img4;
     }
 
-    public void updateLiked(){
-        this.liked += 1;
+    public void updateLiked(String type){
+        if(type.equals("like")) this.liked += 1;
+        else if(type.equals("unlike")) this.liked -= 1;
     }
 }

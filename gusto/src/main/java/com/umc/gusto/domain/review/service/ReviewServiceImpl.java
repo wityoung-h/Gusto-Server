@@ -148,11 +148,23 @@ public class ReviewServiceImpl implements ReviewService{
             throw new GeneralException(Code.NO_ONESELF_LIKE);
         }
 
-        review.updateLiked();
+        review.updateLiked("like");
         reviewRepository.save(review);
 
         Liked liked = Liked.builder().user(user).review(review).build();
         likedRepository.save(liked);
+    }
+
+    @Override
+    public void unlikeReview(User user, Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+
+        //해당 리뷰를 좋아요 클릭한 적이 있는지 확인
+        Liked liked = likedRepository.findByUserAndReview(user, review).orElseThrow(()->new GeneralException(Code.NO_LIKE_REVIEW));
+
+        likedRepository.delete(liked);
+        review.updateLiked("unlike");
+        reviewRepository.save(review);
     }
 
     private void connectHashTag(Review review, String[] hashTags){
