@@ -5,35 +5,42 @@ import com.umc.gusto.domain.route.entity.RouteList;
 import com.umc.gusto.domain.route.model.request.RouteListRequest;
 import com.umc.gusto.domain.route.repository.RouteListRepository;
 import com.umc.gusto.domain.store.repository.StoreRepository;
+import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.global.exception.Code;
+import com.umc.gusto.global.exception.customException.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class RouteListServiceImpl implements RouteListService{
     private final RouteListRepository routeListRepository;
     private final StoreRepository storeRepository;
 
 
+    @Transactional
     @Override
     public void createRouteList(Route route, List<RouteListRequest.createRouteListDto> request) {
         //루트리스트 생성
         request.forEach(dto -> {
-                    RouteList routeList = RouteList.builder()
-                            .route(route)
-                            .store(storeRepository.findById(dto.getStoreId())
-                                    .orElseThrow(() -> new RuntimeException("등록되어 있지 않은 가게입니다.")))
-                            .ordinal(dto.getOrdinal())
-                            .build();
+            RouteList routeList = RouteList.builder()
+                    .route(route)
+                    .store(storeRepository.findById(dto.getStoreId())
+                            .orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND)))
+                    .ordinal(dto.getOrdinal())
+                    .build();
             routeListRepository.save(routeList);
         });
     }
 
+    @Transactional
     @Override
-    public void deleteRouteList(Long routeListId) {
-        RouteList routeList = routeListRepository.findById(routeListId).orElseThrow(() -> new RuntimeException("저장되어 있지 않은 항목입니다."));
+    public void deleteRouteList(Long routeListId, User user) {
+        RouteList routeList = routeListRepository.findById(routeListId).orElseThrow(() -> new NotFoundException(Code.ROUTELIST_NOT_FOUND));
         routeListRepository.delete(routeList);
 
     }
