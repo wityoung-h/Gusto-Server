@@ -12,11 +12,16 @@ import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.customException.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,7 +62,7 @@ public class StoreServiceImpl implements StoreService{
     }
 
     @Transactional(readOnly = true)
-    public StoreResponse.getStoreDetail getStoreDetail(User user, Long storeId) {
+    public StoreResponse.getStoreDetail getStoreDetail(User user, Long storeId, Long reviewId, Pageable pageable) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND));
         Category category = storeRepository.findCategoryByStoreId(storeId)
@@ -69,9 +74,19 @@ public class StoreServiceImpl implements StoreService{
                 .map(Review::getImg1)
                 .collect(Collectors.toList());
 
-        boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
+        // TODO : reviews 페이징 처리 (3,6,6...)
+        int pageSize;
+        int pageNumber = pageable.getPageNumber();
+        List<Review> reviews;
 
-        List<Review> reviews = reviewRepository.findByStoreOrderByReviewIdDesc(store);
+        if (reviewId != null) {
+            pageSize = 6;
+            reviews = reviewRepository.findReviewsAfterIdByStore(store, reviewId, PageRequest.of(pageNumber, pageSize));
+        } else {
+            pageSize = 3;
+            reviews = reviewRepository.findFirstReviewsByStore(store, PageRequest.of(pageNumber, pageSize));
+        }
+
         List<StoreResponse.getReviews> getReviews = reviews.stream()
                 .map(review -> {
                     User reviewer = review.getUser();
@@ -89,6 +104,8 @@ public class StoreServiceImpl implements StoreService{
                         .build();
                 })
                 .toList();
+
+        boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
         return StoreResponse.getStoreDetail.builder()
                 .storeId(storeId)

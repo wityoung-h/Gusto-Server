@@ -77,7 +77,7 @@ public class MyCategoryController {
         User user = authUser.getUser();
         myCategoryService.modifyMyCategory(user, myCategoryId, request);
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping
