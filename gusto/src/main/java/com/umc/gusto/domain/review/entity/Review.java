@@ -136,4 +136,8 @@ public class Review extends BaseEntity {
     public void updateImg4(String img4){
         this.img4 = img4;
     }
+
+    public void updateLiked(){
+        this.liked += 1;
+    }
 }

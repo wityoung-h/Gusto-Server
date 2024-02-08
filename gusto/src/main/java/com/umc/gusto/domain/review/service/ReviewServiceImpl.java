@@ -13,6 +13,7 @@ import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
+import com.umc.gusto.global.exception.GeneralException;
 import com.umc.gusto.global.exception.customException.NoPermission;
 import com.umc.gusto.global.exception.customException.NotFoundException;
 import com.umc.gusto.global.util.S3Service;
@@ -131,6 +132,21 @@ public class ReviewServiceImpl implements ReviewService{
         StringBuilder hashTags = new StringBuilder();
         review.getTaggingSet().stream().map(Tagging::getHashTag).forEach(o-> hashTags.append(o).append(","));
         return ReviewDetailResponse.of(review, hashTags.toString());
+    }
+
+    @Override
+    @Transactional
+    public void likeReview(User user, Long reviewId) {
+
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+
+        //본인 리뷰를 좋아요하는지 확인
+        if(review.getUser().getUserId().equals(user.getUserId())){ //TODO: .equals로 하는 동등성 비교가 안되서 DB의 @ID를 비교하는 식으로 했으나 비즈니스 키로 equals를 구현해보자.
+            throw new GeneralException(Code.NO_ONESELF_LIKE);
+        }
+
+        review.updateLiked();
+        reviewRepository.save(review);
     }
 
     private void connectHashTag(Review review, String[] hashTags){
