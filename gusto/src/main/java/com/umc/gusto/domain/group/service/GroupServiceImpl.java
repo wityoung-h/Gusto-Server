@@ -13,15 +13,16 @@ import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.repository.GroupListRepository;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
+import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import com.umc.gusto.global.exception.customException.NotFoundException;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,8 +33,12 @@ import java.util.stream.Collectors;
 public class GroupServiceImpl implements GroupService{
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
+
+
     private final GroupListRepository groupListRepository;
     private final StoreRepository storeRepository;
+    private final ReviewRepository reviewRepository;
+
 
     public void createGroup(User owner, PostGroupRequest postGroupRequest){
         Group group = Group.builder()
@@ -151,9 +156,24 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Override
-    public GroupListResponse getAllGroupList() {
+    public List<GroupListResponse> getAllGroupList(Long groupId) {
+        // 그룹 존재여부 확인
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.FIND_FAIL_GROUP));
+        // 그룹 내 모든 찜한 상점 조회 = 그룹리스트 조회
+        List<GroupList> groupLists = groupListRepository.findGroupListByGroup(group);
+
+        // 그룹 리스트에 해당하는 각 상점 정보 조회
+        return groupLists.stream().map(gl -> {
+            String reviewImg = reviewRepository.findTopReviewImageByStoreId(gl.getStore().getStoreId()).orElse(null);
+            return GroupListResponse.builder()
+                    .groupListId(gl.getGroupListId())
+                    .storeName(gl.getStore().getStoreName())
+                    .profileImg(reviewImg)
+                    .address(gl.getStore().getAddress())
+                    .build();
+        }).collect(Collectors.toList());
 
 
-        return null;
     }
 }

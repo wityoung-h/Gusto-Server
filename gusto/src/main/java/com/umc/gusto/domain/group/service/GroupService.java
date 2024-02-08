@@ -30,5 +30,5 @@ public interface GroupService {
     void deleteGroupList(List<Long> groupListId, User user);
 
     // 그룹리스트 조회
-    GroupListResponse getAllGroupList();
+    List<GroupListResponse> getAllGroupList(Long groupId);
 }

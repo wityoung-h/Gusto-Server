@@ -4,6 +4,7 @@ import com.umc.gusto.domain.group.model.request.GroupListRequest;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
+import com.umc.gusto.domain.group.model.response.GroupListResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.service.GroupService;
 import com.umc.gusto.domain.user.entity.User;
@@ -88,5 +89,14 @@ public class GroupController {
         User user = authUser.getUser();
         groupService.deleteGroupList(groupListId,user);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 그룹 리스트 조회 == 그룹 내 찜한 식당 정보
+     * [GET] /groups/{groupId}/groupLists
+     */
+    @GetMapping("/{groupId}/groupLists")
+    public ResponseEntity<List<GroupListResponse>> getGroupList(@PathVariable Long groupId){
+        return ResponseEntity.ok().body(groupService.getAllGroupList(groupId));
     }
 }
