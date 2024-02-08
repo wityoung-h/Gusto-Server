@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.group.service;
 
+import com.umc.gusto.domain.group.model.request.JoinGroupRequest;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
@@ -18,4 +19,7 @@ public interface GroupService {
 
     // 그룹 삭제
     void deleteGroup(User owner, Long groupId);
+
+    // 그룹 참여
+    void joinGroup(User user, Long groupId, JoinGroupRequest joinGroupRequest);
 }

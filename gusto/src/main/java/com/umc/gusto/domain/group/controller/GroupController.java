@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.group.controller;
 
+import com.umc.gusto.domain.group.model.request.JoinGroupRequest;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
@@ -62,4 +63,14 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    /**
+     * 그룹 참여
+     * [POST] /groups/{groupId}/join
+     */
+    @PostMapping("/{groupId}/join")
+    public ResponseEntity<?> joinGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId, @RequestBody JoinGroupRequest joinGroupRequest){
+        User user = authUser.getUser();
+        groupService.joinGroup(user, groupId, joinGroupRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 }
