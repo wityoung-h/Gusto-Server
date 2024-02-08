@@ -9,6 +9,7 @@ import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +30,7 @@ public class ReviewController {
     public ResponseEntity<?> createReview(@AuthenticationPrincipal AuthUser authUser, @RequestPart(name = "image", required = false) List<MultipartFile> images, @RequestPart(name = "info") @Valid CreateReviewRequest createReviewRequest){
         User user = authUser.getUser();
         reviewService.createReview(user, images, createReviewRequest);
-        //TODO: 응답 형식 맞추기
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -41,8 +41,7 @@ public class ReviewController {
         User user = authUser.getUser();
         reviewService.validateReviewByUser(user, reviewId);
         reviewService.updateReview(reviewId, images,updateReviewRequest);
-        //TODO: 응답 형식 맞추기
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.RESET_CONTENT).build();
     }
 
     /**
