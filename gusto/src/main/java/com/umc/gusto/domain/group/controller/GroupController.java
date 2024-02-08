@@ -53,9 +53,9 @@ public class GroupController {
 
     /**
      * 그룹 삭제
-     * [PATCH] /groups/{groupId}/delete
+     * [DELETE] /groups/{groupId}
      */
-    @PatchMapping("/{groupId}/delete")
+    @DeleteMapping("/{groupId}")
     public ResponseEntity<?> deleteGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId){
         User owner = authUser.getUser();
         groupService.deleteGroup(owner, groupId);
