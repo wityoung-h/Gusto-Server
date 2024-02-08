@@ -60,4 +60,15 @@ public class StoreResponse {
         String img4;
         
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class getStoresInMap{
+        Long storeId;
+        String storeName;
+        Float longitude;
+        Float latitude;
+    }
 }

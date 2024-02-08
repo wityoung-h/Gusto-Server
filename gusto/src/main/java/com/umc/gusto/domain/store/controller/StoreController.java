@@ -52,4 +52,11 @@ public class StoreController {
         return  ResponseEntity.status(HttpStatus.OK).body(getStoreDetail);
     }
 
+    /**
+     * 현 지역의 카테고리 별 찜한 가게 목록 조회
+     * [GET] /stores/map?townName={townName}&myCategoryId={myCategoryId}
+     */
+//    @GetMapping("/map")
+//    public ResponseEntity<StoreResponse.>
+
 }

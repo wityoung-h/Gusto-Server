@@ -24,7 +24,7 @@ public class Store extends BaseTime {
     @Column(columnDefinition = "VARCHAR(30)")
     private String storeName;
 
-    private Float longtitude;
+    private Float longitude;
 
     private Float latitude;
 
