@@ -109,16 +109,6 @@ public class GroupServiceImpl implements GroupService{
             throw new GeneralException(Code.UNAUTHORIZED_DELETE_GROUP);
         }
 
-        // 그룹의 가게 리스트 일괄 삭제
-        List<GroupList> groupListsToDelete = groupListRepository.findGroupListsByGroup(group);
-        groupListRepository.deleteAll(groupListsToDelete);
-
-        // 그룹의 루트 리스트 일괄 삭제
-        List<Route> routesToDelete = routeRepository.findRoutesByGroupAndStatus(group, BaseEntity.Status.ACTIVE);
-        for(Route route : routesToDelete){
-            route.updateStatus(BaseEntity.Status.INACTIVE);
-        }
-
         // 그룹 삭제
         group.updateStatus(BaseEntity.Status.INACTIVE);
         groupRepository.save(group);
