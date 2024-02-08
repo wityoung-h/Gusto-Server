@@ -2,6 +2,7 @@ package com.umc.gusto.domain.group.service;
 
 import com.umc.gusto.domain.group.entity.Group;
 import com.umc.gusto.domain.group.entity.GroupMember;
+import com.umc.gusto.domain.group.entity.InvitationCode;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
@@ -9,6 +10,7 @@ import com.umc.gusto.domain.group.model.response.GetGroupResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
+import com.umc.gusto.domain.group.repository.InvitationCodeRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
@@ -16,6 +18,7 @@ import com.umc.gusto.global.exception.GeneralException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,8 +29,11 @@ import java.util.stream.Collectors;
 public class GroupServiceImpl implements GroupService{
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final InvitationCodeRepository invitationCodeRepository;
+    private static final int INVITE_CODE_LENGTH = 12;
 
     public void createGroup(User owner, PostGroupRequest postGroupRequest){
+        // 그룹
         Group group = Group.builder()
                 .groupName(postGroupRequest.getGroupName())
                 .groupScript(postGroupRequest.getGroupScript())
@@ -35,11 +41,21 @@ public class GroupServiceImpl implements GroupService{
                 .notice("멤버들에게 새로운 공지사항을 공유해보세요!")
                 .build();
         Group savedGroup = groupRepository.save(group);
+
+        // 그룹 멤버
         GroupMember ownerMember = GroupMember.builder()
                 .group(savedGroup)
                 .user(owner)
                 .build();
         groupMemberRepository.save(ownerMember);
+
+        // 초대 코드
+        String code = RandomStringUtils.randomAlphanumeric(INVITE_CODE_LENGTH);
+        InvitationCode invitationCode = InvitationCode.builder()
+                .group(group)
+                .code(code)
+                .build();
+        invitationCodeRepository.save(invitationCode);
     }
 
     @Transactional(readOnly = true)
