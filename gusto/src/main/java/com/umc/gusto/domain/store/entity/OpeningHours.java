@@ -39,7 +39,7 @@ public class OpeningHours extends BaseTime {
 
     private LocalTime breakEnd;
 
-    public enum BusinessDay {
-        MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
-    }
+//    public enum BusinessDay {
+//        MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+//    }
 }
