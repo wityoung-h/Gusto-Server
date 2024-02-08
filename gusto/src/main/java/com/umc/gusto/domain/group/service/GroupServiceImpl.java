@@ -6,9 +6,12 @@ import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
+import com.umc.gusto.domain.group.model.response.GetGroupsResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
+import com.umc.gusto.domain.group.repository.GroupListRepository;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
+import com.umc.gusto.domain.route.repository.RouteRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
@@ -26,6 +29,8 @@ import java.util.stream.Collectors;
 public class GroupServiceImpl implements GroupService{
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final GroupListRepository groupListRepository;
+    private final RouteRepository routeRepository;
 
     public void createGroup(User owner, PostGroupRequest postGroupRequest){
         Group group = Group.builder()
@@ -107,5 +112,25 @@ public class GroupServiceImpl implements GroupService{
         // 그룹 삭제
         group.updateStatus(BaseEntity.Status.INACTIVE);
         groupRepository.save(group);
+    }
+    @Transactional(readOnly = true)
+    public List<GetGroupsResponse> getUserGroups(User user) {
+        List<Long> groupIds = groupMemberRepository.findGroupIdsByUser(user);
+        List<Group> groups = groupRepository.findGroupsByGroupIdInAndStatus(groupIds, BaseEntity.Status.ACTIVE);
+        return groups.stream()
+                .map(group -> {
+                    int numMembers = groupMemberRepository.countGroupMembersByGroup(group);
+                    int numRestaurants = groupListRepository.countGroupListsByGroup(group);
+                    int numRoutes = routeRepository.countRoutesByGroupAndStatus(group, BaseEntity.Status.ACTIVE);
+
+                    return GetGroupsResponse.builder()
+                            .groupId(group.getGroupId())
+                            .groupName(group.getGroupName())
+                            .numMembers(numMembers)
+                            .numRestaurants(numRestaurants)
+                            .numRoutes(numRoutes)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }
