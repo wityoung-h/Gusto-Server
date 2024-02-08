@@ -27,5 +27,4 @@ public class GroupMember extends BaseTime {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
     private User user;
-
 }
