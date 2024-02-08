@@ -1,7 +1,9 @@
 package com.umc.gusto.domain.review.controller;
 
 import com.umc.gusto.domain.review.model.request.CreateReviewRequest;
+import com.umc.gusto.domain.review.model.request.ReviewViewRequest;
 import com.umc.gusto.domain.review.model.request.UpdateReviewRequest;
+import com.umc.gusto.domain.review.service.CollectReviewService;
 import com.umc.gusto.domain.review.service.ReviewService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
@@ -19,6 +21,7 @@ import java.util.List;
 @RequestMapping("/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
+    private final CollectReviewService collectReviewService;
     /**
      * 리뷰 생성
      */
@@ -59,5 +62,14 @@ public class ReviewController {
     @GetMapping("{reviewId}")
     public ResponseEntity<?> getReview(@PathVariable Long reviewId){
         return ResponseEntity.ok().body(reviewService.getReview(reviewId));
+    }
+
+    /**
+     * 리뷰 모아보기 - 인스타 뷰
+     */
+    @GetMapping("/InstaView")
+    public ResponseEntity<?> getReviewOfInstaView(@AuthenticationPrincipal AuthUser authUser, @RequestBody ReviewViewRequest reviewViewRequest){
+        User user = authUser.getUser();
+        return ResponseEntity.ok().body(collectReviewService.getReviewOfInstaView(user, reviewViewRequest));
     }
 }

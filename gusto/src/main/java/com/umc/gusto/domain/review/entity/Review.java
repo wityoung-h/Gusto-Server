@@ -8,7 +8,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -69,6 +71,15 @@ public class Review extends BaseEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private final Set<Tagging> taggingSet = new HashSet<>();          // 중복 허용x
 
+    public List<String> getImageList(){ //TODO: monogoDB를 활용하여 해당 코드를 리팩토링하는게 좋을 듯
+        List<String> imageList = new ArrayList<>();
+        if(this.img1 != null) imageList.add(this.img1);
+        if(this.img2 != null) imageList.add(this.img2);
+        if(this.img3 != null) imageList.add(this.img3);
+        if(this.img4 != null) imageList.add(this.img4);
+
+        return imageList;
+    }
     public void connectHashTag(Tagging tagging) {
         this.taggingSet.add(tagging);
     }
