@@ -22,4 +22,7 @@ public interface GroupService {
 
     // 그룹 참여
     void joinGroup(User user, Long groupId, JoinGroupRequest joinGroupRequest);
+
+    // 그룹 탈퇴
+    void leaveGroup(User user, Long groupId);
 }

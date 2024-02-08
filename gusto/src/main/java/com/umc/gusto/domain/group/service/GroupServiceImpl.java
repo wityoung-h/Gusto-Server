@@ -111,7 +111,6 @@ public class GroupServiceImpl implements GroupService{
 
         // 그룹 삭제
         group.updateStatus(BaseEntity.Status.INACTIVE);
-        groupRepository.save(group);
     }
 
     public void joinGroup(User user, Long groupId, JoinGroupRequest joinGroupRequest){
@@ -134,6 +133,14 @@ public class GroupServiceImpl implements GroupService{
         }else{
             throw new GeneralException(Code.INVALID_INVITATION_CODE);
         }
+    }
 
+    public void leaveGroup(User user, Long groupId){
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+        GroupMember groupMember = groupMemberRepository.findGroupMemberByGroupAndUser(group, user)
+                        .orElseThrow(()->new GeneralException(Code.USER_NOT_IN_GROUP));
+
+        groupMemberRepository.delete(groupMember);
     }
 }

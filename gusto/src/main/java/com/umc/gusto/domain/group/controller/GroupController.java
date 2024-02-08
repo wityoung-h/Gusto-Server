@@ -73,4 +73,15 @@ public class GroupController {
         groupService.joinGroup(user, groupId, joinGroupRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    /**
+     * 그룹 탈퇴
+     * [DELETE] /groups/{groupId}/leave
+     */
+    @DeleteMapping("/{groupId}/leave")
+    public ResponseEntity<?> leaveGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId){
+        User user = authUser.getUser();
+        groupService.leaveGroup(user, groupId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }
