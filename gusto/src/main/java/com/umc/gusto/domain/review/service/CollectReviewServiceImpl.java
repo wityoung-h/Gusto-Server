@@ -64,7 +64,7 @@ public class CollectReviewServiceImpl implements CollectReviewService{
 
     private Page<Review> pagingReview(User user, Long cursorId, ReviewViewRequest reviewViewRequest){
         //최신순 날짜로 정렬
-        Sort sort = Sort.by("visitedAt").descending();
+        Sort sort = Sort.by("visitedAt").descending().and(Sort.by("createdAt").descending());
         PageRequest pageRequest = PageRequest.of(0, reviewViewRequest.getSize(), sort);
 
         //최초로 조회한 경우
