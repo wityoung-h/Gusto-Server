@@ -12,16 +12,13 @@ import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.customException.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +27,9 @@ public class StoreServiceImpl implements StoreService{
     private final StoreRepository storeRepository;
     private final ReviewRepository reviewRepository;
     private final PinRepository pinRepository;
+    private static final int PAGE_SIZE_FIRST = 3;
+    private static final int PAGE_SIZE = 6;
+
     @Transactional(readOnly = true)
     public StoreResponse.getStore getStore(User user, Long storeId) {
         Store store = storeRepository.findById(storeId)
@@ -80,10 +80,10 @@ public class StoreServiceImpl implements StoreService{
         List<Review> reviews;
 
         if (reviewId != null) {
-            pageSize = 6;
+            pageSize = PAGE_SIZE_FIRST;
             reviews = reviewRepository.findReviewsAfterIdByStore(store, reviewId, PageRequest.of(pageNumber, pageSize));
         } else {
-            pageSize = 3;
+            pageSize = PAGE_SIZE;
             reviews = reviewRepository.findFirstReviewsByStore(store, PageRequest.of(pageNumber, pageSize));
         }
 
