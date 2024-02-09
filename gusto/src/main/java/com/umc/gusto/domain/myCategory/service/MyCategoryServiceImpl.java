@@ -31,9 +31,16 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     private final ReviewRepository reviewRepository;
 
     @Transactional(readOnly = true)
-    public List<MyCategoryResponse.MyCategory> getAllMyCategory(String nickname) {
+    public List<MyCategoryResponse.MyCategory> getAllMyCategory(User user, String nickname) {
 
-        List<MyCategory> myCategoryList = myCategoryRepository.findByUserNickname(nickname);
+        boolean isMyNickname = user.getNickname().equals(nickname);
+        List<MyCategory> myCategoryList;
+        if (isMyNickname) {
+            myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(nickname);       // 받아온 nickname과 User의 nickname 값이 다른 경우
+        } else {
+            myCategoryList = myCategoryRepository.findByUserNickname(nickname);
+        }
+
 
         return myCategoryList.stream()
                 .map(myCategory -> MyCategoryResponse.MyCategory.builder()

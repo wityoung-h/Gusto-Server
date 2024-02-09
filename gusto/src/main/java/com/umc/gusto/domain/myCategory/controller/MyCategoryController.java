@@ -20,10 +20,12 @@ public class MyCategoryController {
 
     @GetMapping("/{nickname}")
     public ResponseEntity<List<MyCategoryResponse.MyCategory>> allMyCategory(
+            @AuthenticationPrincipal AuthUser authUser,
             @PathVariable String nickname) {
-            List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryService.getAllMyCategory(nickname);
+        User user = authUser.getUser();
+        List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryService.getAllMyCategory(user, nickname);
 
-            return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
+        return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
     }
 
     @GetMapping

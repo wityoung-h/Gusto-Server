@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface MyCategoryService {
 
-    List<MyCategoryResponse.MyCategory> getAllMyCategory(String nickname);
+    List<MyCategoryResponse.MyCategory> getAllMyCategory(User user, String nickname);
 
     List<MyCategoryResponse.MyCategory> getAllMyCategoryWithLocation(User user, String townName);
 
