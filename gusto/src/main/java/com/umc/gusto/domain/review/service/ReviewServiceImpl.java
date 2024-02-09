@@ -12,9 +12,11 @@ import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
+import com.umc.gusto.global.common.PublishStatus;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.customException.NoPermission;
 import com.umc.gusto.global.exception.customException.NotFoundException;
+import com.umc.gusto.global.exception.customException.PrivateItemException;
 import com.umc.gusto.global.util.S3Service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -128,6 +130,11 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     public ReviewDetailResponse getReview(Long reviewId) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+        //TODO: 후에 각 리뷰마다의 공개, 비공개를 확인해서 주는거로 수정하기
+        if(!review.getUser().getPublishReview().equals(PublishStatus.PUBLIC)){
+            throw new PrivateItemException(Code.NO_PUBLIC_REVIEW);
+        }
+
         StringBuilder hashTags = new StringBuilder();
         review.getTaggingSet().stream().map(Tagging::getHashTag).forEach(o-> hashTags.append(o).append(","));
         return ReviewDetailResponse.of(review, hashTags.toString());
