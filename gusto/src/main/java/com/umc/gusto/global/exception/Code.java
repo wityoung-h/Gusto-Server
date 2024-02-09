@@ -33,6 +33,8 @@ public enum Code {
     FIND_FAIL_GROUP(HttpStatus.NOT_FOUND, 404401, "존재하지 않는 그룹입니다."),
     UNAUTHORIZED_DELETE_GROUP(HttpStatus.FORBIDDEN, 403402, "그룹을 삭제할 권한이 없습니다."),
     UNAUTHORIZED_MODIFY_GROUP_NAME(HttpStatus.FORBIDDEN, 403403, "그룹명을 수정할 권한이 없습니다."),
+    NO_TRANSFER_PERMISSION(HttpStatus.FORBIDDEN, 403407, "그룹 소유자만이 그룹 소유권을 이전할 수 있습니다."),
+    USER_NOT_IN_GROUP(HttpStatus.NOT_FOUND, 404406, "그룹에 가입되지 않은 유저입니다."),
 
     //myCategory 관련 에러 +5
     MYCATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 404501, "존재하지 않는 카테고리입니다."),

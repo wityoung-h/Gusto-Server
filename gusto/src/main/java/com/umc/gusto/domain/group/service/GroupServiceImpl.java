@@ -3,13 +3,16 @@ package com.umc.gusto.domain.group.service;
 import com.umc.gusto.domain.group.entity.Group;
 import com.umc.gusto.domain.group.entity.GroupMember;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
+import com.umc.gusto.domain.group.model.request.TransferOwnershipRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
+import com.umc.gusto.domain.group.model.response.TransferOwnershipResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
@@ -26,6 +29,7 @@ import java.util.stream.Collectors;
 public class GroupServiceImpl implements GroupService{
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final UserRepository userRepository;
 
     public void createGroup(User owner, PostGroupRequest postGroupRequest){
         Group group = Group.builder()
@@ -107,5 +111,29 @@ public class GroupServiceImpl implements GroupService{
         // 그룹 삭제
         group.updateStatus(BaseEntity.Status.INACTIVE);
         groupRepository.save(group);
+    }
+
+    public TransferOwnershipResponse transferOwnership(User owner, Long groupId, TransferOwnershipRequest transferOwnershipRequest){
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+
+        // 새로운 그룹장 찾기
+        GroupMember newOwnerMember = groupMemberRepository.findGroupMemberByGroupAndGroupMemberId(group, transferOwnershipRequest.getNewOwner())
+                .orElseThrow(()->new GeneralException(Code.USER_NOT_IN_GROUP));
+
+        // 그룹 소유자 권한 확인
+        if(!group.getOwner().getUserId().equals(owner.getUserId())){
+            throw new GeneralException(Code.NO_TRANSFER_PERMISSION);
+        }
+
+        User newOwner = newOwnerMember.getUser();
+
+        // 새로운 그룹장으로 권한 이전
+        group.updateOwner(newOwner);
+        groupRepository.save(group);
+
+        return TransferOwnershipResponse.builder()
+                .newOwner(newOwnerMember.getGroupMemberId())
+                .build();
     }
 }
