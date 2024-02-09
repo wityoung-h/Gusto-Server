@@ -2,13 +2,15 @@ package com.umc.gusto.domain.review.entity;
 
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.user.entity.User;
-import com.umc.gusto.global.common.BaseTime;
+import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.common.PublishStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -16,7 +18,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Review extends BaseTime {
+public class Review extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,6 +71,15 @@ public class Review extends BaseTime {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private final Set<Tagging> taggingSet = new HashSet<>();          // 중복 허용x
 
+    public List<String> getImageList(){ //TODO: monogoDB를 활용하여 해당 코드를 리팩토링하는게 좋을 듯
+        List<String> imageList = new ArrayList<>();
+        if(this.img1 != null) imageList.add(this.img1);
+        if(this.img2 != null) imageList.add(this.img2);
+        if(this.img3 != null) imageList.add(this.img3);
+        if(this.img4 != null) imageList.add(this.img4);
+
+        return imageList;
+    }
     public void connectHashTag(Tagging tagging) {
         this.taggingSet.add(tagging);
     }
@@ -103,5 +114,26 @@ public class Review extends BaseTime {
 
     public void updateComment(String comment){
         this.comment = comment;
+    }
+
+    public void updateStatus(Status status){
+        this.status = status;
+    }
+
+    //TODO: image를 리뷰엔티티가 아닌 file엔티티(photo)로 구분해서 만드는게 나을듯
+    public void updateImg1(String img1){
+        this.img1 = img1;
+    }
+
+    public void updateImg2(String img2){
+        this.img2 = img2;
+    }
+
+    public void updateImg3(String img3){
+        this.img3 = img3;
+    }
+
+    public void updateImg4(String img4){
+        this.img4 = img4;
     }
 }
