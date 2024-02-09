@@ -69,7 +69,7 @@ public class GroupController {
 
     /**
      * 그룹리스트 추가
-     * [POST] /group/{groupId}/groupList
+     * [POST] /groups/{groupId}/groupList
      */
     @PostMapping("/{groupId}/groupList")
     public ResponseEntity<?> createGroupList(
@@ -81,11 +81,12 @@ public class GroupController {
 
     /**
      * 그룹 리스트 삭제
-     * [DELETE] /groups/{groupListId}
+     * [DELETE] /groups/groupLists?groupListId=1
      */
-    @DeleteMapping("")
+    @DeleteMapping("/groupLists")
     public ResponseEntity<?> deleteGroupList(
-            @AuthenticationPrincipal AuthUser authUser, @RequestParam(name = "groupListId") List<Long> groupListId){
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam(name = "groupListId") List<Long> groupListId){
         User user = authUser.getUser();
         groupService.deleteGroupList(groupListId,user);
         return ResponseEntity.ok().build();
