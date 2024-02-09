@@ -37,10 +37,10 @@ public class CollectReviewServiceImpl implements CollectReviewService{
 
     @Override
     public CollectReviewsOfCalResponse getReviewOfCalView(User user, ReviewCalViewRequest reviewCalViewRequest) {
-        //해당 달의 첫 날짜는 프론트에서 준다.
-        LocalDate startDate = reviewCalViewRequest.getDate();
-        //해당 달의 마지막 날짜 구하기
+        //해당 달의 첫 날짜, 마지막 날짜 구하기
+        LocalDate startDate = reviewCalViewRequest.getDate().with(TemporalAdjusters.firstDayOfMonth());
         LocalDate lastDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
+
         List<Review> reviews = reviewRepository.findByUserAndVisitedAtBetween(user, startDate, lastDate);
 
         List<BasicViewResponse> basicViewResponse = reviews.stream().map(BasicViewResponse::of).toList();
