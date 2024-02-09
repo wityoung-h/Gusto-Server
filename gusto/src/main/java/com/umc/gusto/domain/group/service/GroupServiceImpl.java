@@ -115,14 +115,14 @@ public class GroupServiceImpl implements GroupService{
         Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
                 .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
 
-        // 새로운 그룹장 찾기
-        GroupMember newOwnerMember = groupMemberRepository.findGroupMemberByGroupAndGroupMemberId(group, transferOwnershipRequest.getNewOwner())
-                .orElseThrow(()->new GeneralException(Code.USER_NOT_IN_GROUP));
-
         // 그룹 소유자 권한 확인
         if(!group.getOwner().getUserId().equals(owner.getUserId())){
             throw new GeneralException(Code.NO_TRANSFER_PERMISSION);
         }
+
+        // 새로운 그룹장 찾기
+        GroupMember newOwnerMember = groupMemberRepository.findGroupMemberByGroupAndGroupMemberId(group, transferOwnershipRequest.getNewOwner())
+                .orElseThrow(()->new GeneralException(Code.USER_NOT_IN_GROUP));
 
         User newOwner = newOwnerMember.getUser();
 
