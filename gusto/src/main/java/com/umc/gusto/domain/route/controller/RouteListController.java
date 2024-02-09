@@ -41,7 +41,7 @@ public class RouteListController {
 
     // 루트리스트 상세 조회
     @GetMapping("/{routeId}")
-    public ResponseEntity<RouteListResponse.RouteListResponseDto> getRouteListDetail(
+    public ResponseEntity<?> getRouteListDetail(
             @PathVariable Long routeId
     ){
         return ResponseEntity.ok().body(routeListService.getRouteListDetail(routeId));

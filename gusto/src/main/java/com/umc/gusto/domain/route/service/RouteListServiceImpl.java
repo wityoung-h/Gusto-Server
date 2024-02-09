@@ -71,9 +71,9 @@ public class RouteListServiceImpl implements RouteListService{
         List<RouteList> routeList = routeListRepository.findByRoute(route);
         List<RouteListResponse.RouteList> routeLists = routeList.stream().map(rL ->
                 RouteListResponse.RouteList.builder()
-                        .longtitude(rL.getStore().getLongtitude())
-                        .latitude(rL.getStore().getLatitude())
-                        .routeListId(rL.getRouteListId())
+                        .storeId(rL.getStore().getStoreId())
+                        .storeName(rL.getStore().getStoreName())
+                        .address(rL.getStore().getAddress())
                         .ordinal(rL.getOrdinal())
                         .build()
         ).toList();
