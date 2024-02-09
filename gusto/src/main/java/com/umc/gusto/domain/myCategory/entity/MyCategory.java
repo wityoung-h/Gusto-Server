@@ -60,9 +60,10 @@ public class MyCategory extends BaseEntity{
         this.myCategoryScript = myCategoryScript;
     }
 
-    public void updatePublishCategory(PublishStatus publishCategory) {
-        this.publishCategory = publishCategory;
-    }
+    // 데모데이 이후 진행
+//    public void updatePublishCategory(PublishStatus publishCategory) {
+//        this.publishCategory = publishCategory;
+//    }
 
     public void updateStatus(BaseEntity.Status status) {this.status = status;}
 }

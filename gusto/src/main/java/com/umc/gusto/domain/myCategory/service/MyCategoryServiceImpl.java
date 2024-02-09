@@ -36,9 +36,9 @@ public class MyCategoryServiceImpl implements MyCategoryService {
         boolean isMyNickname = user.getNickname().equals(nickname);
         List<MyCategory> myCategoryList;
         if (isMyNickname) {
-            myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(nickname);       // 받아온 nickname과 User의 nickname 값이 다른 경우
-        } else {
             myCategoryList = myCategoryRepository.findByUserNickname(nickname);
+        } else {
+            myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(nickname);   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
         }
 
 
@@ -47,7 +47,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                         .myCategoryId(myCategory.getMyCategoryId())
                         .myCategoryName(myCategory.getMyCategoryName())
                         .myCategoryIcon(myCategory.getMyCategoryIcon())
-                        .publishCategory(myCategory.getPublishCategory())
+                        .publishCategory(user.getPublishCategory())
                         .pinCnt(myCategory.getPinList().size())            // pin 개수 받아오기로 변경
                         .build())
                 .collect(Collectors.toList());
@@ -65,7 +65,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                             .myCategoryId(myCategory.getMyCategoryId())
                             .myCategoryName(myCategory.getMyCategoryName())
                             .myCategoryIcon(myCategory.getMyCategoryIcon())
-                            .publishCategory(myCategory.getPublishCategory())
+                            .publishCategory(user.getPublishCategory())
                             .pinCnt(pinList.size())            // pin 개수 받아오기로 변경
                             .build();
                 })
@@ -134,7 +134,6 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                 .myCategoryName(createMyCategory.getMyCategoryName())
                 .myCategoryIcon(createMyCategory.getMyCategoryIcon())
                 .myCategoryScript(createMyCategory.getMyCategoryScript())
-                .publishCategory(createMyCategory.getPublishCategory())
                 .user(user)
                 .build();
 
@@ -166,10 +165,6 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
             if (updateMyCategory.getMyCategoryScript() != null) {
                 existingMyCategory.updateMyCategoryScript(updateMyCategory.getMyCategoryScript());
-            }
-
-            if (updateMyCategory.getPublishCategory() != null) {
-                existingMyCategory.updatePublishCategory(updateMyCategory.getPublishCategory());
             }
 
             myCategoryRepository.save(existingMyCategory);
