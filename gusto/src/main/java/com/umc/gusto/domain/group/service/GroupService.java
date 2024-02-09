@@ -6,6 +6,7 @@ import com.umc.gusto.domain.group.model.request.TransferOwnershipRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
+import com.umc.gusto.domain.group.model.response.GetInvitationCodeResponse;
 import com.umc.gusto.domain.group.model.response.TransferOwnershipResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupsResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
@@ -25,6 +26,9 @@ public interface GroupService {
 
     // 그룹 삭제
     void deleteGroup(User owner, Long groupId);
+
+    // 그룹 초대 코드 조회
+    GetInvitationCodeResponse getInvitationCode(Long groupId);
 
     // 그룹 소유권 이전
     TransferOwnershipResponse transferOwnership(User owner, Long groupId, TransferOwnershipRequest transferOwnershipRequest);

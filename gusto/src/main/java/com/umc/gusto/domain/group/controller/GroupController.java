@@ -6,6 +6,7 @@ import com.umc.gusto.domain.group.model.request.TransferOwnershipRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
+import com.umc.gusto.domain.group.model.response.GetInvitationCodeResponse;
 import com.umc.gusto.domain.group.model.response.TransferOwnershipResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupsResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
@@ -69,6 +70,15 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    /**
+     * 초대 코드 조회
+     * [GET] /groups/{groupId}/invitationCode
+     */
+    @GetMapping("/{groupId}/invitationCode")
+    public ResponseEntity<GetInvitationCodeResponse> getInvitationCode(@PathVariable Long groupId){
+        GetInvitationCodeResponse getInvitationCode = groupService.getInvitationCode(groupId);
+        return ResponseEntity.status(HttpStatus.OK).body(getInvitationCode);
+      
     /**
      * 그룹 소유권 이전
      * [PATCH] /groups/{groupId}/transfer-ownership
