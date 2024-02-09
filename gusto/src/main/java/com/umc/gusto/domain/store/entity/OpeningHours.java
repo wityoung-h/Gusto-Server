@@ -23,13 +23,13 @@ public class OpeningHours extends BaseTime {
     @Column(nullable = false, updatable = false)
     private Long opHoursId;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "storeId")
     private Store store;
 
-    // businessDay 복수 처리
-    @Column(name = "business_day")
-    private String businessDay;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "business_day", nullable = false, length = 15)
+    private BusinessDay businessDay;
 
     private LocalTime openedAt;
 
@@ -39,7 +39,7 @@ public class OpeningHours extends BaseTime {
 
     private LocalTime breakEnd;
 
-//    public enum BusinessDay {
-//        MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
-//    }
+    public enum BusinessDay {
+        MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+    }
 }

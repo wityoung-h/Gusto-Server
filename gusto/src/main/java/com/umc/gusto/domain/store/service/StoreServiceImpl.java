@@ -7,6 +7,7 @@ import com.umc.gusto.domain.store.entity.Category;
 import com.umc.gusto.domain.store.entity.OpeningHours;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.model.response.StoreResponse;
+import com.umc.gusto.domain.store.repository.OpeningHoursRepository;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.exception.Code;
@@ -17,8 +18,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
+import java.time.LocalTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +30,7 @@ public class StoreServiceImpl implements StoreService{
     private final StoreRepository storeRepository;
     private final ReviewRepository reviewRepository;
     private final PinRepository pinRepository;
+    private final OpeningHoursRepository openingHoursRepository;
     private static final int PAGE_SIZE_FIRST = 3;
     private static final int PAGE_SIZE = 6;
 
@@ -34,8 +38,16 @@ public class StoreServiceImpl implements StoreService{
     public StoreResponse.getStore getStore(User user, Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND));
-        OpeningHours openingHours = storeRepository.findOpeningHoursByStoreId(storeId)
-                .orElseThrow(() -> new NotFoundException(Code.OPENINGHOURS_NOT_FOUND));
+        List<OpeningHours> openingHoursList = openingHoursRepository.findByStoreStoreId(storeId);
+
+        Map<OpeningHours.BusinessDay, StoreResponse.getStore.Timing> businessDays = new LinkedHashMap<>();
+        for (OpeningHours openingHours : openingHoursList) {
+            StoreResponse.getStore.Timing timing = new StoreResponse.getStore.Timing(
+                    openingHours.getOpenedAt(),
+                    openingHours.getClosedAt()
+            );
+            businessDays.put(openingHours.getBusinessDay(), timing);
+        }
 
         List<Review> top3Reviews = reviewRepository.findFirst3ByStoreOrderByLikedDesc(store);
 
@@ -45,21 +57,16 @@ public class StoreServiceImpl implements StoreService{
 
         boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
-        List<String> businessDays = Arrays.asList(openingHours.getBusinessDay().split(","));
-
         return StoreResponse.getStore.builder()
                 .storeId(storeId)
                 .storeName(store.getStoreName())
                 .address(store.getAddress())
                 .businessDay(businessDays)
-                .openedAt(openingHours.getOpenedAt())
-                .closedAt(openingHours.getClosedAt())
-                .contact(store.getContact())
                 .reviewImg3(reviewImg)
                 .pin(isPinned)
                 .build();
-
     }
+
 
     @Transactional(readOnly = true)
     public StoreResponse.getStoreDetail getStoreDetail(User user, Long storeId, Long reviewId, Pageable pageable) {
