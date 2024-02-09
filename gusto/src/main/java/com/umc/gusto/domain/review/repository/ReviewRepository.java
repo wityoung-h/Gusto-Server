@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ReviewRepository extends JpaRepository<Review, Long > {
     Optional<Review> findTopByStoreOrderByLikedDesc(Store store);
@@ -23,6 +24,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long > {
 //    List<Review> searchAllByUserAndVisitedAtStartsWith(@Param("user") User user, @Param("date") String date);
 
     boolean existsByUserAndReviewIdLessThan(User user, Long reviewId);
-//    @Query(value = "SELECT r FROM Review r WHERE r.user NOT :user ORDER BY RAND() LIMIT 15", nativeQuery = true)
-//    List<Review> findRandomByUser(@Param("user") User user);
+    @Query(value = "SELECT * FROM review r WHERE r.user_id <> :user ORDER BY RAND() limit 15", nativeQuery = true)
+    List<Review> findRandomFeedByUser(@Param("user") UUID user); //WHERE r.user_id <> :user
 }

@@ -7,7 +7,6 @@ import com.umc.gusto.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,8 +17,8 @@ public class FeedServiceImpl implements FeedService{
 
     @Override
     public List<RandomFeedResponse> getRandomFeed(User user) {
-//        List<Review> feedList = reviewRepository.findRandomByUser(user);
-        List<Review> feedList = new ArrayList<>();
+        List<Review> feedList = reviewRepository.findRandomFeedByUser(user.getUserId());
+//        List<Review> feedList = new ArrayList<>();
         return feedList.stream().map(RandomFeedResponse::of).collect(Collectors.toList());
     }
 }
