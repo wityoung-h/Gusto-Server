@@ -12,7 +12,6 @@ import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.user.entity.User;
-import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
@@ -29,7 +28,6 @@ import java.util.stream.Collectors;
 public class GroupServiceImpl implements GroupService{
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
-    private final UserRepository userRepository;
 
     public void createGroup(User owner, PostGroupRequest postGroupRequest){
         Group group = Group.builder()
