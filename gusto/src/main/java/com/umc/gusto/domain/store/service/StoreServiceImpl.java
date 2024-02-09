@@ -74,7 +74,7 @@ public class StoreServiceImpl implements StoreService{
                 .map(Review::getImg1)
                 .collect(Collectors.toList());
 
-        // TODO : reviews 페이징 처리 (3,6,6...)
+        // reviews 페이징 처리 (3,6,6...)
         int pageSize;
         int pageNumber = pageable.getPageNumber();
         List<Review> reviews;
