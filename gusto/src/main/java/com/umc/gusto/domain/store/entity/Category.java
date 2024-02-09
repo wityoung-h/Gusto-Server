@@ -17,4 +17,8 @@ public class Category {
 
     @Column(nullable = false, columnDefinition = "VARCHAR(15)")
     private String categoryName;
+
+    @OneToOne
+    @JoinColumn(name = "storeId")
+    private Store store;
 }

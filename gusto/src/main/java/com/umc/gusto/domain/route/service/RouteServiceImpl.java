@@ -59,7 +59,8 @@ public class RouteServiceImpl implements RouteService{
 
     @Override
     public List<RouteResponse.RouteResponseDto> getRoute(String nickname) {
-        User user = userRepository.findByNickname(nickname);
+        User user = userRepository.findByNicknameAndMemberStatus(nickname, User.MemberStatus.ACTIVE)
+                .orElseThrow(()-> new RuntimeException("존재하지 않는 회원입니다."));
 
         List<Route> routes = routeRepository.findRouteByUser(user);
         return routes.stream().map(

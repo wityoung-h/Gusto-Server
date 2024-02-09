@@ -26,6 +26,7 @@ public class MyCategoryResponse {
     @AllArgsConstructor
     public static class PinByMyCategory{
         Long pinId;
+        Long storeId;
         String storeName;
         String address;
         String reviewImg;

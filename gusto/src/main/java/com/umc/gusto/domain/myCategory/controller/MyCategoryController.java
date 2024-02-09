@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -23,8 +22,8 @@ public class MyCategoryController {
     public ResponseEntity<List<MyCategoryResponse.MyCategory>> allMyCategory(
             @PathVariable String nickname) {
             List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryService.getAllMyCategory(nickname);
-            return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
 
+            return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
     }
 
     @GetMapping
@@ -33,6 +32,7 @@ public class MyCategoryController {
             @RequestParam(name = "townName") String townName) {
             User user = authUser.getUser();
             List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryService.getAllMyCategoryWithLocation(user, townName);
+
             return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
     }
 
@@ -41,6 +41,7 @@ public class MyCategoryController {
             @RequestParam(name = "myCategoryId") Long myCategoryId,
             @PathVariable String nickname) {
             List<MyCategoryResponse.PinByMyCategory> myStoreList = myCategoryService.getAllPinByMyCategory(nickname, myCategoryId);
+
             return ResponseEntity.status(HttpStatus.OK).body(myStoreList);
     }
 
@@ -51,6 +52,7 @@ public class MyCategoryController {
             @RequestParam(name = "townName") String townName) {
             User user = authUser.getUser();
             List<MyCategoryResponse.PinByMyCategory> myCategoryList = myCategoryService.getAllPinByMyCategoryWithLocation(user, myCategoryId,townName);
+
             return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
     }
 
@@ -64,7 +66,6 @@ public class MyCategoryController {
             myCategoryService.createMyCategory(user, createMyCategory);
 
             return ResponseEntity.status(HttpStatus.CREATED).build();
-
     }
 
     @PatchMapping("/{myCategoryId}")
@@ -76,7 +77,7 @@ public class MyCategoryController {
         User user = authUser.getUser();
         myCategoryService.modifyMyCategory(user, myCategoryId, request);
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping
