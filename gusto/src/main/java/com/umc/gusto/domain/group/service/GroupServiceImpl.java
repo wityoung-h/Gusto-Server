@@ -161,17 +161,18 @@ public class GroupServiceImpl implements GroupService{
     }
   
     @Transactional(readOnly = true)
-    public GetInvitationCodeResponse getInvitationCode(Long groupId){
+    public GetInvitationCodeResponse getInvitationCode(Long groupId) {
         Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
-                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+                .orElseThrow(() -> new GeneralException(Code.FIND_FAIL_GROUP));
         InvitationCode invitationCode = invitationCodeRepository.findInvitationCodeByGroup(group)
-                .orElseThrow(()->new GeneralException(Code.INVITATION_CODE_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(Code.INVITATION_CODE_NOT_FOUND));
 
         return GetInvitationCodeResponse.builder()
                 .invitationCodeId(invitationCode.getInvitationCodeId())
                 .groupId(invitationCode.getGroup().getGroupId())
                 .code(invitationCode.getCode())
                 .build();
+    }
 
     @Transactional(readOnly = true)
     public List<GetGroupsResponse> getUserGroups(User user) {
