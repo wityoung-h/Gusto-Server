@@ -2,9 +2,11 @@ package com.umc.gusto.domain.group.controller;
 
 import com.umc.gusto.domain.group.model.request.JoinGroupRequest;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
+import com.umc.gusto.domain.group.model.request.TransferOwnershipRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
+import com.umc.gusto.domain.group.model.response.TransferOwnershipResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupsResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.service.GroupService;
@@ -68,7 +70,16 @@ public class GroupController {
     }
 
     /**
-
+     * 그룹 소유권 이전
+     * [PATCH] /groups/{groupId}/transfer-ownership
+     */
+    @PatchMapping("/{groupId}/transfer-ownership")
+    public ResponseEntity<TransferOwnershipResponse> transferOwnership(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId, @RequestBody TransferOwnershipRequest transferOwnershipRequest){
+        User owner = authUser.getUser();
+        TransferOwnershipResponse transferOwnership = groupService.transferOwnership(owner, groupId, transferOwnershipRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(transferOwnership);
+      
+    /**
      * 그룹 참여
      * [POST] /groups/{groupId}/join
      */

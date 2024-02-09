@@ -4,9 +4,11 @@ import com.umc.gusto.domain.group.entity.Group;
 import com.umc.gusto.domain.group.entity.GroupMember;
 import com.umc.gusto.domain.group.model.request.JoinGroupRequest;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
+import com.umc.gusto.domain.group.model.request.TransferOwnershipRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
+import com.umc.gusto.domain.group.model.response.TransferOwnershipResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupsResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.repository.GroupListRepository;
@@ -174,5 +176,29 @@ public class GroupServiceImpl implements GroupService{
                         .profileImg(groupMember.getUser().getProfileImage())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public TransferOwnershipResponse transferOwnership(User owner, Long groupId, TransferOwnershipRequest transferOwnershipRequest){
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+
+        // 그룹 소유자 권한 확인
+        if(!group.getOwner().getUserId().equals(owner.getUserId())){
+            throw new GeneralException(Code.NO_TRANSFER_PERMISSION);
+        }
+
+        // 새로운 그룹장 찾기
+        GroupMember newOwnerMember = groupMemberRepository.findGroupMemberByGroupAndGroupMemberId(group, transferOwnershipRequest.getNewOwner())
+                .orElseThrow(()->new GeneralException(Code.USER_NOT_IN_GROUP));
+
+        User newOwner = newOwnerMember.getUser();
+
+        // 새로운 그룹장으로 권한 이전
+        group.updateOwner(newOwner);
+        groupRepository.save(group);
+
+        return TransferOwnershipResponse.builder()
+                .newOwner(newOwnerMember.getGroupMemberId())
+                .build();
     }
 }

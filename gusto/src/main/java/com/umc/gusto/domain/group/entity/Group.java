@@ -46,4 +46,6 @@ public class Group extends BaseEntity {
     public void updateStatus(BaseEntity.Status status){
         this.status = status;
     }
+
+    public void updateOwner(User owner) { this.owner = owner; }
 }
