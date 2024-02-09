@@ -77,7 +77,7 @@ public class ReviewController {
      * 리뷰 모아보기 - 캘린더 뷰
      */
     @GetMapping("/calView")
-    public ResponseEntity<?> getReviewOfCalView(@AuthenticationPrincipal AuthUser authUser, @RequestBody ReviewCalViewRequest reviewCalViewRequest){
+    public ResponseEntity<?> getReviewOfCalView(@AuthenticationPrincipal AuthUser authUser, @RequestBody @Valid ReviewCalViewRequest reviewCalViewRequest){
         User user = authUser.getUser();
         return ResponseEntity.ok().body(collectReviewService.getReviewOfCalView(user, reviewCalViewRequest));
     }

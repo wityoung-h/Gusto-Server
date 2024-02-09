@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long > {
@@ -16,8 +18,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long > {
     Integer countByStoreAndUserNickname(Store store, String nickname);
     Optional<Page<Review>> findAllByUser(User user, PageRequest pageRequest);
     Optional<Page<Review>> findAllByUserAndReviewIdLessThan(User user, Long reviewId,PageRequest pageRequest);
-//    @Query(value = "SELECT r FROM Review r where r.user=:user AND date_format(r.visitedAt, \"%Y%m\") like %:date%", nativeQuery = true)
-//    List<Review> searchAllByUserAndVisitedAtStartsWith(@Param("user") User user, @Param("date") String date);
+    List<Review> findByUserAndVisitedAtBetween(User user, LocalDate startDate, LocalDate lastDate);
 
     boolean existsByUserAndReviewIdLessThan(User user, Long reviewId);
 }

@@ -14,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 @Service
@@ -35,12 +37,14 @@ public class CollectReviewServiceImpl implements CollectReviewService{
 
     @Override
     public CollectReviewsOfCalResponse getReviewOfCalView(User user, ReviewCalViewRequest reviewCalViewRequest) {
-//        List<Review> reviews = reviewRepository.searchAllByUserAndVisitedAtStartsWith(user, reviewCalViewRequest.getDate());
-//                .orElseThrow(()-> new NotFoundException(Code.REVIEW_NOT_FOUND));
+        //해당 달의 첫 날짜는 프론트에서 준다.
+        LocalDate startDate = reviewCalViewRequest.getDate();
+        //해당 달의 마지막 날짜 구하기
+        LocalDate lastDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
+        List<Review> reviews = reviewRepository.findByUserAndVisitedAtBetween(user, startDate, lastDate);
 
-//        List<BasicViewResponse> basicViewRespons = reviews.stream().map(BasicViewResponse::of).toList();
-//        return CollectReviewsOfCalResponse.builder().reviews(basicViewRespons).build();
-        return CollectReviewsOfCalResponse.builder().build();
+        List<BasicViewResponse> basicViewResponse = reviews.stream().map(BasicViewResponse::of).toList();
+        return CollectReviewsOfCalResponse.builder().reviews(basicViewResponse).build();
     }
 
     @Override
