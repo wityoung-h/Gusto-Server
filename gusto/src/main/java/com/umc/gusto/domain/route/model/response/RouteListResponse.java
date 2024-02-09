@@ -17,7 +17,7 @@ public class RouteListResponse {
     public static class RouteList{
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        private float longtitude;
+        private Float longtitude;
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private Float latitude;
         private Long routeListId;
