@@ -55,7 +55,10 @@ public class CollectReviewServiceImpl implements CollectReviewService{
         //다음에 조회될 리뷰가 있는지 확인하기
         boolean checkNext = hasNext(user, reviews);
 
-        List<TimelineViewResponse> timelineViewResponses = reviews.map(TimelineViewResponse::of).toList();
+        List<TimelineViewResponse> timelineViewResponses = reviews.map(review -> {
+                    int visitedCount = reviewRepository.countByStoreAndUser(review.getStore(), user);
+                    return TimelineViewResponse.of(review, visitedCount);
+                }).toList();
         return CollectReviewsOfTimelineResponse.of(timelineViewResponses, checkNext);
     }
 

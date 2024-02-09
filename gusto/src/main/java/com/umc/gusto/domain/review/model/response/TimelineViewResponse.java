@@ -16,11 +16,12 @@ public class TimelineViewResponse {
     int visitedCount;
     List<String> images;
 
-    public static TimelineViewResponse of(Review review){
+    public static TimelineViewResponse of(Review review, int visitedCount){
         return TimelineViewResponse.builder()
                 .reviewId(review.getReviewId())
                 .storeName(review.getStore().getStoreName())
                 .visitedAt(review.getVisitedAt())
+                .visitedCount(visitedCount)
                 .images(review.getImageList())
                 .build();
     }
