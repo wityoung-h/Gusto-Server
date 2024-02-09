@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.route.service;
 
+import com.umc.gusto.domain.group.entity.Group;
 import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.route.model.request.RouteRequest;
@@ -65,6 +66,23 @@ public class RouteServiceImpl implements RouteService{
     @Override
     public List<RouteResponse.RouteResponseDto> getRoute(User user) {
         List<Route> routes = routeRepository.findRouteByUserAndStatus(user, BaseEntity.Status.ACTIVE);
+        return routes.stream().map(
+                        Route -> RouteResponse.RouteResponseDto.builder()
+                                .routeId(Route.getRouteId())
+                                .routeName(Route.getRouteName())
+                                .numStore(routeListRepository.countRouteListByRoute(Route))
+                                .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<RouteResponse.RouteResponseDto> getGroupRoute(Long groupId) {
+        // 그룹 존재 여부 확인
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+
+        //특정 그룹 내 루트 조회
+        List<Route> routes = routeRepository.findRoutesByGroupAndStatus(group,BaseEntity.Status.ACTIVE);
         return routes.stream().map(
                         Route -> RouteResponse.RouteResponseDto.builder()
                                 .routeId(Route.getRouteId())
