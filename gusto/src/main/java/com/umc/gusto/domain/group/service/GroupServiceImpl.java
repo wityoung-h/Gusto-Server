@@ -2,6 +2,7 @@ package com.umc.gusto.domain.group.service;
 
 import com.umc.gusto.domain.group.entity.Group;
 import com.umc.gusto.domain.group.entity.GroupMember;
+import com.umc.gusto.domain.group.model.request.JoinGroupRequest;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
@@ -11,8 +12,10 @@ import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.repository.GroupListRepository;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
+import com.umc.gusto.domain.group.repository.InvitationCodeRepository;
 import com.umc.gusto.domain.route.repository.RouteRepository;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
@@ -29,6 +32,8 @@ import java.util.stream.Collectors;
 public class GroupServiceImpl implements GroupService{
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final UserRepository userRepository;
+    private final InvitationCodeRepository invitationCodeRepository;
     private final GroupListRepository groupListRepository;
     private final RouteRepository routeRepository;
 
@@ -104,7 +109,37 @@ public class GroupServiceImpl implements GroupService{
 
         // 그룹 삭제
         group.updateStatus(BaseEntity.Status.INACTIVE);
-        groupRepository.save(group);
+    }
+
+    public void joinGroup(User user, Long groupId, JoinGroupRequest joinGroupRequest){
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+        String invitationCode = invitationCodeRepository.findCodeByGroup(group);
+
+        // 초대 코드 확인
+        if(joinGroupRequest.getCode().equals(invitationCode)){
+            // 그룹 참여
+            User joinUser = userRepository.findById(user.getUserId())
+                    .orElseThrow(()->new GeneralException(Code.DONT_EXIST_USER));
+
+            GroupMember groupMember = GroupMember.builder()
+                    .group(group)
+                    .user(joinUser)
+                    .build();
+
+            groupMemberRepository.save(groupMember);
+        }else{
+            throw new GeneralException(Code.INVALID_INVITATION_CODE);
+        }
+    }
+
+    public void leaveGroup(User user, Long groupId){
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+        GroupMember groupMember = groupMemberRepository.findGroupMemberByGroupAndUser(group, user)
+                        .orElseThrow(()->new GeneralException(Code.USER_NOT_IN_GROUP));
+
+        groupMemberRepository.delete(groupMember);
     }
     @Transactional(readOnly = true)
     public List<GetGroupsResponse> getUserGroups(User user) {

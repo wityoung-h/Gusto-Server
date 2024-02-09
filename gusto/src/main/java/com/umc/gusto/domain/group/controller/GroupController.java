@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.group.controller;
 
+import com.umc.gusto.domain.group.model.request.JoinGroupRequest;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
@@ -67,6 +68,29 @@ public class GroupController {
     }
 
     /**
+
+     * 그룹 참여
+     * [POST] /groups/{groupId}/join
+     */
+    @PostMapping("/{groupId}/join")
+    public ResponseEntity<?> joinGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId, @RequestBody JoinGroupRequest joinGroupRequest){
+        User user = authUser.getUser();
+        groupService.joinGroup(user, groupId, joinGroupRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /**
+     * 그룹 탈퇴
+     * [DELETE] /groups/{groupId}/leave
+     */
+    @DeleteMapping("/{groupId}/leave")
+    public ResponseEntity<?> leaveGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId){
+        User user = authUser.getUser();
+        groupService.leaveGroup(user, groupId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+  
+    /**
      * 그룹 목록 조회
      * [GET] /groups
      */
@@ -86,5 +110,4 @@ public class GroupController {
         List<GetGroupMemberResponse> getGroupMembers = groupService.getGroupMembers(groupId);
         return ResponseEntity.status(HttpStatus.OK).body(getGroupMembers);
     }
-
 }
