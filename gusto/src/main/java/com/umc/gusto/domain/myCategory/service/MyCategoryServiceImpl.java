@@ -12,8 +12,8 @@ import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.customException.NotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -29,7 +29,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     private final PinRepository pinRepository;
     private final ReviewRepository reviewRepository;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<MyCategoryResponse.MyCategory> getAllMyCategory(String nickname) {
 
         List<MyCategory> myCategoryList = myCategoryRepository.findByUserNickname(nickname);
@@ -45,7 +45,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<MyCategoryResponse.MyCategory> getAllMyCategoryWithLocation(User user, String townName) {
         List<MyCategory> myCategoryList = myCategoryRepository.findByStatusAndPublishCategoryAndUser(user);                                      // 특정 townName인 storesList
 
@@ -64,7 +64,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategory(String nickname, Long myCategoryId) {
         Optional<MyCategory> existingMyCategory = myCategoryRepository.findById(myCategoryId);
         // 카테고리 별 가게 목록이 비어있으면 pinList도 비어 있음
@@ -88,7 +88,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<MyCategoryResponse.PinByMyCategory> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townName) {
         List<Pin> pinList = myCategoryRepository.findPinsByMyCategoryIdAndTownName(myCategoryId, townName);
 

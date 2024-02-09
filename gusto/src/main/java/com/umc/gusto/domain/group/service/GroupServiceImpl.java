@@ -2,16 +2,22 @@ package com.umc.gusto.domain.group.service;
 
 import com.umc.gusto.domain.group.entity.Group;
 import com.umc.gusto.domain.group.entity.GroupMember;
+import com.umc.gusto.domain.group.model.request.JoinGroupRequest;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.TransferOwnershipRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
 import com.umc.gusto.domain.group.model.response.TransferOwnershipResponse;
+import com.umc.gusto.domain.group.model.response.GetGroupsResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
+import com.umc.gusto.domain.group.repository.GroupListRepository;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
+import com.umc.gusto.domain.group.repository.InvitationCodeRepository;
+import com.umc.gusto.domain.route.repository.RouteRepository;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
@@ -28,6 +34,10 @@ import java.util.stream.Collectors;
 public class GroupServiceImpl implements GroupService{
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final UserRepository userRepository;
+    private final InvitationCodeRepository invitationCodeRepository;
+    private final GroupListRepository groupListRepository;
+    private final RouteRepository routeRepository;
 
     public void createGroup(User owner, PostGroupRequest postGroupRequest){
         Group group = Group.builder()
@@ -49,14 +59,7 @@ public class GroupServiceImpl implements GroupService{
         Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
                 .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
         Long ownerMemberId = groupMemberRepository.findGroupMemberIdByGroupAndUser(group, group.getOwner());
-        List<GroupMember> groupMembers = groupMemberRepository.findGroupMembersByGroup(group);
-        List<GetGroupMemberResponse> groupMembersDto = groupMembers.stream()
-                .map(member -> new GetGroupMemberResponse(
-                        member.getGroupMemberId(),
-                        member.getUser().getNickname(),
-                        member.getUser().getProfileImage()
-                ))
-                .collect(Collectors.toList());
+        List<GetGroupMemberResponse> groupMembersDto = getGroupMembers(groupId);
         return GetGroupResponse.builder()
                 .groupId(group.getGroupId())
                 .groupName(group.getGroupName())
@@ -108,7 +111,71 @@ public class GroupServiceImpl implements GroupService{
 
         // 그룹 삭제
         group.updateStatus(BaseEntity.Status.INACTIVE);
-        groupRepository.save(group);
+    }
+
+    public void joinGroup(User user, Long groupId, JoinGroupRequest joinGroupRequest){
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+        String invitationCode = invitationCodeRepository.findCodeByGroup(group);
+
+        // 초대 코드 확인
+        if(joinGroupRequest.getCode().equals(invitationCode)){
+            // 그룹 참여
+            User joinUser = userRepository.findById(user.getUserId())
+                    .orElseThrow(()->new GeneralException(Code.DONT_EXIST_USER));
+
+            GroupMember groupMember = GroupMember.builder()
+                    .group(group)
+                    .user(joinUser)
+                    .build();
+
+            groupMemberRepository.save(groupMember);
+        }else{
+            throw new GeneralException(Code.INVALID_INVITATION_CODE);
+        }
+    }
+
+    public void leaveGroup(User user, Long groupId){
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+        GroupMember groupMember = groupMemberRepository.findGroupMemberByGroupAndUser(group, user)
+                        .orElseThrow(()->new GeneralException(Code.USER_NOT_IN_GROUP));
+
+        groupMemberRepository.delete(groupMember);
+    }
+    @Transactional(readOnly = true)
+    public List<GetGroupsResponse> getUserGroups(User user) {
+        List<Long> groupIds = groupMemberRepository.findGroupIdsByUser(user);
+        List<Group> groups = groupRepository.findGroupsByGroupIdInAndStatus(groupIds, BaseEntity.Status.ACTIVE);
+        return groups.stream()
+                .map(group -> {
+                    int numMembers = groupMemberRepository.countGroupMembersByGroup(group);
+                    int numRestaurants = groupListRepository.countGroupListsByGroup(group);
+                    int numRoutes = routeRepository.countRoutesByGroupAndStatus(group, BaseEntity.Status.ACTIVE);
+
+                    return GetGroupsResponse.builder()
+                            .groupId(group.getGroupId())
+                            .groupName(group.getGroupName())
+                            .numMembers(numMembers)
+                            .numRestaurants(numRestaurants)
+                            .numRoutes(numRoutes)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<GetGroupMemberResponse> getGroupMembers(Long groupId){
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+        List<GroupMember> groupMembers = groupMemberRepository.findGroupMembersByGroup(group);
+        return groupMembers.stream()
+                .map(groupMember -> GetGroupMemberResponse.builder()
+                        .groupMemberId(groupMember.getGroupMemberId())
+                        .nickname(groupMember.getUser().getNickname())
+                        .profileImg(groupMember.getUser().getProfileImage())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public TransferOwnershipResponse transferOwnership(User owner, Long groupId, TransferOwnershipRequest transferOwnershipRequest){
