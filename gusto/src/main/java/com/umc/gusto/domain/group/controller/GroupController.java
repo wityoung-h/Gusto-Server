@@ -2,8 +2,10 @@ package com.umc.gusto.domain.group.controller;
 
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
+import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
 import com.umc.gusto.domain.group.model.response.GetInvitationCodeResponse;
+import com.umc.gusto.domain.group.model.response.GetGroupsResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.service.GroupService;
 import com.umc.gusto.domain.user.entity.User;
@@ -13,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -71,6 +75,26 @@ public class GroupController {
     public ResponseEntity<GetInvitationCodeResponse> getInvitationCode(@PathVariable Long groupId){
         GetInvitationCodeResponse getInvitationCode = groupService.getInvitationCode(groupId);
         return ResponseEntity.status(HttpStatus.OK).body(getInvitationCode);
+      
+    /**
+     * 그룹 목록 조회
+     * [GET] /groups
+     */
+    @GetMapping
+    public ResponseEntity<List<GetGroupsResponse>> getGroups(@AuthenticationPrincipal AuthUser authUser){
+        User user = authUser.getUser();
+        List<GetGroupsResponse> getGroups = groupService.getUserGroups(user);
+        return ResponseEntity.status(HttpStatus.OK).body(getGroups);
+    }
+
+    /**
+     * 그룹 구성원 조회
+     * [GET] /groups/{groupId}/members
+     */
+    @GetMapping("/{groupId}/members")
+    public ResponseEntity<List<GetGroupMemberResponse>> getGroupMembers (@PathVariable Long groupId){
+        List<GetGroupMemberResponse> getGroupMembers = groupService.getGroupMembers(groupId);
+        return ResponseEntity.status(HttpStatus.OK).body(getGroupMembers);
     }
 
 }
