@@ -146,7 +146,7 @@ public class UserController {
      * @param -
      * @return -
      */
-    @PatchMapping("/my-i정nfo/publishing")
+    @PatchMapping("/my-info/publishing")
     public ResponseEntity updatePublishingInfo(@AuthenticationPrincipal AuthUser authUser, @RequestBody PublishingInfoRequest request) {
         userService.updatePublishingInfo(authUser.getUser(), request);
 
