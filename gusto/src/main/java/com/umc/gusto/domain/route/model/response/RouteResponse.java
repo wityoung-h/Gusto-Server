@@ -2,6 +2,7 @@ package com.umc.gusto.domain.route.model.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 public class RouteResponse {
@@ -9,6 +10,7 @@ public class RouteResponse {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @Getter
     public static class RouteResponseDto{
         private Long routeId;
         private String routeName;

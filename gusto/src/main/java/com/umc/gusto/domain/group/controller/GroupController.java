@@ -81,7 +81,7 @@ public class GroupController {
 
     /**
      * 그룹 리스트 삭제
-     * [DELETE] /groups/groupListId
+     * [DELETE] /groups/{groupListId}
      */
     @DeleteMapping("")
     public ResponseEntity<?> deleteGroupList(

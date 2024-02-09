@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService{
 
 
     @Value("${default.img.url.profile}")
-    private static String DEFAULT_PROFILE_IMG;
+    private String DEFAULT_PROFILE_IMG;
 
     @Override
     @Transactional
