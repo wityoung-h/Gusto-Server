@@ -1,10 +1,13 @@
 package com.umc.gusto.domain.group.controller;
 
+import com.umc.gusto.domain.group.model.request.JoinGroupRequest;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
+import com.umc.gusto.domain.group.model.request.TransferOwnershipRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
 import com.umc.gusto.domain.group.model.response.GetInvitationCodeResponse;
+import com.umc.gusto.domain.group.model.response.TransferOwnershipResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupsResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.service.GroupService;
@@ -77,6 +80,38 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.OK).body(getInvitationCode);
       
     /**
+     * 그룹 소유권 이전
+     * [PATCH] /groups/{groupId}/transfer-ownership
+     */
+    @PatchMapping("/{groupId}/transfer-ownership")
+    public ResponseEntity<TransferOwnershipResponse> transferOwnership(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId, @RequestBody TransferOwnershipRequest transferOwnershipRequest){
+        User owner = authUser.getUser();
+        TransferOwnershipResponse transferOwnership = groupService.transferOwnership(owner, groupId, transferOwnershipRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(transferOwnership);
+      
+    /**
+     * 그룹 참여
+     * [POST] /groups/{groupId}/join
+     */
+    @PostMapping("/{groupId}/join")
+    public ResponseEntity<?> joinGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId, @RequestBody JoinGroupRequest joinGroupRequest){
+        User user = authUser.getUser();
+        groupService.joinGroup(user, groupId, joinGroupRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /**
+     * 그룹 탈퇴
+     * [DELETE] /groups/{groupId}/leave
+     */
+    @DeleteMapping("/{groupId}/leave")
+    public ResponseEntity<?> leaveGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId){
+        User user = authUser.getUser();
+        groupService.leaveGroup(user, groupId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+  
+    /**
      * 그룹 목록 조회
      * [GET] /groups
      */
@@ -96,5 +131,4 @@ public class GroupController {
         List<GetGroupMemberResponse> getGroupMembers = groupService.getGroupMembers(groupId);
         return ResponseEntity.status(HttpStatus.OK).body(getGroupMembers);
     }
-
 }
