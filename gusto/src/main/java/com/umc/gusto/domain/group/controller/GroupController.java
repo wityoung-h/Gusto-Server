@@ -75,20 +75,22 @@ public class GroupController {
      * [GET] /groups/{groupId}/invitationCode
      */
     @GetMapping("/{groupId}/invitationCode")
-    public ResponseEntity<GetInvitationCodeResponse> getInvitationCode(@PathVariable Long groupId){
+    public ResponseEntity<GetInvitationCodeResponse> getInvitationCode(@PathVariable Long groupId) {
         GetInvitationCodeResponse getInvitationCode = groupService.getInvitationCode(groupId);
         return ResponseEntity.status(HttpStatus.OK).body(getInvitationCode);
-      
+    }
+
     /**
      * 그룹 소유권 이전
      * [PATCH] /groups/{groupId}/transfer-ownership
      */
     @PatchMapping("/{groupId}/transfer-ownership")
-    public ResponseEntity<TransferOwnershipResponse> transferOwnership(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId, @RequestBody TransferOwnershipRequest transferOwnershipRequest){
+    public ResponseEntity<TransferOwnershipResponse> transferOwnership(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId, @RequestBody TransferOwnershipRequest transferOwnershipRequest) {
         User owner = authUser.getUser();
         TransferOwnershipResponse transferOwnership = groupService.transferOwnership(owner, groupId, transferOwnershipRequest);
         return ResponseEntity.status(HttpStatus.OK).body(transferOwnership);
-      
+    }
+
     /**
      * 그룹 참여
      * [POST] /groups/{groupId}/join
