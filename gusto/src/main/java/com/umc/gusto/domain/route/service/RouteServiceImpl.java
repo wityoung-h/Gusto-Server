@@ -45,6 +45,7 @@ public class RouteServiceImpl implements RouteService{
                 .build();
         Route savedRoute = routeRepository.save(route);
 
+        // TODO: 그룹 루트인 경우 비지니스 로직 호출 X가능
         // 루트리스트 생성 비지니스 로직 호출
         routeListService.createRouteList(savedRoute, request.getRouteList());
     }

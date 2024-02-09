@@ -56,6 +56,12 @@ public class RouteController {
         return ResponseEntity.ok().body(route);
     }
 
+    // 루트 수정
+    @PatchMapping("/{routeId}")
+    public ResponseEntity<?> modifyRoute( @PathVariable Long routeId){
+        return null;
+    }
+
 
 
 }
