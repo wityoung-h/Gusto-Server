@@ -7,6 +7,10 @@ import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
 import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.response.ProfileResponse;
+import com.umc.gusto.domain.user.model.response.FollowResponse;
+import com.umc.gusto.domain.user.service.UserService;
+import com.umc.gusto.domain.user.model.request.SignUpRequest;
+import com.umc.gusto.domain.user.model.response.ProfileRes;
 import com.umc.gusto.global.auth.model.AuthUser;
 import com.umc.gusto.global.auth.model.Tokens;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -125,6 +131,35 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.RESET_CONTENT)
                 .build();
     }
+  
+    /**
+     * 팔로우
+     * [POST] /users/follow/{nickname}
+     * @param nickname
+     * @return -
+     */
+    @PostMapping("/follow/{nickname}")
+    public ResponseEntity followUser(@AuthenticationPrincipal AuthUser authUser, @PathVariable("nickname") String nickname) {
+        userService.followUser(authUser.getUser(), nickname);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .build();
+    }
+
+
+    /**
+     * 언팔로우
+     * [DELETE] /users/unfollow/{nickname}
+     * @param nickname
+     * @return -
+     */
+    @DeleteMapping("/unfollow/{nickname}")
+    public ResponseEntity unfollow(@AuthenticationPrincipal AuthUser authUser, @PathVariable("nickname") String nickname) {
+        userService.unfollowUser(authUser.getUser(), nickname);
+
+        return ResponseEntity.status(HttpStatus.RESET_CONTENT)
+                .build();
+    }
 
     /**
      * 콘텐츠 공개 여부 조회
@@ -154,4 +189,33 @@ public class UserController {
                 .build();
     }
 
+    /**
+     * 팔로우 리스트 조회
+     * [GET] /users/following?followId={followId}
+     * @param followId
+     * @return List<>
+     */
+    @GetMapping("/following")
+    public ResponseEntity<List<FollowResponse>> followList(@AuthenticationPrincipal AuthUser authUser,
+                                                           @RequestParam(required = false, name = "followId") Long followId) {
+        List<FollowResponse> followResponses = userService.getFollowList(authUser.getUser(), followId);
+
+        return ResponseEntity.ok()
+                .body(followResponses);
+    }
+
+    /**
+     * 팔로워 리스트 조회
+     * [GET] /users/follower?followId={followId}
+     * @param followId
+     * @return List<>
+     */
+    @GetMapping("/follower")
+    public ResponseEntity<List<FollowResponse>> followerList(@AuthenticationPrincipal AuthUser authUser,
+                                                           @RequestParam(required = false, name = "followId") Long followId) {
+        List<FollowResponse> followResponses = userService.getFollwerList(authUser.getUser(), followId);
+
+        return ResponseEntity.ok()
+                .body(followResponses);
+    }
 }
