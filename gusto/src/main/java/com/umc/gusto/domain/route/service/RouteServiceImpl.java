@@ -93,6 +93,7 @@ public class RouteServiceImpl implements RouteService{
                                 .routeId(Route.getRouteId())
                                 .routeName(Route.getRouteName())
                                 .numStore(routeListRepository.countRouteListByRoute(Route))
+                                .groupId(Route.getRouteId())
                                 .build())
                 .collect(Collectors.toList());
     }

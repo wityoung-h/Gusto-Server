@@ -17,7 +17,7 @@ public class RouteResponse {
         private String routeName;
         private int numStore;
 
-        @JsonInclude
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         private Long groupId;
 
     }
