@@ -116,7 +116,6 @@ public class GroupServiceImpl implements GroupService{
     }
 
     public void deleteGroup(User owner, Long groupId){
-
         Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
                 .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
 
