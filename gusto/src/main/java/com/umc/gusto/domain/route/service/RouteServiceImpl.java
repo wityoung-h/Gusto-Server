@@ -33,6 +33,7 @@ public class RouteServiceImpl implements RouteService{
     @Override
     public void createRoute(RouteRequest.createRouteDto request,User user) {
         // 루트명은 내 루트명 중에서 중복 불가능
+        //TODO: 루트명을 그룹 루트명 제외 내 루트명중에서 중복 불가능으로 수정
         if (routeRepository.existsByRouteNameAndStatus(request.getRouteName(),BaseEntity.Status.ACTIVE)) {
             throw new GeneralException(Code.ROUTE_DUPLICATE_ROUTENAME);
         }
