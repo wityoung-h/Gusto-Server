@@ -12,8 +12,12 @@ public enum Code {
     NO_PERMISSION(HttpStatus.FORBIDDEN,403, "해당 권한이 없습니다."),
 
     //User 관련 에러 +0
-    USER_DUPLICATE_NICKNAME(HttpStatus.CONFLICT, 409101, "이미 사용중인 닉네임입니다."),
-    DONT_EXIST_USER(HttpStatus.NOT_FOUND, 404101, "존재하지 않는 유저입니다."),
+    USER_DUPLICATE_NICKNAME(HttpStatus.CONFLICT, 409001, "이미 사용중인 닉네임입니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, 404001, "존재하지 않는 유저입니다."),
+    USER_FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, 404002, "팔로우한 유저가 아닙니다."),
+    USER_FOLLOW_NO_MORE_CONTENT(HttpStatus.NOT_FOUND, 404003, "리스트가 더이상 존재하지 않습니다."),
+    USER_FOLLOW_ALREADY(HttpStatus.CONFLICT, 409002, "이미 팔로우했습니다."),
+    USER_FOLLOW_SELF(HttpStatus.FORBIDDEN, 403001, "자신을 팔로우할 수 없습니다."),
 
     //Store 관련 에러 +1
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND, 404101, "존재하지 않는 가게입니다."),
