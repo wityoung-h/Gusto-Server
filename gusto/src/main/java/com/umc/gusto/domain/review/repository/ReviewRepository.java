@@ -7,10 +7,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import javax.swing.text.html.Option;
+import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.domain.PageRequest;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT r FROM Review r WHERE r.publishReview = 'PUBLIC' AND r.store = :store ORDER BY r.liked DESC LIMIT 1")
@@ -25,5 +27,16 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findReviewsAfterIdByStore(Store store, Long reviewId, Pageable pageable);
     boolean existsByReviewIdAndUser(Long reviewId, User user);
     Integer countByStoreAndUserNickname(Store store, String nickname);      // 방문횟수는 리뷰 공개여부과 상관 X
+    Integer countByStoreAndUser(Store store, User user);
+    @Query("SELECT r.img1 FROM Review r WHERE r.store.storeId = :storeId ORDER BY r.liked DESC")
+    List<String> findTopReviewImageByStoreId(Long storeId);
+
+    Optional<Page<Review>> findAllByUser(User user, PageRequest pageRequest);
+    Optional<Page<Review>> findAllByUserAndReviewIdLessThan(User user, Long reviewId,PageRequest pageRequest);
+    List<Review> findByUserAndVisitedAtBetween(User user, LocalDate startDate, LocalDate lastDate);
+
+    boolean existsByUserAndReviewIdLessThan(User user, Long reviewId);
+    @Query(value = "SELECT * FROM review r WHERE r.user_id <> :user ORDER BY RAND() limit 15", nativeQuery = true)
+    List<Review> findRandomFeedByUser(@Param("user") UUID user); //WHERE r.user_id <> :userZ
 
 }

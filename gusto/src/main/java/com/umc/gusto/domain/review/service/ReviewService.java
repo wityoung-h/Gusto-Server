@@ -14,4 +14,6 @@ public interface ReviewService {
     void updateReview(Long reviewId, List<MultipartFile> images, UpdateReviewRequest updateReviewRequest);
     void deleteReview(Long reviewId);
     ReviewDetailResponse getReview(Long reviewId);
+    void likeReview(User user, Long reviewId);
+    void unlikeReview(User user, Long reviewId);
 }
