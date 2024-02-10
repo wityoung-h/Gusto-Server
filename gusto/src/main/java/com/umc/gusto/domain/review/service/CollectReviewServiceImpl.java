@@ -14,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 @Service
@@ -35,12 +37,14 @@ public class CollectReviewServiceImpl implements CollectReviewService{
 
     @Override
     public CollectReviewsOfCalResponse getReviewOfCalView(User user, ReviewCalViewRequest reviewCalViewRequest) {
-//        List<Review> reviews = reviewRepository.searchAllByUserAndVisitedAtStartsWith(user, reviewCalViewRequest.getDate());
-//                .orElseThrow(()-> new NotFoundException(Code.REVIEW_NOT_FOUND));
+        //해당 달의 첫 날짜, 마지막 날짜 구하기
+        LocalDate startDate = reviewCalViewRequest.getDate().with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate lastDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
 
-//        List<BasicViewResponse> basicViewRespons = reviews.stream().map(BasicViewResponse::of).toList();
-//        return CollectReviewsOfCalResponse.builder().reviews(basicViewRespons).build();
-        return CollectReviewsOfCalResponse.builder().build();
+        List<Review> reviews = reviewRepository.findByUserAndVisitedAtBetween(user, startDate, lastDate);
+
+        List<BasicViewResponse> basicViewResponse = reviews.stream().map(BasicViewResponse::of).toList();
+        return CollectReviewsOfCalResponse.builder().reviews(basicViewResponse).build();
     }
 
     @Override
@@ -51,7 +55,10 @@ public class CollectReviewServiceImpl implements CollectReviewService{
         //다음에 조회될 리뷰가 있는지 확인하기
         boolean checkNext = hasNext(user, reviews);
 
-        List<TimelineViewResponse> timelineViewResponses = reviews.map(TimelineViewResponse::of).toList();
+        List<TimelineViewResponse> timelineViewResponses = reviews.map(review -> {
+                    int visitedCount = reviewRepository.countByStoreAndUser(review.getStore(), user);
+                    return TimelineViewResponse.of(review, visitedCount);
+                }).toList();
         return CollectReviewsOfTimelineResponse.of(timelineViewResponses, checkNext);
     }
 

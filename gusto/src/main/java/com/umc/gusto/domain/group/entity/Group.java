@@ -1,6 +1,5 @@
 package com.umc.gusto.domain.group.entity;
 
-import com.umc.gusto.domain.group.model.response.GroupResponseDto;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -47,4 +46,6 @@ public class Group extends BaseEntity {
     public void updateStatus(BaseEntity.Status status){
         this.status = status;
     }
+
+    public void updateOwner(User owner) { this.owner = owner; }
 }
