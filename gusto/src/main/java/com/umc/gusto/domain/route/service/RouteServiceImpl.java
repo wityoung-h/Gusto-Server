@@ -36,6 +36,10 @@ public class RouteServiceImpl implements RouteService{
         if (routeRepository.existsByRouteNameAndStatus(request.getRouteName(),BaseEntity.Status.ACTIVE)) {
             throw new GeneralException(Code.ROUTE_DUPLICATE_ROUTENAME);
         }
+        // 루트 리스트 갯수 6개 제한 확인
+        if(request.getRouteList().size()>=7){
+            throw new GeneralException(Code.ROUTELIST_TO_MANY_REQUEST);
+        }
 
         // 루트 생성
         Route route = Route.builder()

@@ -2,7 +2,7 @@ package com.umc.gusto.domain.route.controller;
 
 import com.umc.gusto.domain.route.model.request.RouteRequest;
 import com.umc.gusto.domain.route.model.response.RouteResponse;
-import com.umc.gusto.domain.route.service.RouteServiceImpl;
+import com.umc.gusto.domain.route.service.RouteService;
 import com.umc.gusto.global.auth.model.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("routes")
 @RequiredArgsConstructor
 public class RouteController {
-    private final RouteServiceImpl routeService;
+    private final RouteService routeService;
 
     // 루트 생성
     @PostMapping("")
@@ -56,11 +56,7 @@ public class RouteController {
         return ResponseEntity.ok().body(route);
     }
 
-    // 루트 수정
-    @PatchMapping("/{routeId}")
-    public ResponseEntity<?> modifyRoute( @PathVariable Long routeId){
-        return null;
-    }
+
 
 
 

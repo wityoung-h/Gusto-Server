@@ -28,6 +28,7 @@ public enum Code {
     ROUTE_NOT_FOUND(HttpStatus.NOT_FOUND,404302,"존재하지 않는 루트입니다."),
     ROUTELIST_NOT_FOUND(HttpStatus.NOT_FOUND,404302,"루트에 존재하지 않은 상점 항목입니다"),
     USER_NO_PERMISSION_FOR_ROUTE(HttpStatus.FORBIDDEN,403303,"해당 유저는 해당 루트에 대한 권한이 없습니다"),
+    ROUTELIST_TO_MANY_REQUEST(HttpStatus.TOO_MANY_REQUESTS,403304,"루트 내 상점 항목은 최대 6개까지 가능합니다."),
 
     //Group 관련 에러 +4
     FIND_FAIL_GROUP(HttpStatus.NOT_FOUND, 404401, "존재하지 않는 그룹입니다."),

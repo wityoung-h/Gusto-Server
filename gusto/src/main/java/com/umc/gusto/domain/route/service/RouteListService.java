@@ -2,6 +2,7 @@ package com.umc.gusto.domain.route.service;
 
 import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.route.model.request.RouteListRequest;
+import com.umc.gusto.domain.route.model.request.RouteRequest;
 import com.umc.gusto.domain.user.entity.User;
 
 import java.util.List;
@@ -19,4 +20,7 @@ public interface RouteListService {
 
 
     // 루트 상세 조회
+
+    // 루트 상세 수정
+    void modifyRouteList(RouteRequest.createRouteDto request);
 }
