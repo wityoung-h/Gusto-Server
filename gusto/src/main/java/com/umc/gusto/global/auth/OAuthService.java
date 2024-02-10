@@ -3,10 +3,10 @@ package com.umc.gusto.global.auth;
 import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.entity.Social;
-import com.umc.gusto.domain.user.model.response.FirstLogInResponse;
 import com.umc.gusto.global.auth.model.CustomOAuth2User;
 import com.umc.gusto.global.auth.model.OAuthAttributes;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -21,6 +21,8 @@ import java.util.UUID;
 public class OAuthService extends DefaultOAuth2UserService {
     private final SocialRepository socialRepository;
     private final UserService userService;
+    @Value("${default.img.url.profile}")
+    private String DEFAULT_PROFILE_IMG;
 
     // 유저 불러오기 - 해당 유저의 security context가 저장됨
     @Override
@@ -46,6 +48,15 @@ public class OAuthService extends DefaultOAuth2UserService {
                      .socialStatus(Social.SocialStatus.WAITING_SIGN_UP)
                      .temporalToken(UUID.randomUUID())
                      .build());
+
+             if(oAuthAttributes.getNickname() == null) {
+                 oAuthAttributes.updateNickname(userService.generateRandomNickname());
+             }
+
+             if(oAuthAttributes.getProfileImg() == null) {
+                 oAuthAttributes.updateProfileImg(DEFAULT_PROFILE_IMG);
+             }
+
         } else {
             info = socialInfo.get();
         }
@@ -58,21 +69,6 @@ public class OAuthService extends DefaultOAuth2UserService {
                 .delegate(oAuth2User)
                 .oAuthAttributes(oAuthAttributes)
                 .socialInfo(info)
-                .build();
-    }
-
-    public FirstLogInResponse generateFirstLogInRes(OAuthAttributes oAuthAttributes) {
-        String nickname = oAuthAttributes.getNickname();
-
-        if(nickname == null) {
-            nickname = userService.generateRandomNickname();
-        }
-
-        return FirstLogInResponse.builder()
-                .nickname(nickname)
-                .profileImg(oAuthAttributes.getProfileImg())
-                .gender(oAuthAttributes.getGender().name())
-                .age(oAuthAttributes.getAge().name())
                 .build();
     }
 }
