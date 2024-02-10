@@ -1,93 +1,97 @@
 package com.umc.gusto.domain.myCategory.controller;
 
-import com.umc.gusto.domain.myCategory.model.request.MyCategoryRequest;
+import com.umc.gusto.domain.myCategory.model.request.CreateMyCategoryRequest;
+import com.umc.gusto.domain.myCategory.model.request.UpdateMyCategoryRequest;
 import com.umc.gusto.domain.myCategory.model.response.MyCategoryResponse;
+import com.umc.gusto.domain.myCategory.model.response.PinByMyCategoryResponse;
 import com.umc.gusto.domain.myCategory.service.MyCategoryService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/myCategories")
 public class MyCategoryController {
-    private final MyCategoryService myCategoryCommandService;
+    private final MyCategoryService myCategoryService;
 
     @GetMapping("/{nickname}")
-    public ResponseEntity<List<MyCategoryResponse.MyCategory>> allMyCategory(
+    public ResponseEntity<List<MyCategoryResponse>> allMyCategory(
+            @AuthenticationPrincipal AuthUser authUser,
             @PathVariable String nickname) {
-            List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryCommandService.getAllMyCategory(nickname);
-            return ResponseEntity.ok().body(myCategoryList);
+        User user = authUser.getUser();
+        List<MyCategoryResponse> myCategoryList = myCategoryService.getAllMyCategory(user, nickname);
 
+        return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
     }
 
-    @GetMapping("")
-    public ResponseEntity<List<MyCategoryResponse.MyCategory>> allMyCategoryWithLocation(
+    @GetMapping
+    public ResponseEntity<List<MyCategoryResponse>> allMyCategoryWithLocation(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "townName") String townName) {
             User user = authUser.getUser();
-            List<MyCategoryResponse.MyCategory> myCategoryList = myCategoryCommandService.getAllMyCategoryWithLocation(user, townName);
-            return ResponseEntity.ok().body(myCategoryList);
+            List<MyCategoryResponse> myCategoryList = myCategoryService.getAllMyCategoryWithLocation(user, townName);
+
+            return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
     }
 
-    @GetMapping("/pinStores/{nickname}")
-    public ResponseEntity<List<MyCategoryResponse.PinByMyCategory>> allPinByMyCategory(
-            @AuthenticationPrincipal AuthUser authUser,
+    @GetMapping("/pins/{nickname}")
+    public ResponseEntity<List<PinByMyCategoryResponse>> allPinByMyCategory(
             @RequestParam(name = "myCategoryId") Long myCategoryId,
             @PathVariable String nickname) {
-            List<MyCategoryResponse.PinByMyCategory> myStoreList = myCategoryCommandService.getAllPinByMyCategory(nickname, myCategoryId);
-            return ResponseEntity.ok().body(myStoreList);
+            List<PinByMyCategoryResponse> myStoreList = myCategoryService.getAllPinByMyCategory(nickname, myCategoryId);
+
+            return ResponseEntity.status(HttpStatus.OK).body(myStoreList);
     }
 
-    @GetMapping("/pinStores")
-    public ResponseEntity<List<MyCategoryResponse.PinByMyCategory>> allPinByCategoryWithLocation(
+    @GetMapping("/pins")
+    public ResponseEntity<List<PinByMyCategoryResponse>> allPinByCategoryWithLocation(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "myCategoryId") Long myCategoryId,
             @RequestParam(name = "townName") String townName) {
             User user = authUser.getUser();
-            List<MyCategoryResponse.PinByMyCategory> myCategoryList = myCategoryCommandService.getAllPinByMyCategoryWithLocation(user, myCategoryId,townName);
-            return ResponseEntity.ok().body(myCategoryList);
+            List<PinByMyCategoryResponse> myCategoryList = myCategoryService.getAllPinByMyCategoryWithLocation(user, myCategoryId,townName);
+
+            return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
     }
 
 
-    @PostMapping("/create")
-    public ResponseEntity<String> createMyCategory(
+    @PostMapping
+    public ResponseEntity<?> createMyCategory(
             @AuthenticationPrincipal AuthUser authUser,
-            @RequestBody MyCategoryRequest.createMyCategory createMyCategory
+            @RequestBody CreateMyCategoryRequest request
     ) {
             User user = authUser.getUser();
-            // 여기서 createMyCategoryDTO를 사용하여 새로운 MyCategory를 생성하는 로직을 구현합니다.
-            myCategoryCommandService.createMyCategory(user, createMyCategory);
+            myCategoryService.createMyCategory(user, request);
 
-            return ResponseEntity.ok().build();
-
+            return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PatchMapping("/{myCategoryId}/update")
-    public ResponseEntity<String> modifyMyCategory(
+    @PatchMapping("/{myCategoryId}")
+    public ResponseEntity<?> modifyMyCategory(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long myCategoryId,
-            @RequestBody MyCategoryRequest.updateMyCategory request
+            @RequestBody UpdateMyCategoryRequest request
     ) {
         User user = authUser.getUser();
-        myCategoryCommandService.modifyMyCategory(user, myCategoryId, request);
+        myCategoryService.modifyMyCategory(user, myCategoryId, request);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PatchMapping("/delete")
-    public ResponseEntity<String> deleteMyCategory(
+    @DeleteMapping
+    public ResponseEntity<?> deleteMyCategory(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "myCategoryId") List<Long> myCategoryIds) {
             User user = authUser.getUser();
-            myCategoryCommandService.deleteMyCategories(user, myCategoryIds);
+            myCategoryService.deleteMyCategories(user, myCategoryIds);
 
-            return ResponseEntity.ok().build();
+            return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 }

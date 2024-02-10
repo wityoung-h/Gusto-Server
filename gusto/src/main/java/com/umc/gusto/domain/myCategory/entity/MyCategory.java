@@ -8,6 +8,8 @@ import com.umc.gusto.global.common.PublishStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +17,10 @@ import java.util.List;
 @Entity
 @Getter
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@RequiredArgsConstructor
+@DynamicInsert
+@DynamicUpdate
 public class MyCategory extends BaseEntity{
 
     @Id
@@ -56,9 +60,10 @@ public class MyCategory extends BaseEntity{
         this.myCategoryScript = myCategoryScript;
     }
 
-    public void updatePublishCategory(PublishStatus publishCategory) {
-        this.publishCategory = publishCategory;
-    }
+    // 데모데이 이후 진행
+//    public void updatePublishCategory(PublishStatus publishCategory) {
+//        this.publishCategory = publishCategory;
+//    }
 
     public void updateStatus(BaseEntity.Status status) {this.status = status;}
 }

@@ -2,16 +2,19 @@ package com.umc.gusto.domain.myCategory.entity;
 
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.user.entity.User;
-import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.common.BaseTime;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Getter
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@RequiredArgsConstructor
+@DynamicInsert
+@DynamicUpdate
 public class Pin extends BaseTime {
 
     @Id
