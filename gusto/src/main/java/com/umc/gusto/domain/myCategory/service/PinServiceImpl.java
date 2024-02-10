@@ -2,7 +2,7 @@ package com.umc.gusto.domain.myCategory.service;
 
 import com.umc.gusto.domain.myCategory.entity.MyCategory;
 import com.umc.gusto.domain.myCategory.entity.Pin;
-import com.umc.gusto.domain.myCategory.model.request.PinRequest;
+import com.umc.gusto.domain.myCategory.model.request.CreatePinRequest;
 import com.umc.gusto.domain.myCategory.repository.MyCategoryRepository;
 import com.umc.gusto.domain.myCategory.repository.PinRepository;
 import com.umc.gusto.domain.store.entity.Store;
@@ -23,7 +23,7 @@ public class PinServiceImpl implements PinService{
     private final StoreRepository storeRepository;
 
     @Transactional
-    public void createPin(User user, Long myCategoryId, PinRequest.createPin createPin) {
+    public void createPin(User user, Long myCategoryId, CreatePinRequest createPin) {
         MyCategory myCategory = myCategoryRepository.findByUserAndMyCategoryId(user, myCategoryId)
                 .orElseThrow(() -> new NotFoundException(Code.MYCATEGORY_NOT_FOUND));
         Store store = storeRepository.findById(createPin.getStoreId())

@@ -6,7 +6,9 @@ import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.store.entity.Category;
 import com.umc.gusto.domain.store.entity.OpeningHours;
 import com.umc.gusto.domain.store.entity.Store;
-import com.umc.gusto.domain.store.model.response.StoreResponse;
+import com.umc.gusto.domain.store.model.response.GetReviewsResponse;
+import com.umc.gusto.domain.store.model.response.GetStoreDetailResponse;
+import com.umc.gusto.domain.store.model.response.GetStoreResponse;
 import com.umc.gusto.domain.store.repository.OpeningHoursRepository;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
@@ -18,7 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,14 +36,14 @@ public class StoreServiceImpl implements StoreService{
     private static final int PAGE_SIZE = 6;
 
     @Transactional(readOnly = true)
-    public StoreResponse.getStore getStore(User user, Long storeId) {
+    public GetStoreResponse getStore(User user, Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND));
         List<OpeningHours> openingHoursList = openingHoursRepository.findByStoreStoreId(storeId);
 
-        Map<OpeningHours.BusinessDay, StoreResponse.getStore.Timing> businessDays = new LinkedHashMap<>();
+        Map<OpeningHours.BusinessDay, GetStoreResponse.Timing> businessDays = new LinkedHashMap<>();
         for (OpeningHours openingHours : openingHoursList) {
-            StoreResponse.getStore.Timing timing = new StoreResponse.getStore.Timing(
+            GetStoreResponse.Timing timing = new GetStoreResponse.Timing(
                     openingHours.getOpenedAt(),
                     openingHours.getClosedAt()
             );
@@ -57,7 +58,7 @@ public class StoreServiceImpl implements StoreService{
 
         boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
-        return StoreResponse.getStore.builder()
+        return GetStoreResponse.builder()
                 .storeId(storeId)
                 .storeName(store.getStoreName())
                 .address(store.getAddress())
@@ -69,7 +70,7 @@ public class StoreServiceImpl implements StoreService{
 
 
     @Transactional(readOnly = true)
-    public StoreResponse.getStoreDetail getStoreDetail(User user, Long storeId, Long reviewId, Pageable pageable) {
+    public GetStoreDetailResponse getStoreDetail(User user, Long storeId, Long reviewId, Pageable pageable) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND));
         Category category = storeRepository.findCategoryByStoreId(storeId)
@@ -94,10 +95,10 @@ public class StoreServiceImpl implements StoreService{
             reviews = reviewRepository.findFirstReviewsByStore(store, PageRequest.of(pageNumber, pageSize));
         }
 
-        List<StoreResponse.getReviews> getReviews = reviews.stream()
+        List<GetReviewsResponse> getReviews = reviews.stream()
                 .map(review -> {
                     User reviewer = review.getUser();
-                    return StoreResponse.getReviews.builder()
+                    return GetReviewsResponse.builder()
                         .reviewId(review.getReviewId())
                         .visitedAt(review.getVisitedAt())
                         .profileImage(reviewer.getProfileImage())
@@ -114,7 +115,7 @@ public class StoreServiceImpl implements StoreService{
 
         boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
-        return StoreResponse.getStoreDetail.builder()
+        return GetStoreDetailResponse.builder()
                 .storeId(storeId)
                 .categoryName(category.getCategoryName())
                 .storeName(store.getStoreName())
