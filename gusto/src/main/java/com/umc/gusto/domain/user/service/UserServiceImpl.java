@@ -10,7 +10,6 @@ import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
 import com.umc.gusto.domain.user.model.response.ProfileResponse;
 import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
 import com.umc.gusto.domain.user.model.response.FollowResponse;
-import com.umc.gusto.domain.user.model.response.ProfileRes;
 import com.umc.gusto.domain.user.repository.FollowRepository;
 import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.domain.user.repository.UserRepository;
@@ -206,7 +205,7 @@ public class UserServiceImpl implements UserService{
     public PublishingInfoResponse getPublishingInfo(User user) {
         return PublishingInfoResponse.builder()
                 .publishReview(user.getPublishReview() == PublishStatus.PUBLIC)
-                .publishPin(user.getPublishPin() == PublishStatus.PUBLIC)
+                .publishPin(user.getPublishCategory() == PublishStatus.PUBLIC)
                 .build();
     }
 
@@ -219,13 +218,6 @@ public class UserServiceImpl implements UserService{
         user.updatePublishPin(pinStatus);
 
         userRepository.save(user);
-    }
-
-    @Override
-    public ProfileRes getProfile(String nickname) {
-        User user = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
-                .orElseThrow(() -> new NotFoundException(Code.USER_NOT_FOUND));
-        return new ProfileRes(user.getNickname(), user.getReviewCnt(), user.getPinCnt(), user.getFollower());
     }
 
     @Override

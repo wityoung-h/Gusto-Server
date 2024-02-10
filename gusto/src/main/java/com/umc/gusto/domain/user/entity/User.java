@@ -101,7 +101,7 @@ public class User extends BaseTime {
     }
 
     public void updatePublishPin(PublishStatus status) {
-        this.publishPin = status;
+        this.publishCategory = status;
     }
 
     public void updateFollower(long follower) {

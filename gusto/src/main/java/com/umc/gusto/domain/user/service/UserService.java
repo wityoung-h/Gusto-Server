@@ -8,7 +8,6 @@ import com.umc.gusto.domain.user.model.response.ProfileResponse;
 import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.response.FollowResponse;
-import com.umc.gusto.domain.user.model.response.ProfileRes;
 import com.umc.gusto.global.auth.model.Tokens;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,8 +41,6 @@ public interface UserService {
 
     // 콘텐츠 공개 여부 갱신
     void updatePublishingInfo(User user, PublishingInfoRequest request);
-
-    ProfileRes getProfile(String nickname);
 
     // 팔로우
     void followUser(User user, String nickname);
