@@ -13,7 +13,7 @@ import com.umc.gusto.domain.store.repository.OpeningHoursRepository;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.exception.Code;
-import com.umc.gusto.global.exception.customException.NotFoundException;
+import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
@@ -38,7 +38,7 @@ public class StoreServiceImpl implements StoreService{
     @Transactional(readOnly = true)
     public GetStoreResponse getStore(User user, Long storeId) {
         Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
         List<OpeningHours> openingHoursList = openingHoursRepository.findByStoreStoreId(storeId);
 
         Map<OpeningHours.BusinessDay, GetStoreResponse.Timing> businessDays = new LinkedHashMap<>();
@@ -72,9 +72,9 @@ public class StoreServiceImpl implements StoreService{
     @Transactional(readOnly = true)
     public GetStoreDetailResponse getStoreDetail(User user, Long storeId, Long reviewId, Pageable pageable) {
         Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
         Category category = storeRepository.findCategoryByStoreId(storeId)
-                .orElseThrow(() -> new NotFoundException(Code.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(Code.CATEGORY_NOT_FOUND));
 
         List<Review> top4Reviews = reviewRepository.findFirst4ByStoreOrderByLikedDesc(store);
 

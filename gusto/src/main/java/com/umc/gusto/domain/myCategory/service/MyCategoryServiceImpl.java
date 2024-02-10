@@ -14,7 +14,7 @@ import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
-import com.umc.gusto.global.exception.customException.NotFoundException;
+import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
@@ -121,7 +121,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
         // 중복 이름 체크
         myCategoryRepository.findByMyCategoryNameAndUser(createMyCategory.getMyCategoryName(), user)
                 .ifPresent(existingCategory -> {
-                    throw new NotFoundException(Code.MYCATEGORY_DUPLICATE_NAME);
+                    throw new GeneralException(Code.MYCATEGORY_DUPLICATE_NAME);
                 });
 
         // 중복된 이름이 없으면 새로운 MyCategory 생성
@@ -140,13 +140,13 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     @Transactional
     public void modifyMyCategory(User user, Long myCategoryId, UpdateMyCategoryRequest updateMyCategory) {
         MyCategory existingMyCategory = myCategoryRepository.findByUserAndMyCategoryId(user,myCategoryId)
-                .orElseThrow(() -> new NotFoundException(Code.MYCATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(Code.MYCATEGORY_NOT_FOUND));
 
         // 중복 이름 체크
         if (updateMyCategory.getMyCategoryName() != null && updateMyCategory.getMyCategoryName().equals(existingMyCategory.getMyCategoryName())) {
             myCategoryRepository.findByMyCategoryNameAndUser(updateMyCategory.getMyCategoryName(), user)
                     .ifPresent(existingCategory -> {
-                throw new NotFoundException(Code.MYCATEGORY_DUPLICATE_NAME);
+                throw new GeneralException(Code.MYCATEGORY_DUPLICATE_NAME);
             });
         }
 
@@ -174,7 +174,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     public void deleteMyCategories(User user, List<Long> myCategoryIds) {
         for (Long myCategoryId : myCategoryIds) {
             MyCategory existingMyCategory = myCategoryRepository.findByUserAndMyCategoryId(user, myCategoryId)
-                    .orElseThrow(() -> new NotFoundException(Code.MYCATEGORY_NOT_FOUND));
+                    .orElseThrow(() -> new GeneralException(Code.MYCATEGORY_NOT_FOUND));
 
             existingMyCategory.updateStatus(BaseEntity.Status.INACTIVE);
 
