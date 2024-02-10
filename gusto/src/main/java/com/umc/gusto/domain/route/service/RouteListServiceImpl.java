@@ -5,7 +5,6 @@ import com.umc.gusto.domain.route.entity.RouteList;
 import com.umc.gusto.domain.route.model.request.ModifyRoueListRequest;
 import com.umc.gusto.domain.route.model.request.ModifyRouteRequest;
 import com.umc.gusto.domain.route.model.request.RouteListRequest;
-import com.umc.gusto.domain.route.model.request.RouteRequest;
 import com.umc.gusto.domain.route.model.response.RouteListResponse;
 import com.umc.gusto.domain.route.repository.RouteListRepository;
 import com.umc.gusto.domain.route.repository.RouteRepository;
@@ -92,7 +91,7 @@ public class RouteListServiceImpl implements RouteListService{
 
     @Transactional
     @Override
-    public void modifyRouteList(Long routeId,ModifyRouteRequest request) {
+    public void modifyRouteList(Long routeId, ModifyRouteRequest request) {
         // 루트리스트 갯수가 6개 이하인지 확인
         if (request.getRouteList().size() >= 7) {
             throw new GeneralException(Code.ROUTELIST_TO_MANY_REQUEST);
@@ -103,31 +102,29 @@ public class RouteListServiceImpl implements RouteListService{
                 .orElseThrow(() -> new GeneralException(Code.ROUTE_NOT_FOUND));
 
         // 루트 이름 변경 확인
-        if(request.getRouteName() != null){
+        if (request.getRouteName() != null) {
             route.updateRouteName(request.getRouteName());
         }
 
-        List<RouteList> routeLists = routeListRepository.findByRoute(route); // 기존값
-
-        for (RouteList routeList : routeLists) {
-            int index = routeLists.indexOf(routeList);
-
-            // 루트리스트 중 변경된 PK값 확인
-            ModifyRoueListRequest modifyRoueListRequest = request.getRouteList().get(index);  // 바뀐 값
-            if(modifyRoueListRequest.getRouteListId() != null){
+        for (ModifyRoueListRequest modifyRoueListRequest : request.getRouteList()) {
+            // 변경된 PK값 확인
+            if (modifyRoueListRequest.getRouteListId() != null) {
+                // 해당 루트리스트 조회
+                RouteList routeList = routeListRepository.findById(modifyRoueListRequest.getRouteListId())
+                        .orElseThrow(() -> new GeneralException(Code.ROUTELIST_NOT_FOUND));
 
                 // 루트리스트 내 수정된 컬럼 값만 업데이트 진행
-                if(modifyRoueListRequest.getOrdinal()!= null){
-                    routeLists.get(0).updateOrdinal(modifyRoueListRequest.getOrdinal());
+                if (modifyRoueListRequest.getOrdinal() != null) {
+                    routeList.updateOrdinal(modifyRoueListRequest.getOrdinal());
                 }
-                if(modifyRoueListRequest.getStoreId()!= null){
+                if (modifyRoueListRequest.getStoreId() != null) {
                     Store store = storeRepository.findById(modifyRoueListRequest.getStoreId())
                             .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
-                    routeLists.get(0).updateStore(store);
+                    routeList.updateStore(store);
                 }
             }
         }
-
     }
+
 
 }
