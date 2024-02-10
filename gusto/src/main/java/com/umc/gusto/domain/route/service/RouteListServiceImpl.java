@@ -2,11 +2,17 @@ package com.umc.gusto.domain.route.service;
 
 import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.route.entity.RouteList;
+import com.umc.gusto.domain.route.model.request.ModifyRoueListRequest;
+import com.umc.gusto.domain.route.model.request.ModifyRouteRequest;
 import com.umc.gusto.domain.route.model.request.RouteListRequest;
 import com.umc.gusto.domain.route.model.request.RouteRequest;
+import com.umc.gusto.domain.route.model.response.RouteListResponse;
 import com.umc.gusto.domain.route.repository.RouteListRepository;
+import com.umc.gusto.domain.route.repository.RouteRepository;
+import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import com.umc.gusto.global.exception.customException.NotFoundException;
@@ -21,6 +27,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class RouteListServiceImpl implements RouteListService{
     private final RouteListRepository routeListRepository;
+    private final RouteRepository routeRepository;
     private final StoreRepository storeRepository;
 
 
@@ -48,16 +55,79 @@ public class RouteListServiceImpl implements RouteListService{
     }
 
     @Override
-    public void modifyRouteList(RouteRequest.createRouteDto request) {
+    public List<RouteListResponse.RouteList> getRouteListDistance(Long routeId) {
+        Route route = routeRepository.findRouteByRouteIdAndStatus(routeId,BaseEntity.Status.ACTIVE).orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
+        List<RouteList> routeList = routeListRepository.findByRoute(route);
+        return  routeList.stream().map(rL ->
+                RouteListResponse.RouteList.builder()
+                        .longtitude(rL.getStore().getLongtitude())
+                        .latitude(rL.getStore().getLatitude())
+                        .routeListId(rL.getRouteListId())
+                        .ordinal(rL.getOrdinal())
+                        .build()
+        ).toList();
+
+    }
+
+    @Override
+    public RouteListResponse.RouteListResponseDto getRouteListDetail(Long routeId) {
+        Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE).orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
+        List<RouteList> routeList = routeListRepository.findByRoute(route);
+        List<RouteListResponse.RouteList> routeLists = routeList.stream().map(rL ->
+                RouteListResponse.RouteList.builder()
+                        .routeListId(rL.getRouteListId())
+                        .storeId(rL.getStore().getStoreId())
+                        .storeName(rL.getStore().getStoreName())
+                        .address(rL.getStore().getAddress())
+                        .ordinal(rL.getOrdinal())
+                        .build()
+        ).toList();
+
+        return RouteListResponse.RouteListResponseDto.builder()
+                .routeName(route.getRouteName())
+                .routes(routeLists)
+                .build();
+
+    }
+
+    @Transactional
+    @Override
+    public void modifyRouteList(Long routeId,ModifyRouteRequest request) {
         // 루트리스트 갯수가 6개 이하인지 확인
-        if(request.getRouteList().size()>=7){
+        if (request.getRouteList().size() >= 7) {
             throw new GeneralException(Code.ROUTELIST_TO_MANY_REQUEST);
         }
-        // 루트리스트 중 변경된 PK값을 확인
 
-        // 수정된 PK값만 업데이트 진행
+        // 루트 존재 여부 확인
+        Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.ROUTE_NOT_FOUND));
 
-        // 루트리스트 내 수정된 컬럼 값만 업데이트 진행
+        // 루트 이름 변경 확인
+        if(request.getRouteName() != null){
+            route.updateRouteName(request.getRouteName());
+        }
+
+        List<RouteList> routeLists = routeListRepository.findByRoute(route); // 기존값
+
+        for (RouteList routeList : routeLists) {
+            int index = routeLists.indexOf(routeList);
+
+            // 루트리스트 중 변경된 PK값 확인
+            ModifyRoueListRequest modifyRoueListRequest = request.getRouteList().get(index);  // 바뀐 값
+            if(modifyRoueListRequest.getRouteListId() != null){
+
+                // 루트리스트 내 수정된 컬럼 값만 업데이트 진행
+                if(modifyRoueListRequest.getOrdinal()!= null){
+                    routeLists.get(0).updateOrdinal(modifyRoueListRequest.getOrdinal());
+                }
+                if(modifyRoueListRequest.getStoreId()!= null){
+                    Store store = storeRepository.findById(modifyRoueListRequest.getStoreId())
+                            .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
+                    routeLists.get(0).updateStore(store);
+                }
+            }
+        }
+
     }
 
 }

@@ -34,11 +34,16 @@ public enum Code {
     FIND_FAIL_GROUP(HttpStatus.NOT_FOUND, 404401, "존재하지 않는 그룹입니다."),
     UNAUTHORIZED_DELETE_GROUP(HttpStatus.FORBIDDEN, 403402, "그룹을 삭제할 권한이 없습니다."),
     UNAUTHORIZED_MODIFY_GROUP_NAME(HttpStatus.FORBIDDEN, 403403, "그룹명을 수정할 권한이 없습니다."),
-
+    INVITATION_CODE_NOT_FOUND(HttpStatus.NOT_FOUND, 404404,"그룹의 초대 코드를 찾을 수 없습니다."),
+    INVALID_INVITATION_CODE(HttpStatus.FORBIDDEN, 403405, "그룹의 초대 코드가 올바르지 않습니다."),
+    USER_NOT_IN_GROUP(HttpStatus.NOT_FOUND, 404406, "그룹에 가입되지 않은 유저입니다."),
+    NO_TRANSFER_PERMISSION(HttpStatus.FORBIDDEN, 403407, "그룹 소유자만이 그룹 소유권을 이전할 수 있습니다."),
+  
     //myCategory 관련 에러 +5
     MYCATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 404501, "존재하지 않는 카테고리입니다."),
     MYCATEGORY_DUPLICATE_NAME(HttpStatus.CONFLICT, 404502, "이미 존재하는 카테고리입니다."),
     USER_NO_PERMISSION_FOR_MYCATEGORY(HttpStatus.FORBIDDEN, 404503, "해당 유저는 해당 카테고리에 대한 권한이 없습니다."),
+    PIN_NOT_FOUND(HttpStatus.NOT_FOUND, 404504,"존재하지 않는 찜(Pin) 입니다"),
 
     // token 관련 에러 +6
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, 401601, "유효하지 않은 토큰입니다."),
