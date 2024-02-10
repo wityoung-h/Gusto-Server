@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface GroupListRepository extends JpaRepository<GroupList,Long> {
     Optional<GroupList> findGroupListByGroupListId(Long groupListId);
     List<GroupList> findGroupListByGroup(Group group);
+    int countGroupListsByGroup(Group group);
 }
