@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StoreRepository extends JpaRepository<Store, Long> {
-    @Query("SELECT c FROM Category c WHERE c.store.storeId = :storeId")
+    @Query("SELECT oh FROM OpeningHours oh WHERE oh.store.storeId = :storeId")
+    Optional<OpeningHours> findOpeningHoursByStoreId(Long storeId);
+    @Query("SELECT s.category FROM Store s WHERE s.storeId = :storeId")
     Optional<Category> findCategoryByStoreId(Long storeId);
+    @Query("SELECT s FROM Store s WHERE s.town.townName = :townName AND s.storeId IN :storeIds")
+    List<Store> findByTownNameAndStoreIds(String townName, List<Long> storeIds);
 }

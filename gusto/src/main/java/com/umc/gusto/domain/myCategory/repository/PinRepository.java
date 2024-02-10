@@ -31,4 +31,8 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
     List<Pin> findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(User user, Long myCategoryId, String townName);
     Optional<Pin> findByUserAndPinId(User user, Long pinId);
     boolean existsByUserAndStoreStoreId(User user, Long storeId);       // 존재 여부
+    @Query("SELECT p.store.storeId FROM Pin p WHERE p.user = :user AND p.myCategory.myCategoryId = :myCategoryId")
+    List<Long> findStoreIdsByUserAndMyCategoryId(User user, Long myCategoryId);
+    @Query("SELECT p.store.storeId FROM Pin p WHERE p.user = :user")
+    List<Long> findStoreIdsByUser(User user);
 }

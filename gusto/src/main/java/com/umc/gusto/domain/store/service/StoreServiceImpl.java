@@ -9,6 +9,7 @@ import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.model.response.GetReviewsResponse;
 import com.umc.gusto.domain.store.model.response.GetStoreDetailResponse;
 import com.umc.gusto.domain.store.model.response.GetStoreResponse;
+import com.umc.gusto.domain.store.model.response.GetStoresInMapResponse;
 import com.umc.gusto.domain.store.repository.OpeningHoursRepository;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
@@ -125,4 +126,30 @@ public class StoreServiceImpl implements StoreService{
                 .reviews(getReviews)
                 .build();
     }
+
+    @Transactional(readOnly = true)
+    public List<GetStoresInMapResponse> getStoresInMap(User user, String townName, Long myCategoryId) {
+        List<Long> storeIds;
+        List<Store> stores;
+
+        if (myCategoryId == null) {
+            storeIds = pinRepository.findStoreIdsByUser(user);
+        } else {
+            storeIds = pinRepository.findStoreIdsByUserAndMyCategoryId(user, myCategoryId);      // 내 카테고리 별 내가 찜한 가게의 id 리스트
+        }
+
+        stores = storeRepository.findByTownNameAndStoreIds(townName, storeIds);
+
+
+        return stores.stream()
+                .map(store -> GetStoresInMapResponse.builder()
+                        .storeId(store.getStoreId())
+                        .storeName(store.getStoreName())
+                        .longitude(store.getLongitude())
+                        .latitude(store.getLatitude())
+                        .build())
+                .collect(Collectors.toList());
+
+    }
+
 }
