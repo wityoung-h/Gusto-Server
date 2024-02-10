@@ -90,4 +90,24 @@ public class ReviewController {
         User user = authUser.getUser();
         return ResponseEntity.ok().body(collectReviewService.getReviewOfTimeView(user, reviewViewRequest));
     }
+
+    /**
+     * 리뷰 좋아요
+     */
+    @PostMapping("/{reviewId}/like")
+    public ResponseEntity<?> likeReview(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long reviewId){
+        User user = authUser.getUser(); //TODO: 로그인한 유저가 아니면 리뷰를 할 수 없도록 예외처리 필요
+        reviewService.likeReview(user, reviewId);
+        return ResponseEntity.status(HttpStatus.RESET_CONTENT).build();
+    }
+
+    /**
+     * 리뷰 좋아요 취소
+     */
+    @DeleteMapping("/{reviewId}/unlike")
+    public ResponseEntity<?> unLikeReview(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long reviewId){
+        User user = authUser.getUser(); //TODO: 로그인한 유저가 아니면 리뷰를 할 수 없도록 예외처리 필요
+        reviewService.unlikeReview(user, reviewId);
+        return ResponseEntity.status(HttpStatus.RESET_CONTENT).build();
+    }
 }

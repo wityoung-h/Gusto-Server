@@ -1,18 +1,21 @@
 package com.umc.gusto.domain.review.service;
 
 import com.umc.gusto.domain.review.entity.HashTag;
+import com.umc.gusto.domain.review.entity.Liked;
 import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.review.entity.Tagging;
 import com.umc.gusto.domain.review.model.request.CreateReviewRequest;
 import com.umc.gusto.domain.review.model.request.UpdateReviewRequest;
 import com.umc.gusto.domain.review.model.response.ReviewDetailResponse;
 import com.umc.gusto.domain.review.repository.HashTagRepository;
+import com.umc.gusto.domain.review.repository.LikedRepository;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
+import com.umc.gusto.global.exception.GeneralException;
 import com.umc.gusto.global.exception.customException.NoPermission;
 import com.umc.gusto.global.exception.customException.NotFoundException;
 import com.umc.gusto.global.util.S3Service;
@@ -29,6 +32,7 @@ public class ReviewServiceImpl implements ReviewService{
     private final ReviewRepository reviewRepository;
     private final StoreRepository storeRepository;
     private final HashTagRepository hashTagRepository;
+    private final LikedRepository likedRepository;
     private final S3Service s3Service;
 
     public void validateReviewByUser(final User user, final Long reviewId){
@@ -131,6 +135,36 @@ public class ReviewServiceImpl implements ReviewService{
         StringBuilder hashTags = new StringBuilder();
         review.getTaggingSet().stream().map(Tagging::getHashTag).forEach(o-> hashTags.append(o).append(","));
         return ReviewDetailResponse.of(review, hashTags.toString());
+    }
+
+    @Override
+    @Transactional
+    public void likeReview(User user, Long reviewId) {
+
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+
+        //본인 리뷰를 좋아요하는지 확인
+        if(review.getUser().getUserId().equals(user.getUserId())){ //TODO: .equals로 하는 동등성 비교가 안되서 DB의 @ID를 비교하는 식으로 했으나 비즈니스 키로 equals를 구현해보자.
+            throw new GeneralException(Code.NO_ONESELF_LIKE);
+        }
+
+        review.updateLiked("like");
+        reviewRepository.save(review);
+
+        Liked liked = Liked.builder().user(user).review(review).build();
+        likedRepository.save(liked);
+    }
+
+    @Override
+    public void unlikeReview(User user, Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+
+        //해당 리뷰를 좋아요 클릭한 적이 있는지 확인
+        Liked liked = likedRepository.findByUserAndReview(user, review).orElseThrow(()->new GeneralException(Code.NO_LIKE_REVIEW));
+
+        likedRepository.delete(liked);
+        review.updateLiked("unlike");
+        reviewRepository.save(review);
     }
 
     private void connectHashTag(Review review, String[] hashTags){

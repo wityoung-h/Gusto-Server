@@ -28,6 +28,8 @@ public enum Code {
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, 404201, "존재하지 않는 리뷰입니다."),
     HASHTAG_NOT_FOUND(HttpStatus.NOT_FOUND, 404202, "존재하지 않는 해시태그입니다."),
     USER_NO_PERMISSION_FOR_REVIEW(HttpStatus.FORBIDDEN, 403203, "해당 유저는 해당 리뷰에 대한 권한이 없습니다."),
+    NO_ONESELF_LIKE(HttpStatus.BAD_REQUEST, 400204, "자기자신의 리뷰는 좋아요할 수 없습니다."),
+    NO_LIKE_REVIEW(HttpStatus.BAD_REQUEST, 400205, "해당 리뷰에 좋아요를 한 적이 없습니다."),
 
     //Route 관련 에러 +3
     ROUTE_DUPLICATE_ROUTENAME(HttpStatus.CONFLICT, 409301,"이미 사용중인 루트명입니다."),
