@@ -1,6 +1,11 @@
 package com.umc.gusto.domain.user.service;
 
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
+import com.umc.gusto.domain.user.model.request.SignUpRequest;
+import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
+import com.umc.gusto.domain.user.model.response.ProfileResponse;
+import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.response.FollowResponse;
 import com.umc.gusto.domain.user.model.response.ProfileRes;
@@ -24,6 +29,20 @@ public interface UserService {
     String generateRandomNickname();
 
     // 먹스또 프로필 조회
+    ProfileResponse getProfile(User user, String nickname);
+
+    // 닉네임 갱신
+    void updateNickname(User user, String nickname);
+
+    // 프로필 정보 갱신
+    void updateProfile(User user, MultipartFile profileImg, UpdateProfileRequest request);
+
+    // 콘텐츠 공개 여부 검색
+    PublishingInfoResponse getPublishingInfo(User user);
+
+    // 콘텐츠 공개 여부 갱신
+    void updatePublishingInfo(User user, PublishingInfoRequest request);
+
     ProfileRes getProfile(String nickname);
 
     // 팔로우

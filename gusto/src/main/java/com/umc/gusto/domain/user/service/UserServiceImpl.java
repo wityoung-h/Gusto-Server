@@ -4,7 +4,11 @@ import com.umc.gusto.domain.user.entity.Follow;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.NicknameBucket;
+import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
+import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
+import com.umc.gusto.domain.user.model.response.ProfileResponse;
+import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
 import com.umc.gusto.domain.user.model.response.FollowResponse;
 import com.umc.gusto.domain.user.model.response.ProfileRes;
 import com.umc.gusto.domain.user.repository.FollowRepository;
@@ -12,6 +16,7 @@ import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.auth.JwtService;
 import com.umc.gusto.global.auth.model.Tokens;
+import com.umc.gusto.global.common.PublishStatus;
 import com.umc.gusto.global.config.secret.JwtConfig;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
@@ -28,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,8 +44,8 @@ public class UserServiceImpl implements UserService{
     private final SocialRepository socialRepository;
     private final JwtService jwtService;
     private final RedisService redisService;
-    private final S3Service s3Service;
     private final FollowRepository followRepository;
+    private final S3Service s3Service;
 
     private static final long NICKNAME_EXPIRED_TIME = 1000L * 60 * 15;
     private static final int MAX_NICKNAME_NUMBER = 999;
@@ -141,6 +147,78 @@ public class UserServiceImpl implements UserService{
         }
 
         return nickname;
+    }
+
+    @Override
+    public ProfileResponse getProfile(User user, String nickname) {
+        User target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
+
+        AtomicBoolean followed = new AtomicBoolean(false);
+
+        if(user != null) {
+            followRepository.findByFollowerAndFollowing(user, target).ifPresent(a -> followed.set(true));
+        }
+
+        return ProfileResponse.builder()
+                .nickname(target.getNickname())
+                .review(target.getReviewCnt())
+                .pin(target.getPinCnt())
+                .follower(target.getFollower())
+                .followed(followed.get())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void updateNickname(User user, String nickname) {
+        redisService.deleteValues(nickname);
+        checkNickname(nickname);
+
+        user.updateNickname(nickname);
+
+        userRepository.save(user);
+    }
+
+    @Override
+    public void updateProfile(User user, MultipartFile profileImg, UpdateProfileRequest request) {
+        if(profileImg != null) {
+            s3Service.deleteImageFromUrl(user.getProfileImage());
+            String newProfile = s3Service.uploadImage(profileImg);
+
+            user.updateProfile(newProfile);
+        }
+
+        if(request != null) {
+            if(request.getAge() != null) {
+                user.updateAge(User.Age.valueOf(request.getAge()));
+            }
+
+            if(request.getGender() != null) {
+                user.updateGender(User.Gender.valueOf(request.getGender()));
+            }
+        }
+
+        userRepository.save(user);
+    }
+
+    @Override
+    public PublishingInfoResponse getPublishingInfo(User user) {
+        return PublishingInfoResponse.builder()
+                .publishReview(user.getPublishReview() == PublishStatus.PUBLIC)
+                .publishPin(user.getPublishPin() == PublishStatus.PUBLIC)
+                .build();
+    }
+
+    @Override
+    public void updatePublishingInfo(User user, PublishingInfoRequest request) {
+        PublishStatus reviewStatus = (request.getPublishReview()) ?PublishStatus.PUBLIC : PublishStatus.PRIVATE;
+        PublishStatus pinStatus = (request.getPublishPin()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
+
+        user.updatePublishReview(reviewStatus);
+        user.updatePublishPin(pinStatus);
+
+        userRepository.save(user);
     }
 
     @Override

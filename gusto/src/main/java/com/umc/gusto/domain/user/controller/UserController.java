@@ -1,5 +1,12 @@
 package com.umc.gusto.domain.user.controller;
 
+import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
+import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
+import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
+import com.umc.gusto.domain.user.service.UserService;
+import com.umc.gusto.domain.user.model.request.SignUpRequest;
+import com.umc.gusto.domain.user.model.response.ProfileResponse;
 import com.umc.gusto.domain.user.model.response.FollowResponse;
 import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
@@ -81,13 +88,50 @@ public class UserController {
      * @return ProfileRes
      */
     @GetMapping("/{nickname}/profile")
-    public ResponseEntity<ProfileRes> retrieveProfile(@PathVariable("nickname") String nickname) {
-        ProfileRes profileRes = userService.getProfile(nickname);
+    public ResponseEntity<ProfileResponse> retrieveProfile(@AuthenticationPrincipal AuthUser authUser,
+                                                           @PathVariable("nickname") String nickname) {
+        User user = null;
+
+        if(authUser != null) {
+            user = authUser.getUser();
+        }
+
+        ProfileResponse profileRes = userService.getProfile(user, nickname);
 
         return ResponseEntity.ok()
                 .body(profileRes);
     }
 
+    /**
+     * 닉네임 수정
+     * [PATCH] /users/update-nickname?nickname={new_nickname}
+     * @param nickname
+     * @return
+     */
+    @PatchMapping("/update-nickname")
+    public ResponseEntity updateNickname(@AuthenticationPrincipal AuthUser authUser, @RequestParam("nickname") String nickname) {
+        userService.updateNickname(authUser.getUser(), nickname);
+
+        return ResponseEntity.ok()
+                .build();
+    }
+
+    /**
+     * 프로필 정보 수정
+     * [PATCH] /users/my-info
+     * @param -
+     * @return -
+     */
+    @PatchMapping("/my-info")
+    public ResponseEntity updateProfile(@AuthenticationPrincipal AuthUser authUser,
+                                        @RequestPart(required = false, name = "profileImg") MultipartFile profileImg,
+                                        @RequestPart(required = false, name = "setting") UpdateProfileRequest setting) {
+        userService.updateProfile(authUser.getUser(), profileImg, setting);
+
+        return ResponseEntity.status(HttpStatus.RESET_CONTENT)
+                .build();
+    }
+  
     /**
      * 팔로우
      * [POST] /users/follow/{nickname}
@@ -114,6 +158,34 @@ public class UserController {
         userService.unfollowUser(authUser.getUser(), nickname);
 
         return ResponseEntity.status(HttpStatus.RESET_CONTENT)
+                .build();
+    }
+
+    /**
+     * 콘텐츠 공개 여부 조회
+     * [GET] /users/my-info/publishing
+     * @param -
+     * @return -
+     */
+    @GetMapping("/my-info/publishing")
+    public ResponseEntity<PublishingInfoResponse> getPublishingInfo(@AuthenticationPrincipal AuthUser authUser) {
+        PublishingInfoResponse pir = userService.getPublishingInfo(authUser.getUser());
+
+        return ResponseEntity.ok()
+                .body(pir);
+    }
+
+    /**
+     * 콘텐츠 공개 여부 수정
+     * [PATCH] /users/my-info/publishing
+     * @param -
+     * @return -
+     */
+    @PatchMapping("/my-info/publishing")
+    public ResponseEntity updatePublishingInfo(@AuthenticationPrincipal AuthUser authUser, @RequestBody PublishingInfoRequest request) {
+        userService.updatePublishingInfo(authUser.getUser(), request);
+
+        return ResponseEntity.ok()
                 .build();
     }
 
