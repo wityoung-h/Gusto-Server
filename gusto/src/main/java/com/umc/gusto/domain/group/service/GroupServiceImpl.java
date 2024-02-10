@@ -51,8 +51,6 @@ public class GroupServiceImpl implements GroupService{
   
     private static final int INVITE_CODE_LENGTH = 12;
 
-
-    private final GroupListRepository groupListRepository;
     private final StoreRepository storeRepository;
     private final ReviewRepository reviewRepository;
 
