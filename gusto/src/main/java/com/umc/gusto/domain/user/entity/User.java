@@ -49,6 +49,11 @@ public class User extends BaseTime {
     @Column(name = "publishCategory", nullable = false, length = 10)
     private PublishStatus publishCategory = PublishStatus.PUBLIC;
 
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(name = "publishRoute", nullable = false, length = 10)
+    private PublishStatus publishRoute = PublishStatus.PUBLIC;
+
     @Column(nullable = false, columnDefinition = "bigint default 0")
     private Long follower;
 
@@ -75,4 +80,31 @@ public class User extends BaseTime {
         ACTIVE, INACTIVE, PAUSE
     }
 
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateProfile(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    public void updateAge(User.Age age) {
+        this.age = age;
+    }
+
+    public void updateGender(User.Gender gender) {
+        this.gender = gender;
+    }
+
+    public void updatePublishReview(PublishStatus status) {
+        this.publishReview = status;
+    }
+
+    public void updatePublishPin(PublishStatus status) {
+        this.publishCategory = status;
+    }
+
+    public void updateFollower(long follower) {
+        this.follower = follower;
+    }
 }
