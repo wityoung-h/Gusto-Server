@@ -6,20 +6,24 @@ import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.store.entity.Category;
 import com.umc.gusto.domain.store.entity.OpeningHours;
 import com.umc.gusto.domain.store.entity.Store;
-import com.umc.gusto.domain.store.model.response.StoreResponse;
+import com.umc.gusto.domain.store.model.response.GetReviewsResponse;
+import com.umc.gusto.domain.store.model.response.GetStoreDetailResponse;
+import com.umc.gusto.domain.store.model.response.GetStoreResponse;
+import com.umc.gusto.domain.store.model.response.GetStoresInMapResponse;
+import com.umc.gusto.domain.store.repository.OpeningHoursRepository;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.exception.Code;
-import com.umc.gusto.global.exception.customException.NotFoundException;
+import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,13 +32,24 @@ public class StoreServiceImpl implements StoreService{
     private final StoreRepository storeRepository;
     private final ReviewRepository reviewRepository;
     private final PinRepository pinRepository;
+    private final OpeningHoursRepository openingHoursRepository;
+    private static final int PAGE_SIZE_FIRST = 3;
+    private static final int PAGE_SIZE = 6;
 
     @Transactional(readOnly = true)
-    public StoreResponse.getStore getStore(User user, Long storeId) {
+    public GetStoreResponse getStore(User user, Long storeId) {
         Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND));
-        OpeningHours openingHours = storeRepository.findOpeningHoursByStoreId(storeId)
-                .orElseThrow(() -> new NotFoundException(Code.OPENINGHOURS_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
+        List<OpeningHours> openingHoursList = openingHoursRepository.findByStoreStoreId(storeId);
+
+        Map<OpeningHours.BusinessDay, GetStoreResponse.Timing> businessDays = new LinkedHashMap<>();
+        for (OpeningHours openingHours : openingHoursList) {
+            GetStoreResponse.Timing timing = new GetStoreResponse.Timing(
+                    openingHours.getOpenedAt(),
+                    openingHours.getClosedAt()
+            );
+            businessDays.put(openingHours.getBusinessDay(), timing);
+        }
 
         List<Review> top3Reviews = reviewRepository.findFirst3ByStoreOrderByLikedDesc(store);
 
@@ -44,28 +59,23 @@ public class StoreServiceImpl implements StoreService{
 
         boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
-        List<String> businessDays = Arrays.asList(openingHours.getBusinessDay().split(","));
-
-        return StoreResponse.getStore.builder()
+        return GetStoreResponse.builder()
                 .storeId(storeId)
                 .storeName(store.getStoreName())
                 .address(store.getAddress())
                 .businessDay(businessDays)
-                .openedAt(openingHours.getOpenedAt())
-                .closedAt(openingHours.getClosedAt())
-                .contact(store.getContact())
                 .reviewImg3(reviewImg)
                 .pin(isPinned)
                 .build();
-
     }
 
+
     @Transactional(readOnly = true)
-    public StoreResponse.getStoreDetail getStoreDetail(User user, Long storeId, Long reviewId, Pageable pageable) {
+    public GetStoreDetailResponse getStoreDetail(User user, Long storeId, Long reviewId, Pageable pageable) {
         Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
         Category category = storeRepository.findCategoryByStoreId(storeId)
-                .orElseThrow(() -> new NotFoundException(Code.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(Code.CATEGORY_NOT_FOUND));
 
         List<Review> top4Reviews = reviewRepository.findFirst4ByStoreOrderByLikedDesc(store);
 
@@ -79,17 +89,17 @@ public class StoreServiceImpl implements StoreService{
         List<Review> reviews;
 
         if (reviewId != null) {
-            pageSize = 6;
+            pageSize = PAGE_SIZE_FIRST;
             reviews = reviewRepository.findReviewsAfterIdByStore(store, reviewId, PageRequest.of(pageNumber, pageSize));
         } else {
-            pageSize = 3;
+            pageSize = PAGE_SIZE;
             reviews = reviewRepository.findFirstReviewsByStore(store, PageRequest.of(pageNumber, pageSize));
         }
 
-        List<StoreResponse.getReviews> getReviews = reviews.stream()
+        List<GetReviewsResponse> getReviews = reviews.stream()
                 .map(review -> {
                     User reviewer = review.getUser();
-                    return StoreResponse.getReviews.builder()
+                    return GetReviewsResponse.builder()
                         .reviewId(review.getReviewId())
                         .visitedAt(review.getVisitedAt())
                         .profileImage(reviewer.getProfileImage())
@@ -106,7 +116,7 @@ public class StoreServiceImpl implements StoreService{
 
         boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
-        return StoreResponse.getStoreDetail.builder()
+        return GetStoreDetailResponse.builder()
                 .storeId(storeId)
                 .categoryName(category.getCategoryName())
                 .storeName(store.getStoreName())
@@ -118,7 +128,7 @@ public class StoreServiceImpl implements StoreService{
     }
 
     @Transactional(readOnly = true)
-    public List<StoreResponse.getStoresInMap> getStoresInMap(User user, String townName, Long myCategoryId) {
+    public List<GetStoresInMapResponse> getStoresInMap(User user, String townName, Long myCategoryId) {
         List<Long> storeIds;
         List<Store> stores;
 
@@ -132,7 +142,7 @@ public class StoreServiceImpl implements StoreService{
 
 
         return stores.stream()
-                .map(store -> StoreResponse.getStoresInMap.builder()
+                .map(store -> GetStoresInMapResponse.builder()
                         .storeId(store.getStoreId())
                         .storeName(store.getStoreName())
                         .longitude(store.getLongitude())

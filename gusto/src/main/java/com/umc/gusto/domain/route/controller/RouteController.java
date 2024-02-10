@@ -3,11 +3,12 @@ package com.umc.gusto.domain.route.controller;
 import com.umc.gusto.domain.route.model.request.RouteRequest;
 import com.umc.gusto.domain.route.model.response.RouteResponse;
 import com.umc.gusto.domain.route.service.RouteServiceImpl;
-import com.umc.gusto.global.auth.UserDetailsService;
+import com.umc.gusto.global.auth.model.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,27 +22,30 @@ public class RouteController {
 
     // 루트 생성
     @PostMapping("")
-    public ResponseEntity<?> createRoute(
-            @RequestBody @Valid RouteRequest.createRouteDto request)
+    public ResponseEntity createRoute(
+            @RequestBody @Valid RouteRequest.createRouteDto request,
+            @AuthenticationPrincipal AuthUser authUSer)
     {
-        routeService.createRoute(request);
+        routeService.createRoute(request,authUSer.getUser());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     // 루트 삭제
     @DeleteMapping("/{routeId}")
-    public ResponseEntity<?> deleteRoute(@PathVariable Long routeId)
+    public ResponseEntity deleteRoute(
+            @PathVariable Long routeId,
+            @AuthenticationPrincipal AuthUser authUSer)
     {
-        routeService.deleteRoute(routeId);
+        routeService.deleteRoute(routeId,authUSer.getUser());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     // 내 루트 조회
-    @GetMapping("/{nickname}")
-    public ResponseEntity<?> allMyRoute(
-            @PathVariable String nickname
+    @GetMapping("")
+    public ResponseEntity<List<RouteResponse.RouteResponseDto>> allMyRoute(
+            @AuthenticationPrincipal AuthUser authUSer
     ){
-        List<RouteResponse.RouteResponseDto> route = routeService.getRoute(nickname);
+        List<RouteResponse.RouteResponseDto> route = routeService.getRoute(authUSer.getUser());
         return ResponseEntity.ok().body(route);
     }
 
