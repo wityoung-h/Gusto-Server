@@ -6,6 +6,7 @@ import com.umc.gusto.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long > {
@@ -15,5 +16,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long > {
     Integer countByStoreAndUserNickname(Store store, String nickname);
 
     @Query("SELECT r.img1 FROM Review r WHERE r.store.storeId = :storeId ORDER BY r.liked DESC")
-    Optional<String> findTopReviewImageByStoreId(Long storeId);
+    List<String> findTopReviewImageByStoreId(Long storeId);
 }

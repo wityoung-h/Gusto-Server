@@ -165,7 +165,7 @@ public class GroupServiceImpl implements GroupService{
 
         // 그룹 리스트에 해당하는 각 상점 정보 조회
         return groupLists.stream().map(gl -> {
-            String reviewImg = reviewRepository.findTopReviewImageByStoreId(gl.getStore().getStoreId()).orElse(null);
+            String reviewImg = reviewRepository.findTopReviewImageByStoreId(gl.getStore().getStoreId()).get(0);
             return GroupListResponse.builder()
                     .groupListId(gl.getGroupListId())
                     .storeName(gl.getStore().getStoreName())
