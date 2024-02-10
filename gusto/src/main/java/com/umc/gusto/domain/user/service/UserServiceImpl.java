@@ -17,6 +17,7 @@ import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import com.umc.gusto.global.exception.customException.NotFoundException;
 import com.umc.gusto.global.util.RedisService;
+import com.umc.gusto.global.util.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +38,7 @@ public class UserServiceImpl implements UserService{
     private final SocialRepository socialRepository;
     private final JwtService jwtService;
     private final RedisService redisService;
+    private final S3Service s3Service;
     private final FollowRepository followRepository;
 
     private static final long NICKNAME_EXPIRED_TIME = 1000L * 60 * 15;
@@ -46,7 +48,7 @@ public class UserServiceImpl implements UserService{
 
 
     @Value("${default.img.url.profile}")
-    private static String DEFAULT_PROFILE_IMG;
+    private String DEFAULT_PROFILE_IMG;
 
     @Override
     @Transactional
@@ -55,6 +57,10 @@ public class UserServiceImpl implements UserService{
         UUID socialUID = UUID.fromString(tempToken);
         Social socialInfo = socialRepository.findByTemporalToken(socialUID).orElseThrow(() -> new GeneralException(Code.INVALID_ACCESS_TOKEN));
 
+        if(socialInfo.getSocialStatus() == Social.SocialStatus.CONNECTED) {
+            throw new GeneralException(Code.USER_ALREADY_SIGNUP);
+        }
+
         redisService.deleteValues(request.getNickname());
         checkNickname(request.getNickname());
 
@@ -62,14 +68,11 @@ public class UserServiceImpl implements UserService{
 
         if(multipartFile != null) {
             // profileImg를 이미지 파일로 받았다면
-            // TODO:
-            //  s3 이미지 업로드 후 생성 된 url로 profileImg url 변경
+            profileImg = s3Service.uploadImage(multipartFile);
         } else if(request.getProfileImg() != null) {
             // profileImg를 이미지로 받지 않고, url로 받았다면
             profileImg = request.getProfileImg();
         }
-
-        System.out.println(profileImg);
 
         // user 생성
         User user = User.builder()
