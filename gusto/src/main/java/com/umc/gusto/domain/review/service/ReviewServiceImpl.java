@@ -115,7 +115,7 @@ public class ReviewServiceImpl implements ReviewService{
         if(updateReviewRequest.getComment()!=null){
             review.updateComment(updateReviewRequest.getComment());
         }
-        if(!images.isEmpty()){
+        if(images!=null){
             //TODO: review 엔티티에서 이미지를 분리하거나 monogoDB를 쓰는게 나을 듯, 나머지 기능 개발 후 바꿀 예정
             updateImages(images, review);
         }
