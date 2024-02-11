@@ -97,7 +97,13 @@ public class JwtService implements InitializingBean {
 
     @Transactional
     public Tokens reissueToken(String accessToken, String refreshToken) {
-        String accessUuid = (String) getClaims(accessToken).get(UUID);
+        String accessUuid = null;
+
+        try {
+            accessUuid = (String) getClaims(accessToken).get(UUID);
+        } catch (ExpiredJwtException e) {
+            accessUuid = String.valueOf(e.getClaims().get(UUID));
+        }
 
         try {
             getClaims(refreshToken);
