@@ -12,16 +12,27 @@ public enum Code {
     NO_PERMISSION(HttpStatus.FORBIDDEN,403, "해당 권한이 없습니다."),
 
     //User 관련 에러 +0
-    USER_DUPLICATE_NICKNAME(HttpStatus.CONFLICT, 409101, "이미 사용중인 닉네임입니다."),
-    DONT_EXIST_USER(HttpStatus.NOT_FOUND, 404101, "존재하지 않는 유저입니다."),
+    USER_DUPLICATE_NICKNAME(HttpStatus.CONFLICT, 409001, "이미 사용중인 닉네임입니다."),
+    DONT_EXIST_USER(HttpStatus.NOT_FOUND, 404001, "존재하지 않는 유저입니다."),
+    USER_ALREADY_SIGNUP(HttpStatus.CONFLICT, 409003, "가입이 완료된 유저입니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, 404001, "존재하지 않는 유저입니다."),
+    USER_FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, 404002, "팔로우한 유저가 아닙니다."),
+    USER_FOLLOW_NO_MORE_CONTENT(HttpStatus.NOT_FOUND, 404003, "리스트가 더이상 존재하지 않습니다."),
+    USER_FOLLOW_ALREADY(HttpStatus.CONFLICT, 409002, "이미 팔로우했습니다."),
+    USER_FOLLOW_SELF(HttpStatus.FORBIDDEN, 403001, "자신을 팔로우할 수 없습니다."),
 
     //Store 관련 에러 +1
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND, 404101, "존재하지 않는 가게입니다."),
+    OPENINGHOURS_NOT_FOUND(HttpStatus.NOT_FOUND, 404102,"해당 가게에 대한 운영시간이 존재하지 않습니다."),
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 404103,"해당 가게에 대한 카테고리가 존재하지 않습니다."),
 
     //Review 관련 에러 +2
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, 404201, "존재하지 않는 리뷰입니다."),
     HASHTAG_NOT_FOUND(HttpStatus.NOT_FOUND, 404202, "존재하지 않는 해시태그입니다."),
     USER_NO_PERMISSION_FOR_REVIEW(HttpStatus.FORBIDDEN, 403203, "해당 유저는 해당 리뷰에 대한 권한이 없습니다."),
+    NO_PUBLIC_REVIEW(HttpStatus.FORBIDDEN, 403204, "해당 리뷰는 public입니다."),
+    NO_ONESELF_LIKE(HttpStatus.BAD_REQUEST, 400204, "자기자신의 리뷰는 좋아요할 수 없습니다."),
+    NO_LIKE_REVIEW(HttpStatus.BAD_REQUEST, 400205, "해당 리뷰에 좋아요를 한 적이 없습니다."),
 
     //Route 관련 에러 +3
     ROUTE_DUPLICATE_ROUTENAME(HttpStatus.CONFLICT, 409301,"이미 사용중인 루트명입니다."),
@@ -37,12 +48,14 @@ public enum Code {
     INVALID_INVITATION_CODE(HttpStatus.FORBIDDEN, 403405, "그룹의 초대 코드가 올바르지 않습니다."),
     USER_NOT_IN_GROUP(HttpStatus.NOT_FOUND, 404406, "그룹에 가입되지 않은 유저입니다."),
     NO_TRANSFER_PERMISSION(HttpStatus.FORBIDDEN, 403407, "그룹 소유자만이 그룹 소유권을 이전할 수 있습니다."),
+    USER_NO_PERMISSION_FOR_GROUP(HttpStatus.FORBIDDEN,403408,"해당 유저는 그룹 구성원이 아닙니다."),
+    GROUPLIST_NOT_FROUND(HttpStatus.NOT_FOUND,403409,"존재하지 않는 그룹 내 상점입니다."),
   
     //myCategory 관련 에러 +5
     MYCATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 404501, "존재하지 않는 카테고리입니다."),
-    MYCATEGORY_DUPLICATE_NAME(HttpStatus.CONFLICT, 404502, "이미 존재하는 카테고리입니다."),
-    USER_NO_PERMISSION_FOR_MYCATEGORY(HttpStatus.FORBIDDEN, 404503, "해당 유저는 해당 카테고리에 대한 권한이 없습니다."),
-    PIN_NOT_FOUND(HttpStatus.NOT_FOUND, 404504,"존재하지 않는 찜(Pin) 입니다"),
+    PIN_NOT_FOUND(HttpStatus.NOT_FOUND, 404502,"존재하지 않는 찜 입니다"),
+    MYCATEGORY_DUPLICATE_NAME(HttpStatus.CONFLICT, 409501, "이미 존재하는 카테고리입니다."),
+    USER_NO_PERMISSION_FOR_MYCATEGORY(HttpStatus.FORBIDDEN, 403501, "해당 유저는 해당 카테고리에 대한 권한이 없습니다."),
 
     // token 관련 에러 +6
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, 401601, "유효하지 않은 토큰입니다."),

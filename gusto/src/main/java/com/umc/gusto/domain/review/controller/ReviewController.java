@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -89,5 +90,33 @@ public class ReviewController {
     public ResponseEntity<?> getReviewOfTimeView(@AuthenticationPrincipal AuthUser authUser, @RequestBody ReviewViewRequest reviewViewRequest){
         User user = authUser.getUser();
         return ResponseEntity.ok().body(collectReviewService.getReviewOfTimeView(user, reviewViewRequest));
+    }
+  
+    /**
+     * 다른 유저의 리뷰 모아보기
+     */
+    @GetMapping()
+    public ResponseEntity<?> getOthersReview(@RequestParam(name = "userId")UUID userId, @RequestBody ReviewViewRequest reviewViewRequest){
+        return ResponseEntity.ok().body(collectReviewService.getOthersReview(userId, reviewViewRequest));
+    }
+
+    /**
+     * 리뷰 좋아요
+     */
+    @PostMapping("/{reviewId}/like")
+    public ResponseEntity<?> likeReview(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long reviewId){
+        User user = authUser.getUser(); //TODO: 로그인한 유저가 아니면 리뷰를 할 수 없도록 예외처리 필요
+        reviewService.likeReview(user, reviewId);
+        return ResponseEntity.status(HttpStatus.RESET_CONTENT).build();
+    }
+
+    /**
+     * 리뷰 좋아요 취소
+     */
+    @DeleteMapping("/{reviewId}/unlike")
+    public ResponseEntity<?> unLikeReview(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long reviewId){
+        User user = authUser.getUser(); //TODO: 로그인한 유저가 아니면 리뷰를 할 수 없도록 예외처리 필요
+        reviewService.unlikeReview(user, reviewId);
+        return ResponseEntity.status(HttpStatus.RESET_CONTENT).build();
     }
 }
