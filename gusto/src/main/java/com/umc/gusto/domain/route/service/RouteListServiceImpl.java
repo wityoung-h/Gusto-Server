@@ -60,6 +60,7 @@ public class RouteListServiceImpl implements RouteListService{
                         .latitude(rL.getStore().getLatitude())
                         .routeListId(rL.getRouteListId())
                         .ordinal(rL.getOrdinal())
+                        .storeId(rL.getStore().getStoreId())
                         .build()
         ).toList();
 
