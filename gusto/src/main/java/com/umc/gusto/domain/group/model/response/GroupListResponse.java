@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class GroupListResponse {
     private String storeName;
+    private Long storeId;
     private String storeProfileImg;
     private String userProfileImg;
     private String address;
