@@ -2,7 +2,7 @@ package com.umc.gusto.domain.route.controller;
 
 import com.umc.gusto.domain.route.model.request.RouteRequest;
 import com.umc.gusto.domain.route.model.response.RouteResponse;
-import com.umc.gusto.domain.route.service.RouteServiceImpl;
+import com.umc.gusto.domain.route.service.RouteService;
 import com.umc.gusto.global.auth.model.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +18,11 @@ import java.util.List;
 @RequestMapping("routes")
 @RequiredArgsConstructor
 public class RouteController {
-    private final RouteServiceImpl routeService;
+    private final RouteService routeService;
 
     // 루트 생성
     @PostMapping("")
-    public ResponseEntity createRoute(
+    public ResponseEntity<?> createRoute(
             @RequestBody @Valid RouteRequest.createRouteDto request,
             @AuthenticationPrincipal AuthUser authUSer)
     {
@@ -32,12 +32,12 @@ public class RouteController {
 
     // 루트 삭제
     @DeleteMapping("/{routeId}")
-    public ResponseEntity deleteRoute(
+    public ResponseEntity<?> deleteRoute(
             @PathVariable Long routeId,
             @AuthenticationPrincipal AuthUser authUSer)
     {
         routeService.deleteRoute(routeId,authUSer.getUser());
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     // 내 루트 조회
