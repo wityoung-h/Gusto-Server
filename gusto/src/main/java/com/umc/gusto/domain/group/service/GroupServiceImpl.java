@@ -290,7 +290,8 @@ public class GroupServiceImpl implements GroupService{
             return GroupListResponse.builder()
                     .groupListId(gl.getGroupListId())
                     .storeName(gl.getStore().getStoreName())
-                    .profileImg(reviewImg)
+                    .storeProfileImg(reviewImg)
+                    .userProfileImg(gl.getUser().getProfileImage())
                     .address(gl.getStore().getAddress())
                     .build();
         }).collect(Collectors.toList());
