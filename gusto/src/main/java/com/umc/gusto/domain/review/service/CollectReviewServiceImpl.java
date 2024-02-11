@@ -66,7 +66,7 @@ public class CollectReviewServiceImpl implements CollectReviewService{
                 }).toList();
         return CollectReviewsOfTimelineResponse.of(timelineViewResponses, checkNext);
     }
-
+  
     @Override
     public CollectReviewsOfInstaResponse getOthersReview(UUID userId, ReviewViewRequest reviewViewRequest) {
         User other = userRepository.findById(userId).orElseThrow(()-> new NotFoundException(Code.DONT_EXIST_USER));
