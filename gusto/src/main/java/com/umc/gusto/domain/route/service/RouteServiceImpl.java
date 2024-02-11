@@ -67,7 +67,6 @@ public class RouteServiceImpl implements RouteService{
 
     @Override
     public List<RouteResponse.RouteResponseDto> getRoute(User user) {
-        //TODO: group 루트 제외하기
         List<Route> routes = routeRepository.findRouteByUserAndStatus(user, BaseEntity.Status.ACTIVE);
         return routes.stream().map(
                         Route -> RouteResponse.RouteResponseDto.builder()

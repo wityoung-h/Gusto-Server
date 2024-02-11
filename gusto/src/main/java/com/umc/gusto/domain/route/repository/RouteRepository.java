@@ -17,20 +17,16 @@ public interface RouteRepository extends JpaRepository<Route,Long> {
     @Query("SELECT CASE WHEN COUNT(r) > 0 THEN TRUE ELSE FALSE END FROM Route r WHERE r.routeName = :routeName AND r.status = :status AND r.user = :user")
     Boolean existsByRouteName(@Param("routeName") String routeName, @Param("status") BaseEntity.Status status, @Param("user") User user);
 
-//    Boolean existsByRouteNameAndStatus(String routeName, BaseEntity.Status status);
-
     // rootId PK값으로 루트 찾기
     Optional<Route> findRouteByRouteIdAndStatus(Long routeId,BaseEntity.Status status);
 
     // 그룹X, ACTIVE
-    @Query("SELECT r FROM Route r WHERE r.routeId = ?1 AND r.status = ?2 AND r.group.groupId IS NULL")
-    Optional<Route> findRouteByRouteIdAndStatusAndGroup(Long routeId, BaseEntity.Status status);
+    @Query("SELECT r FROM Route r WHERE r.routeId = :routeId AND r.status = :status AND r.group.groupId IS NULL")
+    Optional<Route> findRouteByRouteIdAndStatusAndGroup(@Param("routeId") Long routeId, @Param("status") BaseEntity.Status status);
 
     // 유저의 루트 목록 조회 , 그룹X
-    List<Route> findRouteByUserAndStatus(User user, BaseEntity.Status status);
-
-    // 그룹의 루트 목록 조회
-    List<Route> findRoutesByGroupAndStatus(Group group, BaseEntity.Status status);
+    @Query("select r from Route r where r.user = :user AND r.status = :status AND r.group.groupId IS NULL ")
+    List<Route> findRouteByUserAndStatus(@Param("user") User user, @Param("status") BaseEntity.Status status);
 
     // 그룹의 루트 개수 조회
     int countRoutesByGroupAndStatus(Group group, BaseEntity.Status status);
