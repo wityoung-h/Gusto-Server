@@ -22,7 +22,11 @@ public interface RouteRepository extends JpaRepository<Route,Long> {
     // rootId PK값으로 루트 찾기
     Optional<Route> findRouteByRouteIdAndStatus(Long routeId,BaseEntity.Status status);
 
-    // 유저의 루트 목록 조회
+    // 그룹X, ACTIVE
+    @Query("SELECT r FROM Route r WHERE r.routeId = ?1 AND r.status = ?2 AND r.group.groupId IS NULL")
+    Optional<Route> findRouteByRouteIdAndStatusAndGroup(Long routeId, BaseEntity.Status status);
+
+    // 유저의 루트 목록 조회 , 그룹X
     List<Route> findRouteByUserAndStatus(User user, BaseEntity.Status status);
 
     // 그룹의 루트 목록 조회

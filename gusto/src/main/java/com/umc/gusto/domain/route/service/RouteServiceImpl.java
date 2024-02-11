@@ -50,13 +50,16 @@ public class RouteServiceImpl implements RouteService{
 
     @Transactional
     @Override
-    public void deleteRoute(Long routeId,User user) {
-        Route route = routeRepository.findById(routeId).orElseThrow(() -> new GeneralException(Code.ROUTE_NOT_FOUND));
+    public void deleteRoute(Long routeId, User user) {
+        // 그룹X, ACTIVE 한정
+        Route route = routeRepository.findRouteByRouteIdAndStatusAndGroup(routeId,BaseEntity.Status.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.ROUTE_NOT_FOUND));
 
         // 루트를 생성한 유저만 삭제
-        if(!route.getUser().equals(user)){
+        if(!route.getUser().getNickname().equals(user.getNickname())){
             throw new GeneralException(Code.USER_NO_PERMISSION_FOR_ROUTE);
         }
+
         //루트 삭제 : soft delete // TODO:DB 최종 삭제 주기 체크
         route.updateStatus(BaseEntity.Status.INACTIVE);
 
@@ -64,6 +67,7 @@ public class RouteServiceImpl implements RouteService{
 
     @Override
     public List<RouteResponse.RouteResponseDto> getRoute(User user) {
+        //TODO: group 루트 제외하기
         List<Route> routes = routeRepository.findRouteByUserAndStatus(user, BaseEntity.Status.ACTIVE);
         return routes.stream().map(
                         Route -> RouteResponse.RouteResponseDto.builder()
