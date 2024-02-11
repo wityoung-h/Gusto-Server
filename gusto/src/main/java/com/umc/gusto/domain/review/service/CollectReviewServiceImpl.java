@@ -34,8 +34,7 @@ public class CollectReviewServiceImpl implements CollectReviewService{
         Page<Review> reviews = pagingReview(user, reviewViewRequest.getReviewId(), reviewViewRequest);
 
         //다음에 조회될 리뷰가 있는지 확인하기
-        boolean checkNext = hasNext(user, reviews);
-
+        boolean checkNext = reviews.hasNext();
         List<BasicViewResponse> basicViewResponse = reviews.map(BasicViewResponse::of).toList();
         return CollectReviewsOfInstaResponse.of(basicViewResponse, checkNext);
     }
@@ -58,7 +57,7 @@ public class CollectReviewServiceImpl implements CollectReviewService{
         Page<Review> reviews = pagingReview(user, reviewViewRequest.getReviewId(), reviewViewRequest);
 
         //다음에 조회될 리뷰가 있는지 확인하기
-        boolean checkNext = hasNext(user, reviews);
+        boolean checkNext = reviews.hasNext();
 
         List<TimelineViewResponse> timelineViewResponses = reviews.map(review -> {
                     int visitedCount = reviewRepository.countByStoreAndUser(review.getStore(), user);
