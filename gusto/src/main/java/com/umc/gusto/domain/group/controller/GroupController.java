@@ -1,9 +1,15 @@
 package com.umc.gusto.domain.group.controller;
 
+import com.umc.gusto.domain.group.model.request.GroupListRequest;
+import com.umc.gusto.domain.group.model.request.JoinGroupRequest;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
+import com.umc.gusto.domain.group.model.request.TransferOwnershipRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
 import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
+import com.umc.gusto.domain.group.model.response.GroupListResponse;
+import com.umc.gusto.domain.group.model.response.GetInvitationCodeResponse;
+import com.umc.gusto.domain.group.model.response.TransferOwnershipResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupsResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.service.GroupService;
@@ -67,6 +73,83 @@ public class GroupController {
     }
 
     /**
+     * 그룹리스트 추가
+     * [POST] /groups/{groupId}/groupList
+     */
+    @PostMapping("/{groupId}/groupList")
+    public ResponseEntity<?> createGroupList(
+            @AuthenticationPrincipal AuthUser authUser,@PathVariable Long groupId, @RequestBody GroupListRequest request){
+        User user = authUser.getUser();
+        groupService.createGroupList(groupId,request,user);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+     }
+
+    /**
+     * 초대 코드 조회
+     * [GET] /groups/{groupId}/invitationCode
+     */
+    @GetMapping("/{groupId}/invitationCode")
+    public ResponseEntity<GetInvitationCodeResponse> getInvitationCode(@PathVariable Long groupId) {
+        GetInvitationCodeResponse getInvitationCode = groupService.getInvitationCode(groupId);
+        return ResponseEntity.status(HttpStatus.OK).body(getInvitationCode);
+    }
+
+    /**
+     * 그룹 소유권 이전
+     * [PATCH] /groups/{groupId}/transfer-ownership
+     */
+    @PatchMapping("/{groupId}/transfer-ownership")
+    public ResponseEntity<TransferOwnershipResponse> transferOwnership(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId, @RequestBody TransferOwnershipRequest transferOwnershipRequest) {
+        User owner = authUser.getUser();
+        TransferOwnershipResponse transferOwnership = groupService.transferOwnership(owner, groupId, transferOwnershipRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(transferOwnership);
+    }
+
+    /**
+     * 그룹 참여
+     * [POST] /groups/{groupId}/join
+     */
+    @PostMapping("/{groupId}/join")
+    public ResponseEntity<?> joinGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId, @RequestBody JoinGroupRequest joinGroupRequest){
+        User user = authUser.getUser();
+        groupService.joinGroup(user, groupId, joinGroupRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /**
+     * 그룹 리스트 삭제
+     * [DELETE] /groups/groupLists?groupListId=1
+     */
+    @DeleteMapping("/groupLists")
+    public ResponseEntity<?> deleteGroupList(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam(name = "groupListId") List<Long> groupListId){
+        User user = authUser.getUser();
+        groupService.deleteGroupList(groupListId,user);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 그룹 리스트 조회 == 그룹 내 찜한 식당 정보
+     * [GET] /groups/{groupId}/groupLists
+     */
+    @GetMapping("/{groupId}/groupLists")
+    public ResponseEntity<List<GroupListResponse>> getGroupList(@PathVariable Long groupId){
+        return ResponseEntity.ok().body(groupService.getAllGroupList(groupId));
+    }
+
+      
+     /** 그룹 탈퇴
+     * [DELETE] /groups/{groupId}/leave
+     */
+    @DeleteMapping("/{groupId}/leave")
+    public ResponseEntity<?> leaveGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId){
+        User user = authUser.getUser();
+        groupService.leaveGroup(user, groupId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+  
+    /**
      * 그룹 목록 조회
      * [GET] /groups
      */
@@ -86,5 +169,4 @@ public class GroupController {
         List<GetGroupMemberResponse> getGroupMembers = groupService.getGroupMembers(groupId);
         return ResponseEntity.status(HttpStatus.OK).body(getGroupMembers);
     }
-
 }

@@ -24,7 +24,6 @@ public class MyCategoryRequest {
         String myCategoryName;
         String myCategoryScript;
         Integer myCategoryIcon;
-        PublishStatus publishCategory = PublishStatus.PUBLIC;
 
     }
 
