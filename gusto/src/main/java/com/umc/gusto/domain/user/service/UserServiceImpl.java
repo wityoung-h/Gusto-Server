@@ -8,6 +8,7 @@ import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
 import com.umc.gusto.domain.user.model.response.FeedProfileResponse;
+import com.umc.gusto.domain.user.model.response.ProfileResponse;
 import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
 import com.umc.gusto.domain.user.model.response.FollowResponse;
 import com.umc.gusto.domain.user.repository.FollowRepository;
@@ -177,6 +178,16 @@ public class UserServiceImpl implements UserService{
         user.updateNickname(nickname);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public ProfileResponse getProfile(User user) {
+        return ProfileResponse.builder()
+                .profileImg(user.getProfileImage())
+                .nickname(user.getNickname())
+                .age(user.getAge().toString())
+                .gender(user.getGender().toString())
+                .build();
     }
 
     @Override

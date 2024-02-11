@@ -5,6 +5,7 @@ import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
 import com.umc.gusto.domain.user.model.response.FeedProfileResponse;
+import com.umc.gusto.domain.user.model.response.ProfileResponse;
 import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
 import com.umc.gusto.domain.user.model.response.FollowResponse;
 import com.umc.gusto.global.auth.model.Tokens;
@@ -31,6 +32,9 @@ public interface UserService {
 
     // 닉네임 갱신
     void updateNickname(User user, String nickname);
+
+    // 프로필 정보 리턴
+    ProfileResponse getProfile(User user);
 
     // 프로필 정보 갱신
     void updateProfile(User user, MultipartFile profileImg, UpdateProfileRequest request);
