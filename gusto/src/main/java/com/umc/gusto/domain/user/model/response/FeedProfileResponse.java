@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 @Getter
-public class ProfileResponse {
+public class FeedProfileResponse {
     private String nickname;
     private int review;
     private int pin;

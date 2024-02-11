@@ -6,7 +6,7 @@ import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
 import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
 import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
-import com.umc.gusto.domain.user.model.response.ProfileResponse;
+import com.umc.gusto.domain.user.model.response.FeedProfileResponse;
 import com.umc.gusto.domain.user.model.response.FollowResponse;
 import com.umc.gusto.global.auth.model.AuthUser;
 import com.umc.gusto.global.auth.model.Tokens;
@@ -85,15 +85,15 @@ public class UserController {
      * @return ProfileRes
      */
     @GetMapping("/{nickname}/profile")
-    public ResponseEntity<ProfileResponse> retrieveProfile(@AuthenticationPrincipal AuthUser authUser,
-                                                           @PathVariable("nickname") String nickname) {
+    public ResponseEntity<FeedProfileResponse> retrieveProfile(@AuthenticationPrincipal AuthUser authUser,
+                                                               @PathVariable("nickname") String nickname) {
         User user = null;
 
         if(authUser != null) {
             user = authUser.getUser();
         }
 
-        ProfileResponse profileRes = userService.getProfile(user, nickname);
+        FeedProfileResponse profileRes = userService.getProfile(user, nickname);
 
         return ResponseEntity.ok()
                 .body(profileRes);

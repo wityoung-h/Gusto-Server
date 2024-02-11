@@ -7,7 +7,7 @@ import com.umc.gusto.domain.user.model.NicknameBucket;
 import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
-import com.umc.gusto.domain.user.model.response.ProfileResponse;
+import com.umc.gusto.domain.user.model.response.FeedProfileResponse;
 import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
 import com.umc.gusto.domain.user.model.response.FollowResponse;
 import com.umc.gusto.domain.user.repository.FollowRepository;
@@ -149,7 +149,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public ProfileResponse getProfile(User user, String nickname) {
+    public FeedProfileResponse getProfile(User user, String nickname) {
         User target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
                 .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
 
@@ -159,7 +159,7 @@ public class UserServiceImpl implements UserService{
             followRepository.findByFollowerAndFollowing(user, target).ifPresent(a -> followed.set(true));
         }
 
-        return ProfileResponse.builder()
+        return FeedProfileResponse.builder()
                 .nickname(target.getNickname())
                 .review(target.getReviewCnt())
                 .pin(target.getPinCnt())
