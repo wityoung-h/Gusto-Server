@@ -206,6 +206,7 @@ public class UserServiceImpl implements UserService{
         return PublishingInfoResponse.builder()
                 .publishReview(user.getPublishReview() == PublishStatus.PUBLIC)
                 .publishPin(user.getPublishCategory() == PublishStatus.PUBLIC)
+                .publishRoute(user.getPublishRoute() == PublishStatus.PUBLIC)
                 .build();
     }
 
