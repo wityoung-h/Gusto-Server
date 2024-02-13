@@ -99,7 +99,17 @@ public class RouteListServiceImpl implements RouteListService{
     }
 
     @Override
-    public RouteListResponse.RouteListResponseDto getRouteListDetail(Long routeId) {
+    public RouteListResponse.RouteListResponseDto getRouteListDetail(Long routeId,User user, Long groupId) {
+        // 그룹 내 루트 상세 조회인 경우에만
+        if(groupId != null){
+            Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                    .orElseThrow(() -> new GeneralException(Code.FIND_FAIL_GROUP));
+            if(!groupMemberRepository.existsGroupMemberByGroupAndUser(group,user)){
+                throw new GeneralException(Code.USER_NOT_IN_GROUP);
+            }
+        }
+
+
         Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE).orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
         List<RouteList> routeList = routeListRepository.findByRoute(route);
         List<RouteListResponse.RouteList> routeLists = routeList.stream().map(rL ->
@@ -113,6 +123,7 @@ public class RouteListServiceImpl implements RouteListService{
         ).toList();
 
         return RouteListResponse.RouteListResponseDto.builder()
+                .routeId(route.getRouteId())
                 .routeName(route.getRouteName())
                 .routes(routeLists)
                 .build();

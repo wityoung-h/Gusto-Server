@@ -28,6 +28,7 @@ public class RouteListResponse {
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private String address;
 
+
 }
 
     @Builder
@@ -35,6 +36,7 @@ public class RouteListResponse {
     @NoArgsConstructor
     @Getter
     public static class RouteListResponseDto{
+        private Long routeId;
         private String routeName;
         private List<RouteList> routes;
     }
