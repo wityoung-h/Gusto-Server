@@ -1,15 +1,13 @@
 package com.umc.gusto.domain.store.service;
 
+import com.umc.gusto.domain.myCategory.entity.Pin;
 import com.umc.gusto.domain.myCategory.repository.PinRepository;
 import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.store.entity.Category;
 import com.umc.gusto.domain.store.entity.OpeningHours;
 import com.umc.gusto.domain.store.entity.Store;
-import com.umc.gusto.domain.store.model.response.GetReviewsResponse;
-import com.umc.gusto.domain.store.model.response.GetStoreDetailResponse;
-import com.umc.gusto.domain.store.model.response.GetStoreResponse;
-import com.umc.gusto.domain.store.model.response.GetStoresInMapResponse;
+import com.umc.gusto.domain.store.model.response.*;
 import com.umc.gusto.domain.store.repository.OpeningHoursRepository;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
@@ -21,9 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -152,4 +148,53 @@ public class StoreServiceImpl implements StoreService{
 
     }
 
+    @Transactional(readOnly = true)
+    public List<GetPinStoreResponse> getPinStoresByCategoryAndLocation(User user, Long myCategoryId, String townName) {
+
+        List<Pin> pins = pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName);
+        List<GetStoreInfoResponse> visitedStoresInfo = new ArrayList<>();
+        List<GetStoreInfoResponse> unvisitedStoresInfo = new ArrayList<>();
+
+        for (Pin pin : pins){
+            Store store = pin.getStore();
+            Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(store);
+            String reviewImg = topReviewOptional.map(Review::getImg1).orElse(null);
+            boolean hasVisited = reviewRepository.existsByStoreAndUserNickname(store, user.getNickname());
+
+            GetStoreInfoResponse getStoreInfoResponse = GetStoreInfoResponse.builder()
+                    .storeId(store.getStoreId())
+                    .categoryName(store.getCategory().getCategoryName())
+                    .storeName(store.getStoreName())
+                    .address(store.getAddress())
+                    .reviewImg(reviewImg)
+                    .build();
+
+            if(!hasVisited){
+                unvisitedStoresInfo.add(getStoreInfoResponse);
+            }else {
+                visitedStoresInfo.add(getStoreInfoResponse);
+            }
+        }
+
+        // 방문하지 않은 가게 리스트
+        UnvisitedStoresResponse unvisitedStoresResponse = UnvisitedStoresResponse.builder()
+                .numPinStores(unvisitedStoresInfo.size())
+                .unvisitedStores(unvisitedStoresInfo)
+                .build();
+
+        // 방문한 가게 리스트
+        VisitedStoresResponse visitedStoresResponse = VisitedStoresResponse.builder()
+                .numPinStores(visitedStoresInfo.size())
+                .visitedStores(visitedStoresInfo)
+                .build();
+
+        GetPinStoreResponse pinStoreResponse = GetPinStoreResponse.builder()
+                .nickname(user.getNickname())
+                .numPinStores(pins.size())
+                .unvisitedStores(Collections.singletonList(unvisitedStoresResponse))
+                .visitedStores(Collections.singletonList(visitedStoresResponse))
+                .build();
+
+        return Collections.singletonList(pinStoreResponse);
+    }
 }
