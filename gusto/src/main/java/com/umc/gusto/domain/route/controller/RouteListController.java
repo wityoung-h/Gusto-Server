@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.route.controller;
 
+import com.umc.gusto.domain.route.model.request.RouteListRequest;
 import com.umc.gusto.domain.route.model.response.RouteListResponse;
 import com.umc.gusto.domain.route.service.RouteListService;
 import com.umc.gusto.global.auth.model.AuthUser;
@@ -7,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,6 +18,18 @@ import java.util.List;
 public class RouteListController {
 
     private final RouteListService routeListService;
+
+    // 루트리스트만 추가
+    @PostMapping("/{routeId}")
+    public ResponseEntity<?> createRouteList
+    (@PathVariable Long routeId,
+     @RequestParam(required = false) Long groupId,
+     @RequestBody List<RouteListRequest.createRouteListDto> request,
+     @AuthenticationPrincipal AuthUser authUSer
+    ){
+        routeListService.createRouteList(groupId,routeId,request,authUSer.getUser());
+        return ResponseEntity.ok().build();
+    }
 
     // 루르리스트 항목 삭제
     @DeleteMapping("/{routeListId}")

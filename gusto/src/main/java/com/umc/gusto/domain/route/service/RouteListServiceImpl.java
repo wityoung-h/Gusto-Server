@@ -1,5 +1,8 @@
 package com.umc.gusto.domain.route.service;
 
+import com.umc.gusto.domain.group.entity.Group;
+import com.umc.gusto.domain.group.repository.GroupMemberRepository;
+import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.route.entity.RouteList;
 import com.umc.gusto.domain.route.model.request.RouteListRequest;
@@ -25,6 +28,8 @@ public class RouteListServiceImpl implements RouteListService{
     private final RouteListRepository routeListRepository;
     private final RouteRepository routeRepository;
     private final StoreRepository storeRepository;
+    private final GroupRepository groupRepository;
+    private final GroupMemberRepository groupMemberRepository;
 
 
     @Transactional
@@ -34,6 +39,31 @@ public class RouteListServiceImpl implements RouteListService{
         request.forEach(dto -> {
             RouteList routeList = RouteList.builder()
                     .route(route)
+                    .store(storeRepository.findById(dto.getStoreId())
+                            .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND)))
+                    .ordinal(dto.getOrdinal())
+                    .build();
+            routeListRepository.save(routeList);
+        });
+    }
+
+    // 루트리스트만 추가
+    @Transactional
+    @Override
+    public void createRouteList(Long groupId,Long routeId, List<RouteListRequest.createRouteListDto> request,User user) {
+        if(groupId != null){
+            Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                    .orElseThrow(() -> new GeneralException(Code.FIND_FAIL_GROUP));
+            if(!groupMemberRepository.existsGroupMemberByGroupAndUser(group,user)){
+                throw new GeneralException(Code.USER_NOT_IN_GROUP);
+            }
+        }
+
+        //루트리스트 생성
+        request.forEach(dto -> {
+            RouteList routeList = RouteList.builder()
+                    .route(routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE)
+                            .orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND)))
                     .store(storeRepository.findById(dto.getStoreId())
                             .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND)))
                     .ordinal(dto.getOrdinal())

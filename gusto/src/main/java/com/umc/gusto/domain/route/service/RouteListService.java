@@ -14,6 +14,9 @@ public interface RouteListService {
     // 루트 리스트 생성
     void createRouteList(Route route, List<RouteListRequest.createRouteListDto> request);
 
+    // 루트 리스트만 생성
+    void createRouteList(Long groupId,Long routeId, List<RouteListRequest.createRouteListDto> request,User user);
+
     // 루트 리스트 항목 삭제
     void deleteRouteList(Long routeListId, User user);
 

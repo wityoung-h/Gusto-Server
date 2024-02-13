@@ -40,7 +40,7 @@ public class RouteServiceImpl implements RouteService{
                 .routeName(request.getRouteName())
                 .user(user)
                 //TODO: request.getGroupId가 null이 아니면 그룹이 존재하는지 확인으로 로직 수정
-                .group(groupRepository.findGroupByGroupId(request.getGroupId()).orElse(null))
+                .group(groupRepository.findGroupByGroupIdAndStatus(request.getGroupId(), BaseEntity.Status.ACTIVE).orElse(null))
                 .build();
         Route savedRoute = routeRepository.save(route);
 
