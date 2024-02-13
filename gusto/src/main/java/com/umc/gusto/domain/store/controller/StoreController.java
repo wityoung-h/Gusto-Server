@@ -23,6 +23,9 @@ import java.util.List;
 public class StoreController {
     private final StoreService storeService;
 
+    private static final int DEFAULT_PAGE_NUMBER = 0;
+    private static final int DEFAULT_PAGE_SIZE = 3;
+
     /**
      * 가게 1건 조회
      * [GET] /stores/{storeId}
@@ -46,7 +49,7 @@ public class StoreController {
             @PathVariable Long storeId,
             @RequestParam(name = "reviewId", required = false) Long reviewId){
         User user = authUser.getUser();
-        Pageable pageable = PageRequest.of(0, 3);
+        Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
 
         // 상점 세부 정보 가져오기
         GetStoreDetailResponse getStoreDetail = storeService.getStoreDetail(user, storeId, reviewId, pageable);
