@@ -20,6 +20,7 @@ import com.umc.gusto.domain.group.repository.GroupListRepository;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
+import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.group.repository.InvitationCodeRepository;
 import com.umc.gusto.domain.route.repository.RouteRepository;
@@ -295,6 +296,22 @@ public class GroupServiceImpl implements GroupService{
                     .build();
         }).collect(Collectors.toList());
 
+
+    }
+
+    @Override
+    public void deleteRoute(Long routeId, User user, Long groupId) {
+        // 그룹 구성원인지 확인
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+        if(!groupMemberRepository.existsGroupMemberByGroupAndUser(group,user)){
+            throw new GeneralException(Code.USER_NOT_IN_GROUP);
+        }
+
+        Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.ROUTE_NOT_FOUND));
+        //루트 삭제 : soft delete // TODO:DB 최종 삭제 주기 체크
+        route.updateStatus(BaseEntity.Status.INACTIVE);
 
     }
 }

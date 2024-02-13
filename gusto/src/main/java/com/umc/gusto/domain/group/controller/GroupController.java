@@ -169,4 +169,18 @@ public class GroupController {
         List<GetGroupMemberResponse> getGroupMembers = groupService.getGroupMembers(groupId);
         return ResponseEntity.status(HttpStatus.OK).body(getGroupMembers);
     }
+
+    /**
+     * 그룹 루트 삭제
+     * [DELETE] /groups/routes/{routeId}??groupId={groupId}
+     */
+    @DeleteMapping("/routes/{routeId}")
+    public ResponseEntity<?> getDeleteGroupRoute
+    (@PathVariable Long routeId,
+     @AuthenticationPrincipal AuthUser authUser,
+     @RequestParam Long groupId
+    ){
+        groupService.deleteRoute(routeId,authUser.getUser(),groupId);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
 }

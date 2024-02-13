@@ -30,4 +30,6 @@ public interface RouteRepository extends JpaRepository<Route,Long> {
 
     // 그룹의 루트 개수 조회
     int countRoutesByGroupAndStatus(Group group, BaseEntity.Status status);
+
+
 }
