@@ -13,7 +13,6 @@ public class RouteRequest {
         @NotBlank(message = "루트 명은 필수 입력값입니다.")
         private String routeName;
         private Long groupId;
-
         private List<RouteListRequest.createRouteListDto> routeList;
 
     }

@@ -4,6 +4,7 @@ import com.umc.gusto.domain.route.model.request.RouteListRequest;
 import com.umc.gusto.domain.route.model.response.RouteListResponse;
 import com.umc.gusto.domain.route.service.RouteListService;
 import com.umc.gusto.global.auth.model.AuthUser;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,7 +25,7 @@ public class RouteListController {
     public ResponseEntity<?> createRouteList
     (@PathVariable Long routeId,
      @RequestParam(required = false) Long groupId,
-     @RequestBody List<RouteListRequest.createRouteListDto> request,
+     @RequestBody @Valid List<RouteListRequest.createRouteListDto> request,
      @AuthenticationPrincipal AuthUser authUSer
     ){
         routeListService.createRouteList(groupId,routeId,request,authUSer.getUser());
