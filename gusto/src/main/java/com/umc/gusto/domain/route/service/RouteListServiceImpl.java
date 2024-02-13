@@ -37,13 +37,15 @@ public class RouteListServiceImpl implements RouteListService{
     public void createRouteList(Route route, List<RouteListRequest.createRouteListDto> request) {
         //루트리스트 생성
         request.forEach(dto -> {
-            RouteList routeList = RouteList.builder()
-                    .route(route)
-                    .store(storeRepository.findById(dto.getStoreId())
-                            .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND)))
-                    .ordinal(dto.getOrdinal())
-                    .build();
-            routeListRepository.save(routeList);
+            if(dto.getOrdinal() >= 1 && dto.getOrdinal() <= 6){
+                RouteList routeList = RouteList.builder()
+                        .route(route)
+                        .store(storeRepository.findById(dto.getStoreId())
+                                .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND)))
+                        .ordinal(dto.getOrdinal())
+                        .build();
+                routeListRepository.save(routeList);
+            } else throw new GeneralException(Code.ROUTE_ORDINAL_BAD_REQUEST);
         });
     }
 

@@ -39,13 +39,19 @@ public class RouteServiceImpl implements RouteService{
         Route route = Route.builder()
                 .routeName(request.getRouteName())
                 .user(user)
-                //TODO: request.getGroupId가 null이 아니면 그룹이 존재하는지 확인으로 로직 수정
                 .group(groupRepository.findGroupByGroupIdAndStatus(request.getGroupId(), BaseEntity.Status.ACTIVE).orElse(null))
                 .build();
         Route savedRoute = routeRepository.save(route);
 
-        // 루트리스트 생성 비지니스 로직 호출
-        routeListService.createRouteList(savedRoute, request.getRouteList());
+
+        if(request.getRouteList() != null){
+            // 루트리스트 생성 비지니스 로직 호출
+            routeListService.createRouteList(savedRoute, request.getRouteList());
+        }else if(request.getGroupId() == null ){
+            // 내 루트 생성시에는 최소 1개 이상의 경로가 포함되어야 함
+            throw new GeneralException(Code.ROUTE_MYROUTE_BAD_REQUEST);
+        }
+
     }
 
     @Transactional
