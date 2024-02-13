@@ -250,7 +250,7 @@ public class GroupServiceImpl implements GroupService{
                 .orElseThrow(() -> new GeneralException(Code.FIND_FAIL_GROUP));
         // 그룹 구성원인지 확인
         if(!groupMemberRepository.existsGroupMemberByGroupAndUser(group,user))
-            throw new GeneralException(Code.USER_NO_PERMISSION_FOR_GROUP);
+            throw new GeneralException(Code.USER_NOT_IN_GROUP);
 
         GroupList groupList =GroupList.builder()
                 .group(group)
@@ -269,7 +269,7 @@ public class GroupServiceImpl implements GroupService{
             GroupList groupList = groupListRepository.findGroupListByGroupListId(gl).orElseThrow(() -> new GeneralException(Code.GROUPLIST_NOT_FROUND));
             // 그룹 구성원인지 확인
             if(!groupMemberRepository.existsGroupMemberByGroupAndUser(groupList.getGroup(),user))
-                throw new GeneralException(Code.USER_NO_PERMISSION_FOR_GROUP);
+                throw new GeneralException(Code.USER_NOT_IN_GROUP);
             // 그룹리스트 삭제
             groupListRepository.delete(groupList);
         }

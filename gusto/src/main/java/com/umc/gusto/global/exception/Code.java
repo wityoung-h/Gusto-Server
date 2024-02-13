@@ -49,7 +49,6 @@ public enum Code {
     INVALID_INVITATION_CODE(HttpStatus.FORBIDDEN, 403405, "그룹의 초대 코드가 올바르지 않습니다."),
     USER_NOT_IN_GROUP(HttpStatus.NOT_FOUND, 404406, "그룹에 가입되지 않은 유저입니다."),
     NO_TRANSFER_PERMISSION(HttpStatus.FORBIDDEN, 403407, "그룹 소유자만이 그룹 소유권을 이전할 수 있습니다."),
-    USER_NO_PERMISSION_FOR_GROUP(HttpStatus.FORBIDDEN,403408,"해당 유저는 그룹 구성원이 아닙니다."),
     GROUPLIST_NOT_FROUND(HttpStatus.NOT_FOUND,403409,"존재하지 않는 그룹 내 상점입니다."),
   
     //myCategory 관련 에러 +5
