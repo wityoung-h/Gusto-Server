@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,7 +68,7 @@ public class StoreServiceImpl implements StoreService{
 
 
     @Transactional(readOnly = true)
-    public GetStoreDetailResponse getStoreDetail(User user, Long storeId, Long reviewId, Pageable pageable) {
+    public GetStoreDetailResponse getStoreDetail(User user, Long storeId, LocalDate visitedAt, Long reviewId, Pageable pageable) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
         Category category = storeRepository.findCategoryByStoreId(storeId)
@@ -84,31 +85,33 @@ public class StoreServiceImpl implements StoreService{
         int pageNumber = pageable.getPageNumber();
         List<Review> reviews;
 
-        if (reviewId != null) {
-            pageSize = PAGE_SIZE_FIRST;
-            reviews = reviewRepository.findReviewsAfterIdByStore(store, reviewId, PageRequest.of(pageNumber, pageSize));
-        } else {
+        if (reviewId != null && visitedAt != null) {
             pageSize = PAGE_SIZE;
+            reviews = reviewRepository.findReviewsAfterIdByStore(store, visitedAt, reviewId, PageRequest.of(pageNumber, pageSize));
+        } else {
+            pageSize = PAGE_SIZE_FIRST;
             reviews = reviewRepository.findFirstReviewsByStore(store, PageRequest.of(pageNumber, pageSize));
         }
 
-        List<GetReviewsResponse> getReviews = reviews.stream()
-                .map(review -> {
-                    User reviewer = review.getUser();
-                    return GetReviewsResponse.builder()
-                        .reviewId(review.getReviewId())
-                        .visitedAt(review.getVisitedAt())
-                        .profileImage(reviewer.getProfileImage())
-                        .nickname(reviewer.getNickname())
-                        .liked(review.getLiked())
-                        .comment(review.getComment())
-                        .img1(review.getImg1())
-                        .img2(review.getImg2())
-                        .img3(review.getImg3())
-                        .img4(review.getImg4())
-                        .build();
-                })
-                .toList();
+        Map<LocalDate, List<GetReviewsResponse>> reviewsByVisitedAt = new LinkedHashMap<>();
+
+        reviews.forEach(review -> {
+            LocalDate visitedAtDate = review.getVisitedAt();
+            GetReviewsResponse reviewsResponse = GetReviewsResponse.builder()
+                    .reviewId(review.getReviewId())
+                    .visitedAt(review.getVisitedAt())
+                    .profileImage(review.getUser().getProfileImage())
+                    .nickname(review.getUser().getNickname())
+                    .liked(review.getLiked())
+                    .comment(review.getComment())
+                    .img1(review.getImg1())
+                    .img2(review.getImg2())
+                    .img3(review.getImg3())
+                    .img4(review.getImg4())
+                    .build();
+
+            reviewsByVisitedAt.computeIfAbsent(visitedAtDate, k -> new ArrayList<>()).add(reviewsResponse);
+        });
 
         boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
@@ -119,7 +122,7 @@ public class StoreServiceImpl implements StoreService{
                 .address(store.getAddress())
                 .reviewImg4(reviewImg)
                 .pin(isPinned)
-                .reviews(getReviews)
+                .reviews(reviewsByVisitedAt)
                 .build();
     }
 

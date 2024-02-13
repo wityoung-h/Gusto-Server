@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -20,6 +21,9 @@ import java.util.List;
 @RequestMapping("/stores")
 public class StoreController {
     private final StoreService storeService;
+
+    private static final int DEFAULT_PAGE_NUMBER = 0;
+    private static final int DEFAULT_PAGE_SIZE = 3;
 
     /**
      * 가게 1건 조회
@@ -42,12 +46,13 @@ public class StoreController {
     public ResponseEntity<GetStoreDetailResponse> getStoreDetail(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long storeId,
+            @RequestParam(name = "visitedAt", required = false) LocalDate visitedAt,
             @RequestParam(name = "reviewId", required = false) Long reviewId){
         User user = authUser.getUser();
-        Pageable pageable = PageRequest.of(0, 3);
+        Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
 
         // 상점 세부 정보 가져오기
-        GetStoreDetailResponse getStoreDetail = storeService.getStoreDetail(user, storeId, reviewId, pageable);
+        GetStoreDetailResponse getStoreDetail = storeService.getStoreDetail(user, storeId, visitedAt, reviewId, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(getStoreDetail);
     }
 

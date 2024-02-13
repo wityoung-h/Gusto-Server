@@ -22,10 +22,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findFirst3ByStoreOrderByLikedDesc(Store store);
     @Query("SELECT r FROM Review r WHERE r.user.publishReview = 'PUBLIC' ORDER BY r.liked DESC LIMIT 4")
     List<Review> findFirst4ByStoreOrderByLikedDesc(Store store);
-    @Query("SELECT r FROM Review r WHERE r.user.publishReview = 'PUBLIC' AND r.store = :store ORDER BY r.reviewId DESC")
+    @Query("SELECT r FROM Review r WHERE r.user.publishReview = 'PUBLIC' AND r.store = :store ORDER BY r.visitedAt DESC, r.reviewId DESC")
     List<Review> findFirstReviewsByStore(Store store, Pageable pageable);
-    @Query("SELECT r FROM Review r WHERE r.user.publishReview = 'PUBLIC' AND r.store = :store AND r.reviewId < :reviewId ORDER BY r.reviewId DESC")
-    List<Review> findReviewsAfterIdByStore(Store store, Long reviewId, Pageable pageable);
+    @Query("SELECT r FROM Review r WHERE r.user.publishReview = 'PUBLIC' AND r.store = :store AND r.visitedAt <= :visitedAt AND r.reviewId < :reviewId ORDER BY r.visitedAt DESC, r.reviewId DESC")
+    List<Review> findReviewsAfterIdByStore(Store store, LocalDate visitedAt, Long reviewId, Pageable pageable);
     boolean existsByReviewIdAndUser(Long reviewId, User user);
     Integer countByStoreAndUserNickname(Store store, String nickname);      // 방문횟수는 리뷰 공개여부과 상관 X
     Integer countByStoreAndUser(Store store, User user);
