@@ -5,9 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @Builder
 @Getter
@@ -20,6 +18,6 @@ public class GetStoreDetailResponse{
     String address;
     Boolean pin;        // 찜 여부
     List<String> reviewImg4;
-    Map<LocalDate, List<GetReviewsResponse>> reviews;
+    List<GetReviewsResponse> reviews;
 
 }
