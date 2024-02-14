@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService{
     private static final int FOLLOW_LIST_PAGE = 30;
 
 
-    @Value("${default.img.url.profile}")
+    @Value("${default.img.url}")
     private String DEFAULT_PROFILE_IMG;
 
     @Override
