@@ -89,10 +89,10 @@ public class StoreServiceImpl implements StoreService{
         List<Review> reviews;
 
         if (reviewId != null) {
-            pageSize = PAGE_SIZE_FIRST;
+            pageSize = PAGE_SIZE;
             reviews = reviewRepository.findReviewsAfterIdByStore(store, reviewId, PageRequest.of(pageNumber, pageSize));
         } else {
-            pageSize = PAGE_SIZE;
+            pageSize = PAGE_SIZE_FIRST;
             reviews = reviewRepository.findFirstReviewsByStore(store, PageRequest.of(pageNumber, pageSize));
         }
 
