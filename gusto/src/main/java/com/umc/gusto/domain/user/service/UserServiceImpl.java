@@ -161,6 +161,7 @@ public class UserServiceImpl implements UserService{
 
         return ProfileResponse.builder()
                 .nickname(target.getNickname())
+                .profileImg(target.getProfileImage())
                 .review(target.getReviewCnt())
                 .pin(target.getPinCnt())
                 .follower(target.getFollower())
