@@ -47,6 +47,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                 .map(myCategory -> MyCategoryResponse.builder()
                         .myCategoryId(myCategory.getMyCategoryId())
                         .myCategoryName(myCategory.getMyCategoryName())
+                        .myCategoryScript(myCategory.getMyCategoryScript())
                         .myCategoryIcon(myCategory.getMyCategoryIcon())
                         .publishCategory(user.getPublishCategory())
                         .pinCnt(myCategory.getPinList().size())            // pin 개수 받아오기로 변경
@@ -66,6 +67,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                     return MyCategoryResponse.builder()
                             .myCategoryId(myCategory.getMyCategoryId())
                             .myCategoryName(myCategory.getMyCategoryName())
+                            .myCategoryScript(myCategory.getMyCategoryScript())
                             .myCategoryIcon(myCategory.getMyCategoryIcon())
                             .publishCategory(user.getPublishCategory())
                             .pinCnt(pinList.size())            // pin 개수 받아오기로 변경
