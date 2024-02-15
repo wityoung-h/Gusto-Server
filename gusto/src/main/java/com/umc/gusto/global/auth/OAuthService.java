@@ -21,7 +21,7 @@ import java.util.UUID;
 public class OAuthService extends DefaultOAuth2UserService {
     private final SocialRepository socialRepository;
     private final UserService userService;
-    @Value("${default.img.url.profile}")
+    @Value("${default.img.url}")
     private String DEFAULT_PROFILE_IMG;
 
     // 유저 불러오기 - 해당 유저의 security context가 저장됨

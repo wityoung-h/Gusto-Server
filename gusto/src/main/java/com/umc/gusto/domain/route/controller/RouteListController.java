@@ -1,16 +1,15 @@
 package com.umc.gusto.domain.route.controller;
 
+import com.umc.gusto.domain.route.model.request.ModifyRouteRequest;
 import com.umc.gusto.domain.route.model.response.RouteListResponse;
-import com.umc.gusto.domain.route.service.RouteListServiceImpl;
+import com.umc.gusto.domain.route.service.RouteListService;
 import com.umc.gusto.global.auth.model.AuthUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,11 +18,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RouteListController {
 
-    private final RouteListServiceImpl routeListService;
+    private final RouteListService routeListService;
 
     // 루르리스트 항목 삭제
     @DeleteMapping("/{routeListId}")
-    public ResponseEntity deleteRouteLis(
+    public ResponseEntity<?> deleteRouteLis(
             @PathVariable Long routeListId,
             @AuthenticationPrincipal AuthUser authUSer
     ){
@@ -47,5 +46,10 @@ public class RouteListController {
         return ResponseEntity.ok().body(routeListService.getRouteListDetail(routeId));
     }
 
-
+    // 루트 수정
+    @PatchMapping("/{routeId}")
+    public ResponseEntity<?> modifyRoute(@PathVariable Long routeId, @RequestBody ModifyRouteRequest request){
+        routeListService.modifyRouteList(routeId,request);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
 }

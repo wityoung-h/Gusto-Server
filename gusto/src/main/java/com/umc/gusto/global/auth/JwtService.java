@@ -2,6 +2,8 @@ package com.umc.gusto.global.auth;
 
 import com.umc.gusto.global.auth.model.Tokens;
 import com.umc.gusto.global.config.secret.JwtConfig;
+import com.umc.gusto.global.exception.Code;
+import com.umc.gusto.global.exception.GeneralException;
 import com.umc.gusto.global.util.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -13,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -90,5 +93,35 @@ public class JwtService implements InitializingBean {
         redisService.setValuesWithTimeout(tokens.getRefreshToken(), userUUID, REFRESH_TOKEN_VALID_TIME);
 
         return tokens;
+    }
+
+    @Transactional
+    public Tokens reissueToken(String accessToken, String refreshToken) {
+        String accessUuid = null;
+
+        try {
+            accessUuid = (String) getClaims(accessToken).get(UUID);
+        } catch (ExpiredJwtException e) {
+            accessUuid = String.valueOf(e.getClaims().get(UUID));
+        }
+
+        try {
+            getClaims(refreshToken);
+
+            String value = redisService.getValues(refreshToken)
+                    .orElseThrow(() -> new GeneralException(Code.INVALID_REFRESH_TOKEN));
+
+            if(!value.equals(accessUuid)) {
+                throw new GeneralException(Code.INVALID_REFRESH_TOKEN);
+            }
+
+            // 기존 refresh token 삭제 후 재생성
+            redisService.deleteValues(refreshToken);
+            Tokens newTokens = createAndSaveTokens(value);
+
+            return newTokens;
+        } catch (ExpiredJwtException e) {
+            throw new GeneralException(Code.EXPIRED_REFRESH_TOKEN);
+        }
     }
 }

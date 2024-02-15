@@ -14,7 +14,7 @@ public class RedisService {
     private final RedisTemplate<String, String> redisTemplate;
 
     public void setValuesWithTimeout(String key, String value, long timeout) {
-        redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.MICROSECONDS);
+        redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.MILLISECONDS);
     }
 
     @Transactional(readOnly = true)

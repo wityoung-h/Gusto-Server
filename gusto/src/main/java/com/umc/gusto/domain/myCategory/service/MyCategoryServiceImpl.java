@@ -47,6 +47,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                 .map(myCategory -> MyCategoryResponse.builder()
                         .myCategoryId(myCategory.getMyCategoryId())
                         .myCategoryName(myCategory.getMyCategoryName())
+                        .myCategoryScript(myCategory.getMyCategoryScript())
                         .myCategoryIcon(myCategory.getMyCategoryIcon())
                         .publishCategory(user.getPublishCategory())
                         .pinCnt(myCategory.getPinList().size())            // pin 개수 받아오기로 변경
@@ -66,6 +67,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                     return MyCategoryResponse.builder()
                             .myCategoryId(myCategory.getMyCategoryId())
                             .myCategoryName(myCategory.getMyCategoryName())
+                            .myCategoryScript(myCategory.getMyCategoryScript())
                             .myCategoryIcon(myCategory.getMyCategoryIcon())
                             .publishCategory(user.getPublishCategory())
                             .pinCnt(pinList.size())            // pin 개수 받아오기로 변경
@@ -149,27 +151,28 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                 .orElseThrow(() -> new GeneralException(Code.MYCATEGORY_NOT_FOUND));
 
         // 중복 이름 체크
-        if (updateMyCategory.getMyCategoryName() != null && updateMyCategory.getMyCategoryName().equals(existingMyCategory.getMyCategoryName())) {
+        if (updateMyCategory.getMyCategoryName() != null && !updateMyCategory.getMyCategoryName().equals(existingMyCategory.getMyCategoryName())) {
             myCategoryRepository.findByMyCategoryNameAndUser(updateMyCategory.getMyCategoryName(), user)
                     .ifPresent(existingCategory -> {
                 throw new GeneralException(Code.MYCATEGORY_DUPLICATE_NAME);
             });
         }
+        // 변경하려는 필드만 업데이트
+        if (updateMyCategory.getMyCategoryName() != null) {
+            existingMyCategory.updateMyCategoryName(updateMyCategory.getMyCategoryName());
+        }
 
-            // 변경하려는 필드만 업데이트
-            if (updateMyCategory.getMyCategoryName() != null) {
-                existingMyCategory.updateMyCategoryName(updateMyCategory.getMyCategoryName());
-            }
+        if (updateMyCategory.getMyCategoryIcon() != null) {
+            existingMyCategory.updateMyCategoryIcon(updateMyCategory.getMyCategoryIcon());
+        }
 
-            if (updateMyCategory.getMyCategoryIcon() != null) {
-                existingMyCategory.updateMyCategoryIcon(updateMyCategory.getMyCategoryIcon());
-            }
+        if (updateMyCategory.getMyCategoryScript() != null) {
+            existingMyCategory.updateMyCategoryScript(updateMyCategory.getMyCategoryScript());
+        }
 
-            if (updateMyCategory.getMyCategoryScript() != null) {
-                existingMyCategory.updateMyCategoryScript(updateMyCategory.getMyCategoryScript());
-            }
+        myCategoryRepository.save(existingMyCategory);
 
-            myCategoryRepository.save(existingMyCategory);
+
     }
 
     @Transactional

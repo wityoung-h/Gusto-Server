@@ -32,4 +32,6 @@ public class RouteList {
     @Column(nullable = false)
     private Integer ordinal;
 
+    public void updateStore(Store store){this.store =store;}
+    public void updateOrdinal(Integer ordinal){this.ordinal = ordinal;}
 }

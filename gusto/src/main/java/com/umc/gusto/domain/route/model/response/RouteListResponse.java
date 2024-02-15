@@ -22,8 +22,6 @@ public class RouteListResponse {
         private Float latitude;
         private Long routeListId;
         private Integer ordinal;
-
-        @JsonInclude(JsonInclude.Include.NON_NULL)
         private Long storeId;
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private String storeName;
