@@ -155,6 +155,9 @@ public class StoreServiceImpl implements StoreService{
     public List<GetPinStoreResponse> getPinStoresByCategoryAndLocation(User user, Long myCategoryId, String townName) {
 
         List<Pin> pins = pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName);
+        if(myCategoryId == null){
+            pins = pinRepository.findPinsByUserAndTownNameAndPinIdDESC(user, townName);
+        }
         List<GetStoreInfoResponse> visitedStoresInfo = new ArrayList<>();
         List<GetStoreInfoResponse> unvisitedStoresInfo = new ArrayList<>();
 

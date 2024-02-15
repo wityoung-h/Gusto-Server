@@ -78,7 +78,7 @@ public class StoreController {
     @GetMapping("/pins")
     public ResponseEntity<List<GetPinStoreResponse>> getPinStoresByCategoryAndLocation(
             @AuthenticationPrincipal AuthUser authUser,
-            @RequestParam(name = "myCategoryId") Long myCategoryId,
+            @RequestParam(name = "myCategoryId", required = false) Long myCategoryId,
             @RequestParam(name = "townName") String townName){
         User user = authUser.getUser();
         List<GetPinStoreResponse> storeList = storeService.getPinStoresByCategoryAndLocation(user, myCategoryId, townName);
