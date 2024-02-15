@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -95,8 +94,8 @@ public class ReviewController {
      * 다른 유저의 리뷰 모아보기
      */
     @GetMapping()
-    public ResponseEntity<?> getOthersReview(@RequestParam(name = "userId")UUID userId, @RequestParam(name = "reviewId", required = false) Long reviewId, @RequestParam(name = "size") int size){
-        return ResponseEntity.ok().body(collectReviewService.getOthersReview(userId, reviewId, size));
+    public ResponseEntity<?> getOthersReview(@RequestParam(name = "nickName")String nickName, @RequestParam(name = "reviewId", required = false) Long reviewId, @RequestParam(name = "size") int size){
+        return ResponseEntity.ok().body(collectReviewService.getOthersReview(nickName, reviewId, size));
     }
 
     /**
