@@ -38,7 +38,7 @@ public class RouteListServiceImpl implements RouteListService{
             RouteList routeList = RouteList.builder()
                     .route(route)
                     .store(storeRepository.findById(dto.getStoreId())
-                            .orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND)))
+                            .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND)))
                     .ordinal(dto.getOrdinal())
                     .build();
             routeListRepository.save(routeList);
@@ -63,6 +63,7 @@ public class RouteListServiceImpl implements RouteListService{
                         .latitude(rL.getStore().getLatitude())
                         .routeListId(rL.getRouteListId())
                         .ordinal(rL.getOrdinal())
+                        .storeId(rL.getStore().getStoreId())
                         .build()
         ).toList();
 

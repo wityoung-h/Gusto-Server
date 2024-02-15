@@ -11,7 +11,6 @@ import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
-import com.umc.gusto.global.exception.customException.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,14 +26,13 @@ public class RouteServiceImpl implements RouteService{
     private final RouteRepository routeRepository;
     private final GroupRepository groupRepository;
     private final RouteListRepository routeListRepository;
-    private final RouteListServiceImpl routeListService;
+    private final RouteListService routeListService;
 
     @Transactional
     @Override
     public void createRoute(RouteRequest.createRouteDto request,User user) {
         // 루트명은 내 루트명 중에서 중복 불가능
-        //TODO: 루트명을 그룹 루트명 제외 내 루트명중에서 중복 불가능으로 수정
-        if (routeRepository.existsByRouteNameAndStatus(request.getRouteName(),BaseEntity.Status.ACTIVE)) {
+        if (routeRepository.existsByRouteName(request.getRouteName(),BaseEntity.Status.ACTIVE,user)) {
             throw new GeneralException(Code.ROUTE_DUPLICATE_ROUTENAME);
         }
         // 루트 리스트 갯수 6개 제한 확인
@@ -46,6 +44,7 @@ public class RouteServiceImpl implements RouteService{
         Route route = Route.builder()
                 .routeName(request.getRouteName())
                 .user(user)
+                //TODO: request.getGroupId가 null이 아니면 그룹이 존재하는지 확인으로 로직 수정
                 .group(groupRepository.findGroupByGroupId(request.getGroupId()).orElse(null))
                 .build();
         Route savedRoute = routeRepository.save(route);
@@ -57,13 +56,16 @@ public class RouteServiceImpl implements RouteService{
 
     @Transactional
     @Override
-    public void deleteRoute(Long routeId,User user) {
-        Route route = routeRepository.findById(routeId).orElseThrow(() -> new NotFoundException(Code.ROUTE_NOT_FOUND));
+    public void deleteRoute(Long routeId, User user) {
+        // 그룹X, ACTIVE 한정
+        Route route = routeRepository.findRouteByRouteIdAndStatusAndGroup(routeId,BaseEntity.Status.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.ROUTE_NOT_FOUND));
 
         // 루트를 생성한 유저만 삭제
-        if(!route.getUser().equals(user)){
+        if(!route.getUser().getNickname().equals(user.getNickname())){
             throw new GeneralException(Code.USER_NO_PERMISSION_FOR_ROUTE);
         }
+
         //루트 삭제 : soft delete // TODO:DB 최종 삭제 주기 체크
         route.updateStatus(BaseEntity.Status.INACTIVE);
 

@@ -22,7 +22,7 @@ public class RouteController {
 
     // 루트 생성
     @PostMapping("")
-    public ResponseEntity createRoute(
+    public ResponseEntity<?> createRoute(
             @RequestBody @Valid RouteRequest.createRouteDto request,
             @AuthenticationPrincipal AuthUser authUSer)
     {
@@ -32,12 +32,12 @@ public class RouteController {
 
     // 루트 삭제
     @DeleteMapping("/{routeId}")
-    public ResponseEntity deleteRoute(
+    public ResponseEntity<?> deleteRoute(
             @PathVariable Long routeId,
             @AuthenticationPrincipal AuthUser authUSer)
     {
         routeService.deleteRoute(routeId,authUSer.getUser());
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     // 내 루트 조회
