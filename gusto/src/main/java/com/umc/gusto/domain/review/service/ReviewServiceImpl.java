@@ -23,6 +23,7 @@ import com.umc.gusto.global.exception.customException.PrivateItemException;
 import com.umc.gusto.global.util.S3Service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +32,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService{
+    @Value("${default.img.url}")
+    private String DEFAULT_IMG;
     private final ReviewRepository reviewRepository;
     private final StoreRepository storeRepository;
     private final HashTagRepository hashTagRepository;
@@ -65,6 +68,8 @@ public class ReviewServiceImpl implements ReviewService{
         //s3에 이미지 저장
         if(images!=null){
             updateImages(images, review);
+        }else{ //이미지가 null인 경우 디폴트 이미지로 저장
+            review.updateImg1(DEFAULT_IMG);
         }
 
         //리뷰와 해시태그 연결
