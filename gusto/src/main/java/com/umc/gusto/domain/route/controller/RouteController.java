@@ -49,5 +49,15 @@ public class RouteController {
         return ResponseEntity.ok().body(route);
     }
 
+    // 그룹 내 루트 조회
+    @GetMapping("/{groupId}")
+    public ResponseEntity<List<RouteResponse.RouteResponseDto>> allMyRoute(@PathVariable Long groupId){
+        List<RouteResponse.RouteResponseDto> route = routeService.getGroupRoute(groupId);
+        return ResponseEntity.ok().body(route);
+    }
+
+
+
+
 
 }

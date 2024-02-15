@@ -9,6 +9,7 @@ import lombok.Getter;
 @Getter
 public class ProfileResponse {
     private String nickname;
+    private String profileImg;
     private int review;
     private int pin;
     private long follower;

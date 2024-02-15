@@ -16,4 +16,6 @@ public interface RouteService {
     // 내 루트 조회
     List<RouteResponse.RouteResponseDto> getRoute(User user);
 
+    // 그룹 내 루트 조회
+    List<RouteResponse.RouteResponseDto> getGroupRoute(Long groupId );
 }

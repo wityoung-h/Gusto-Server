@@ -104,6 +104,10 @@ public class User extends BaseTime {
         this.publishCategory = status;
     }
 
+    public void updatePublishRoute(PublishStatus status) {
+        this.publishRoute = status;
+    }
+
     public void updateFollower(long follower) {
         this.follower = follower;
     }

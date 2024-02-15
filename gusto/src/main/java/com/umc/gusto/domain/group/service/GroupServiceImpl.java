@@ -197,6 +197,7 @@ public class GroupServiceImpl implements GroupService{
                     return GetGroupsResponse.builder()
                             .groupId(group.getGroupId())
                             .groupName(group.getGroupName())
+                            .isOwner(user.getUserId().equals(group.getOwner().getUserId()))
                             .numMembers(numMembers)
                             .numRestaurants(numRestaurants)
                             .numRoutes(numRoutes)

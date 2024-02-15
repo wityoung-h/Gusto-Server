@@ -3,10 +3,11 @@ package com.umc.gusto.domain.user.controller;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
+import com.umc.gusto.domain.user.model.response.ProfileResponse;
 import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
 import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
-import com.umc.gusto.domain.user.model.response.ProfileResponse;
+import com.umc.gusto.domain.user.model.response.FeedProfileResponse;
 import com.umc.gusto.domain.user.model.response.FollowResponse;
 import com.umc.gusto.global.auth.model.AuthUser;
 import com.umc.gusto.global.auth.model.Tokens;
@@ -85,15 +86,15 @@ public class UserController {
      * @return ProfileRes
      */
     @GetMapping("/{nickname}/profile")
-    public ResponseEntity<ProfileResponse> retrieveProfile(@AuthenticationPrincipal AuthUser authUser,
-                                                           @PathVariable("nickname") String nickname) {
+    public ResponseEntity<FeedProfileResponse> retrieveProfile(@AuthenticationPrincipal AuthUser authUser,
+                                                               @PathVariable("nickname") String nickname) {
         User user = null;
 
         if(authUser != null) {
             user = authUser.getUser();
         }
 
-        ProfileResponse profileRes = userService.getProfile(user, nickname);
+        FeedProfileResponse profileRes = userService.getProfile(user, nickname);
 
         return ResponseEntity.ok()
                 .body(profileRes);
@@ -111,6 +112,20 @@ public class UserController {
 
         return ResponseEntity.ok()
                 .build();
+    }
+
+    /**
+     * 프로필 정보 조회
+     * [GET] /users/my-info
+     * @param -
+     * @return -
+     */
+    @GetMapping("/my-info")
+    public ResponseEntity getProfile(@AuthenticationPrincipal AuthUser authUser) {
+        ProfileResponse profileResponse = userService.getProfile(authUser.getUser());
+
+        return ResponseEntity.ok()
+                .body(profileResponse);
     }
 
     /**

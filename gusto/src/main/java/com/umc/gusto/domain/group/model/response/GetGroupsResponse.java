@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class GetGroupsResponse {
     Long groupId;
     String groupName;
+    Boolean isOwner;
     Integer numMembers;
     Integer numRestaurants;
     Integer numRoutes;
