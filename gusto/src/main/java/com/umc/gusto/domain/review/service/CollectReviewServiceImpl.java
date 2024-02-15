@@ -1,8 +1,6 @@
 package com.umc.gusto.domain.review.service;
 
 import com.umc.gusto.domain.review.entity.Review;
-import com.umc.gusto.domain.review.model.request.ReviewCalViewRequest;
-import com.umc.gusto.domain.review.model.request.ReviewViewRequest;
 import com.umc.gusto.domain.review.model.response.*;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.user.entity.User;
@@ -29,9 +27,9 @@ public class CollectReviewServiceImpl implements CollectReviewService{
     private final UserRepository userRepository;
 
     @Override
-    public CollectReviewsOfInstaResponse getReviewOfInstaView(User user, ReviewViewRequest reviewViewRequest) {
+    public CollectReviewsOfInstaResponse getReviewOfInstaView(User user, Long reviewId, int size) {
         //페이징해서 가져오기
-        Page<Review> reviews = pagingReview(user, reviewViewRequest.getReviewId(), reviewViewRequest);
+        Page<Review> reviews = pagingReview(user, reviewId, size);
 
         //다음에 조회될 리뷰가 있는지 확인하기
         boolean checkNext = reviews.hasNext();
@@ -40,9 +38,9 @@ public class CollectReviewServiceImpl implements CollectReviewService{
     }
 
     @Override
-    public CollectReviewsOfCalResponse getReviewOfCalView(User user, ReviewCalViewRequest reviewCalViewRequest) {
+    public CollectReviewsOfCalResponse getReviewOfCalView(User user, Long reviewId, int size, LocalDate date) {
         //해당 달의 첫 날짜, 마지막 날짜 구하기
-        LocalDate startDate = reviewCalViewRequest.getDate().with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate startDate = date.with(TemporalAdjusters.firstDayOfMonth());
         LocalDate lastDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
 
         List<Review> reviews = reviewRepository.findByUserAndVisitedAtBetween(user, startDate, lastDate);
@@ -52,9 +50,9 @@ public class CollectReviewServiceImpl implements CollectReviewService{
     }
 
     @Override
-    public CollectReviewsOfTimelineResponse getReviewOfTimeView(User user, ReviewViewRequest reviewViewRequest) {
+    public CollectReviewsOfTimelineResponse getReviewOfTimeView(User user, Long reviewId, int size) {
         //페이징해서 가져오기
-        Page<Review> reviews = pagingReview(user, reviewViewRequest.getReviewId(), reviewViewRequest);
+        Page<Review> reviews = pagingReview(user, reviewId, size);
 
         //다음에 조회될 리뷰가 있는지 확인하기
         boolean checkNext = reviews.hasNext();
@@ -67,7 +65,7 @@ public class CollectReviewServiceImpl implements CollectReviewService{
     }
   
     @Override
-    public CollectReviewsOfInstaResponse getOthersReview(UUID userId, ReviewViewRequest reviewViewRequest) {
+    public CollectReviewsOfInstaResponse getOthersReview(UUID userId, Long reviewId, int size) {
         User other = userRepository.findById(userId).orElseThrow(()-> new NotFoundException(Code.DONT_EXIST_USER));
         //다른 유저의 공개 여부 확인
         if(!other.getPublishReview().equals(PublishStatus.PUBLIC)){
@@ -75,7 +73,7 @@ public class CollectReviewServiceImpl implements CollectReviewService{
         }
 
         //페이징해서 가져오기
-        Page<Review> reviews = pagingReview(other, reviewViewRequest.getReviewId(), reviewViewRequest);
+        Page<Review> reviews = pagingReview(other, reviewId, size);
 
         //다음에 조회될 리뷰가 있는지 확인하기
         boolean checkNext = hasNext(other, reviews);
@@ -84,10 +82,10 @@ public class CollectReviewServiceImpl implements CollectReviewService{
         return CollectReviewsOfInstaResponse.of(basicViewResponse, checkNext);
     }
 
-    private Page<Review> pagingReview(User user, Long cursorId, ReviewViewRequest reviewViewRequest){
+    private Page<Review> pagingReview(User user, Long cursorId, int size){
         //최신순 날짜로 정렬
         Sort sort = Sort.by("visitedAt").descending();
-        PageRequest pageRequest = PageRequest.of(0, reviewViewRequest.getSize(), sort);
+        PageRequest pageRequest = PageRequest.of(0, size, sort);
 
         //최초로 조회한 경우
         if(cursorId==null){
