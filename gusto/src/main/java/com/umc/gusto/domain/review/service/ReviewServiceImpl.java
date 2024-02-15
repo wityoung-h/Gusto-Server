@@ -145,7 +145,9 @@ public class ReviewServiceImpl implements ReviewService{
         }
 
         StringBuilder hashTags = new StringBuilder();
-        review.getTaggingSet().stream().map(Tagging::getHashTag).forEach(o-> hashTags.append(o).append(","));
+        review.getTaggingSet().stream().map(r-> r.getHashTag().getHasTagId()).forEach(o-> hashTags.append(o).append(","));
+        //마지막 문자 , 제거
+        hashTags.deleteCharAt(hashTags.length()-1);
         return ReviewDetailResponse.of(review, hashTags.toString());
     }
 

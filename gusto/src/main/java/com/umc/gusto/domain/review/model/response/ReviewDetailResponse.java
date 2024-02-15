@@ -6,15 +6,15 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Builder
 @Getter
 public class ReviewDetailResponse {
     Long storeId;
     String storeName;
-    String nickName;
     LocalDate visitedAt;
-    //TODO: img고려
+    List<String> images;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String menuName;
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -36,9 +36,8 @@ public class ReviewDetailResponse {
         return ReviewDetailResponse.builder()
                 .storeId(review.getStore().getStoreId())
                 .storeName(review.getStore().getStoreName())
-                .nickName(review.getUser().getNickname())
                 .visitedAt(review.getVisitedAt())
-//                    .img() TODO: img 처리하기
+                .images(review.getImageList())
                 .menuName(review.getMenuName())
                 .hashTags(hashTags)
                 .taste(review.getTaste())
