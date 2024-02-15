@@ -45,8 +45,8 @@ public class CollectReviewServiceImpl implements CollectReviewService{
 
         List<Review> reviews = reviewRepository.findByUserAndVisitedAtBetween(user, startDate, lastDate);
 
-        List<BasicViewResponse> basicViewResponse = reviews.stream().map(BasicViewResponse::of).toList();
-        return CollectReviewsOfCalResponse.builder().reviews(basicViewResponse).build();
+        List<CalendarViewResponse> calendarViewResponses = reviews.stream().map(CalendarViewResponse::of).toList();
+        return CollectReviewsOfCalResponse.builder().reviews(calendarViewResponses).build();
     }
 
     @Override
