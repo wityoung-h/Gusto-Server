@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.route.service;
 
+import com.umc.gusto.domain.group.entity.Group;
 import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.route.model.request.RouteRequest;
@@ -32,8 +33,13 @@ public class RouteServiceImpl implements RouteService{
     @Override
     public void createRoute(RouteRequest.createRouteDto request,User user) {
         // 루트명은 내 루트명 중에서 중복 불가능
+        //TODO: 루트명을 그룹 루트명 제외 내 루트명중에서 중복 불가능으로 수정
         if (routeRepository.existsByRouteNameAndStatus(request.getRouteName(),BaseEntity.Status.ACTIVE)) {
             throw new GeneralException(Code.ROUTE_DUPLICATE_ROUTENAME);
+        }
+        // 루트 리스트 갯수 6개 제한 확인
+        if(request.getRouteList().size()>=7){
+            throw new GeneralException(Code.ROUTELIST_TO_MANY_REQUEST);
         }
 
         // 루트 생성
@@ -44,6 +50,7 @@ public class RouteServiceImpl implements RouteService{
                 .build();
         Route savedRoute = routeRepository.save(route);
 
+        // TODO: 그룹 루트인 경우 비지니스 로직 호출 X가능
         // 루트리스트 생성 비지니스 로직 호출
         routeListService.createRouteList(savedRoute, request.getRouteList());
     }
@@ -70,6 +77,24 @@ public class RouteServiceImpl implements RouteService{
                                 .routeId(Route.getRouteId())
                                 .routeName(Route.getRouteName())
                                 .numStore(routeListRepository.countRouteListByRoute(Route))
+                                .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<RouteResponse.RouteResponseDto> getGroupRoute(Long groupId) {
+        // 그룹 존재 여부 확인
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+
+        //특정 그룹 내 루트 조회
+        List<Route> routes = routeRepository.findRoutesByGroupAndStatus(group,BaseEntity.Status.ACTIVE);
+        return routes.stream().map(
+                        Route -> RouteResponse.RouteResponseDto.builder()
+                                .routeId(Route.getRouteId())
+                                .routeName(Route.getRouteName())
+                                .numStore(routeListRepository.countRouteListByRoute(Route))
+                                .groupId(Route.getRouteId())
                                 .build())
                 .collect(Collectors.toList());
     }

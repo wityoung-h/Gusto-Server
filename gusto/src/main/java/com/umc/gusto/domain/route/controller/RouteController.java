@@ -2,7 +2,7 @@ package com.umc.gusto.domain.route.controller;
 
 import com.umc.gusto.domain.route.model.request.RouteRequest;
 import com.umc.gusto.domain.route.model.response.RouteResponse;
-import com.umc.gusto.domain.route.service.RouteServiceImpl;
+import com.umc.gusto.domain.route.service.RouteService;
 import com.umc.gusto.global.auth.model.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("routes")
 @RequiredArgsConstructor
 public class RouteController {
-    private final RouteServiceImpl routeService;
+    private final RouteService routeService;
 
     // 루트 생성
     @PostMapping("")
@@ -48,6 +48,16 @@ public class RouteController {
         List<RouteResponse.RouteResponseDto> route = routeService.getRoute(authUSer.getUser());
         return ResponseEntity.ok().body(route);
     }
+
+    // 그룹 내 루트 조회
+    @GetMapping("/{groupId}")
+    public ResponseEntity<List<RouteResponse.RouteResponseDto>> allMyRoute(@PathVariable Long groupId){
+        List<RouteResponse.RouteResponseDto> route = routeService.getGroupRoute(groupId);
+        return ResponseEntity.ok().body(route);
+    }
+
+
+
 
 
 }

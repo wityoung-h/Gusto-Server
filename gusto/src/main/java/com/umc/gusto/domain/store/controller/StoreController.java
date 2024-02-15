@@ -1,9 +1,7 @@
 package com.umc.gusto.domain.store.controller;
 
 
-import com.umc.gusto.domain.store.model.response.GetStoreDetailResponse;
-import com.umc.gusto.domain.store.model.response.GetStoreResponse;
-import com.umc.gusto.domain.store.model.response.GetStoresInMapResponse;
+import com.umc.gusto.domain.store.model.response.*;
 import com.umc.gusto.domain.store.service.StoreService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
@@ -71,4 +69,17 @@ public class StoreController {
         return  ResponseEntity.status(HttpStatus.OK).body(getStoresInMaps);
     }
 
+    /**
+     * 현재 지역의 찜한 식당 방문 여부 조회
+     * [GET] /stores/pins?myCategoryId={categoryId}&townName={townName}
+     */
+    @GetMapping("/pins")
+    public ResponseEntity<List<GetPinStoreResponse>> getPinStoresByCategoryAndLocation(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam(name = "myCategoryId", required = false) Long myCategoryId,
+            @RequestParam(name = "townName") String townName){
+        User user = authUser.getUser();
+        List<GetPinStoreResponse> storeList = storeService.getPinStoresByCategoryAndLocation(user, myCategoryId, townName);
+        return ResponseEntity.status(HttpStatus.OK).body(storeList);
+    }
 }
