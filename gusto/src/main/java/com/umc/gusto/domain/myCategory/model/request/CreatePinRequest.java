@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @Getter
 public class CreatePinRequest {
-    @NotNull
+    @NotNull(message = "내 카테고리는 필수 입력 값입니다.")
     Long myCategoryId;
-    @NotNull
+    @NotNull(message = "가게는 필수 입력 값입니다.")
     Long storeId;
 }
