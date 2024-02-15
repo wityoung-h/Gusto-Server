@@ -7,9 +7,11 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 @Getter
-public class ProfileResponse {
+public class FeedProfileResponse {
     private String nickname;
     private String profileImg;
-    private String age;
-    private String gender;
+    private int review;
+    private int pin;
+    private long follower;
+    private boolean followed;
 }

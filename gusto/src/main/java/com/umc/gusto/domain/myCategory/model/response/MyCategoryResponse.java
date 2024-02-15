@@ -10,6 +10,7 @@ import lombok.*;
 public class MyCategoryResponse{
     Long myCategoryId;
     String myCategoryName;
+    String myCategoryScript;
     Integer myCategoryIcon;
     PublishStatus publishCategory;
     Integer pinCnt;
