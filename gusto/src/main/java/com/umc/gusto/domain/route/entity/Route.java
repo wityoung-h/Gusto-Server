@@ -35,5 +35,5 @@ public class Route extends BaseEntity {
 
 
     public void updateStatus(BaseEntity.Status status) {this.status = status;}
-
+    public void updateRouteName(String routeName){this.routeName = routeName;}
 }
