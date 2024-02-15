@@ -54,9 +54,11 @@ public class MyCategoryController {
      */
     @GetMapping("/pins/{nickname}")
     public ResponseEntity<List<PinByMyCategoryResponse>> allPinByMyCategory(
+            @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "myCategoryId") Long myCategoryId,
             @PathVariable String nickname) {
-            List<PinByMyCategoryResponse> myStoreList = myCategoryService.getAllPinByMyCategory(nickname, myCategoryId);
+            User user = authUser.getUser();
+            List<PinByMyCategoryResponse> myStoreList = myCategoryService.getAllPinByMyCategory(user, nickname, myCategoryId);
 
             return ResponseEntity.status(HttpStatus.OK).body(myStoreList);
     }

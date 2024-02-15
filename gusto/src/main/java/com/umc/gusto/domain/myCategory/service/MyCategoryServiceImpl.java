@@ -12,6 +12,7 @@ import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
@@ -31,25 +32,30 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     private final MyCategoryRepository myCategoryRepository;
     private final PinRepository pinRepository;
     private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public List<MyCategoryResponse> getAllMyCategory(User user, String nickname) {
 
-        boolean isMyNickname = user.getNickname().equals(nickname);
         List<MyCategory> myCategoryList;
-        if (isMyNickname) {
-            myCategoryList = myCategoryRepository.findByUserNickname(nickname);
+        if (nickname.equals("my")) {
+            myCategoryList = myCategoryRepository.findByUserNickname(user.getNickname());
+        } else if (nickname.equals(user.getNickname())) {
+            throw new GeneralException(Code.USER_FOUND_SELF);
         } else {
+            user = userRepository.findByNickname(nickname)
+                    .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
             myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(nickname);   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
         }
 
+        User finalUser = user;
         return myCategoryList.stream()
                 .map(myCategory -> MyCategoryResponse.builder()
                         .myCategoryId(myCategory.getMyCategoryId())
                         .myCategoryName(myCategory.getMyCategoryName())
                         .myCategoryScript(myCategory.getMyCategoryScript())
                         .myCategoryIcon(myCategory.getMyCategoryIcon())
-                        .publishCategory(user.getPublishCategory())
+                        .publishCategory(finalUser.getPublishCategory())
                         .pinCnt(myCategory.getPinList().size())            // pin 개수 받아오기로 변경
                         .build())
                 .collect(Collectors.toList());
@@ -77,35 +83,34 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     }
 
     @Transactional(readOnly = true)
-    public List<PinByMyCategoryResponse> getAllPinByMyCategory(String nickname, Long myCategoryId) {
-        Optional<MyCategory> existingMyCategory = myCategoryRepository.findByMyCategoryIdAndUserNickname(nickname, myCategoryId);
+    public List<PinByMyCategoryResponse> getAllPinByMyCategory(User user, String nickname, Long myCategoryId) {
+        Optional<MyCategory> existingMyCategory;
+        if (nickname.equals("my")) {
+            existingMyCategory = myCategoryRepository.findByMyCategoryIdAndUserNickname(user.getNickname(), myCategoryId);
+        } else if (nickname.equals(user.getNickname())) {
+            throw new GeneralException(Code.USER_FOUND_SELF);
+        } else {
+            user = userRepository.findByNickname(nickname)
+                    .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
+            existingMyCategory = myCategoryRepository.findByMyCategoryIdAndUserNickname(nickname, myCategoryId);
+        }
+
         // 카테고리 별 가게 목록이 비어있으면 pinList도 비어 있음
         List<Pin> pinList = existingMyCategory.map(pinRepository::findByMyCategoryOrderByPinIdDesc)
                 .orElse(Collections.emptyList());
 
-        return pinList.stream()
-                .map(pin -> {
-                    Store store = pin.getStore();
-                    Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(store);
-                    String reviewImg = topReviewOptional.map(Review::getImg1).orElse(null);
-                    Integer reviewCnt = reviewRepository.countByStoreAndUserNickname(store, nickname);
-
-                    return  PinByMyCategoryResponse.builder()
-                            .pinId(pin.getPinId())
-                            .storeId(store.getStoreId())
-                            .storeName(store.getStoreName())
-                            .address(store.getAddress())
-                            .reviewImg(reviewImg)
-                            .reviewCnt(reviewCnt)
-                            .build();
-                })
-                .collect(Collectors.toList());
+        User finalUser = user;
+        return getPinByMyCategoryResponses(finalUser, pinList);
     }
 
     @Transactional(readOnly = true)
     public List<PinByMyCategoryResponse> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townName) {
         List<Pin> pinList = pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName);
 
+        return getPinByMyCategoryResponses(user, pinList);
+    }
+
+    private List<PinByMyCategoryResponse> getPinByMyCategoryResponses(User user, List<Pin> pinList) {
         return pinList.stream()                                     // townName을 기준으로 보일 수 있는 store가 포함된 pin만 보이기
                 .map(pin -> {
                     Store store = pin.getStore();

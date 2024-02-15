@@ -13,7 +13,7 @@ public interface MyCategoryService {
     List<MyCategoryResponse> getAllMyCategory(User user, String nickname);
     List<MyCategoryResponse> getAllMyCategoryWithLocation(User user, String townName);
 
-    List<PinByMyCategoryResponse> getAllPinByMyCategory(String nickname, Long myCategoryId);
+    List<PinByMyCategoryResponse> getAllPinByMyCategory(User user, String nickname, Long myCategoryId);
 
     List<PinByMyCategoryResponse> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townName);
 
