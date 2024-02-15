@@ -8,9 +8,8 @@ import lombok.Getter;
 @Builder
 @Getter
 public class ProfileResponse {
-    private String nickname;
-    private int review;
-    private int pin;
-    private long follower;
-    private boolean followed;
+    String profileImg;
+    String nickname;
+    String age;
+    String gender;
 }
