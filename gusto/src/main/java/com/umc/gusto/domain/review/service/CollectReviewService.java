@@ -6,12 +6,11 @@ import com.umc.gusto.domain.review.model.response.CollectReviewsOfTimelineRespon
 import com.umc.gusto.domain.user.entity.User;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 public interface CollectReviewService {
 //    CollectReviewsOfInstaResponse getReviewOfInstaView(User user, ReviewViewRequest reviewViewRequest);
     CollectReviewsOfInstaResponse getReviewOfInstaView(User user, Long reviewId, int size);
     CollectReviewsOfCalResponse getReviewOfCalView(User user, Long reviewId, int size, LocalDate date);
     CollectReviewsOfTimelineResponse getReviewOfTimeView(User user, Long reviewId, int size);
-    CollectReviewsOfInstaResponse getOthersReview(UUID userId, Long reviewId, int size);
+    CollectReviewsOfInstaResponse getOthersReview(String nickName, Long reviewId, int size);
 }

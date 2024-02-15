@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -65,8 +64,8 @@ public class CollectReviewServiceImpl implements CollectReviewService{
     }
   
     @Override
-    public CollectReviewsOfInstaResponse getOthersReview(UUID userId, Long reviewId, int size) {
-        User other = userRepository.findById(userId).orElseThrow(()-> new NotFoundException(Code.DONT_EXIST_USER));
+    public CollectReviewsOfInstaResponse getOthersReview(String nickName, Long reviewId, int size) {
+        User other = userRepository.findByNicknameAndMemberStatusIs(nickName, User.MemberStatus.ACTIVE).orElseThrow(()-> new NotFoundException(Code.DONT_EXIST_USER));
         //다른 유저의 공개 여부 확인
         if(!other.getPublishReview().equals(PublishStatus.PUBLIC)){
             throw new PrivateItemException(Code.NO_PUBLIC_REVIEW);
