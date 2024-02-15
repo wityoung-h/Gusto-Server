@@ -10,8 +10,6 @@ import lombok.Getter;
 public class ProfileResponse {
     private String nickname;
     private String profileImg;
-    private int review;
-    private int pin;
-    private long follower;
-    private boolean followed;
+    private String age;
+    private String gender;
 }
