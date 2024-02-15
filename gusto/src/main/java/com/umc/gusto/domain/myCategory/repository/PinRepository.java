@@ -10,13 +10,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PinRepository extends JpaRepository<Pin, Long> {
-    @Query("SELECT p FROM Pin p ORDER BY p.pinId DESC")
-    List<Pin> findByMyCategoryOrderByPinIdDesc(MyCategory myCategory);
-
     @Query("SELECT p FROM Pin p " +
             "JOIN p.store s " +
             "JOIN s.town t " +
             "WHERE p.myCategory = :myCategory AND t.townName = :townName " +
+            "AND p.user.publishCategory = 'PUBLIC'" +
             "ORDER BY p.pinId DESC")
     List<Pin> findAllByUserAndMyCategoryOrderByPinIdDesc(MyCategory myCategory, String townName);
 
@@ -27,11 +25,20 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
             "WHERE p.user = :user " +
             "AND p.myCategory.myCategoryId = :myCategoryId " +
             "AND t.townName = :townName " +
+            "AND u.publishCategory = 'PUBLIC' " +
             "ORDER BY p.pinId DESC")
     List<Pin> findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(User user, Long myCategoryId, String townName);
+    @Query("SELECT p FROM Pin p " +
+            "JOIN p.store s " +
+            "JOIN p.user u " +
+            "WHERE p.user = :user " +
+            "AND p.myCategory.myCategoryId = :myCategoryId " +
+            "AND u.publishCategory = 'PUBLIC' " +
+            "ORDER BY p.pinId DESC")
+    List<Pin> findPinsByUserAndMyCategoryIdAndPinIdDESC(User user, Long myCategoryId);
     Optional<Pin> findByUserAndPinId(User user, Long pinId);
     boolean existsByUserAndStoreStoreId(User user, Long storeId);       // 존재 여부
-    @Query("SELECT p.store.storeId FROM Pin p WHERE p.user = :user AND p.myCategory.myCategoryId = :myCategoryId")
+    @Query("SELECT p.store.storeId FROM Pin p WHERE p.user = :user AND p.myCategory.myCategoryId = :myCategoryId AND p.user.publishCategory = 'PUBLIC'")
     List<Long> findStoreIdsByUserAndMyCategoryId(User user, Long myCategoryId);
     @Query("SELECT p.store.storeId FROM Pin p WHERE p.user = :user")
     List<Long> findStoreIdsByUser(User user);

@@ -10,12 +10,12 @@ import java.util.List;
 
 public interface MyCategoryService {
 
-    List<MyCategoryResponse> getAllMyCategory(User user, String nickname);
-    List<MyCategoryResponse> getAllMyCategoryWithLocation(User user, String townName);
+    List<MyCategoryResponse> getAllMyCategory(User user, String nickname, String townName);
+//    List<MyCategoryResponse> getAllMyCategoryWithLocation(User user, String townName);
 
-    List<PinByMyCategoryResponse> getAllPinByMyCategory(User user, String nickname, Long myCategoryId);
+    List<PinByMyCategoryResponse> getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName);
 
-    List<PinByMyCategoryResponse> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townName);
+//    List<PinByMyCategoryResponse> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townName);
 
     void createMyCategory(User user, CreateMyCategoryRequest request);
 

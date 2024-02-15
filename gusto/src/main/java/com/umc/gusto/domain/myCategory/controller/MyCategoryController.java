@@ -24,12 +24,13 @@ public class MyCategoryController {
      * 카테고리 전체 조회
      * [GET] /myCategories/{nickname}
      */
-    @GetMapping("/{nickname}")
+    @GetMapping
     public ResponseEntity<List<MyCategoryResponse>> allMyCategory(
             @AuthenticationPrincipal AuthUser authUser,
-            @PathVariable String nickname) {
+            @RequestParam(name = "nickname", required = false) String nickname,
+            @RequestParam(name = "townName", required = false) String townName) {
         User user = authUser.getUser();
-        List<MyCategoryResponse> myCategoryList = myCategoryService.getAllMyCategory(user, nickname);
+        List<MyCategoryResponse> myCategoryList = myCategoryService.getAllMyCategory(user, nickname, townName);
 
         return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
     }
@@ -38,27 +39,29 @@ public class MyCategoryController {
      * 위치 기반 내 카테고리 전체 조회
      * [GET] /myCategories?townName={townName}
      */
-    @GetMapping
-    public ResponseEntity<List<MyCategoryResponse>> allMyCategoryWithLocation(
-            @AuthenticationPrincipal AuthUser authUser,
-            @RequestParam(name = "townName") String townName) {
-            User user = authUser.getUser();
-            List<MyCategoryResponse> myCategoryList = myCategoryService.getAllMyCategoryWithLocation(user, townName);
-
-            return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
-    }
+//    @GetMapping
+//    public ResponseEntity<List<MyCategoryResponse>> allMyCategoryWithLocation(
+//            @AuthenticationPrincipal AuthUser authUser,
+//            @RequestParam(name = "townName") String townName) {
+//            User user = authUser.getUser();
+//            List<MyCategoryResponse> myCategoryList = myCategoryService.getAllMyCategoryWithLocation(user, townName);
+//
+//            return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
+//    }
 
     /**
      * 카테고리 별 가게 목록 조회
-     * [GET] /myCategories/pins/{nickname}?myCategoryId={myCategoryId}
+     * [GET] /myCategories/pins?nickname={nickname}&myCategoryId={myCategoryId}&townName={townName}
      */
-    @GetMapping("/pins/{nickname}")
+    @GetMapping("/pins")             // 나의 찜을 조회 할 시 nickname 값을 받지 않고, nickname이 조회될 경우 townName을 받지 않음
     public ResponseEntity<List<PinByMyCategoryResponse>> allPinByMyCategory(
             @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam(name = "nickname", required = false) String nickname,
             @RequestParam(name = "myCategoryId") Long myCategoryId,
-            @PathVariable String nickname) {
+            @RequestParam(name = "townName", required = false) String townName
+            ) {
             User user = authUser.getUser();
-            List<PinByMyCategoryResponse> myStoreList = myCategoryService.getAllPinByMyCategory(user, nickname, myCategoryId);
+            List<PinByMyCategoryResponse> myStoreList = myCategoryService.getAllPinByMyCategory(user, nickname, myCategoryId, townName);
 
             return ResponseEntity.status(HttpStatus.OK).body(myStoreList);
     }
@@ -67,16 +70,16 @@ public class MyCategoryController {
      * 위치 기반 내 카테고리 별 가게 목록 조회
      * [GET] /myCategories/pins?myCategoryId={mycategoryId}&townName={townName}
      */
-    @GetMapping("/pins")
-    public ResponseEntity<List<PinByMyCategoryResponse>> allPinByCategoryWithLocation(
-            @AuthenticationPrincipal AuthUser authUser,
-            @RequestParam(name = "myCategoryId") Long myCategoryId,
-            @RequestParam(name = "townName") String townName) {
-            User user = authUser.getUser();
-            List<PinByMyCategoryResponse> myCategoryList = myCategoryService.getAllPinByMyCategoryWithLocation(user, myCategoryId,townName);
-
-            return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
-    }
+//    @GetMapping("/pins")
+//    public ResponseEntity<List<PinByMyCategoryResponse>> allPinByCategoryWithLocation(
+//            @AuthenticationPrincipal AuthUser authUser,
+//            @RequestParam(name = "myCategoryId") Long myCategoryId,
+//            @RequestParam(name = "townName") String townName) {
+//            User user = authUser.getUser();
+//            List<PinByMyCategoryResponse> myCategoryList = myCategoryService.getAllPinByMyCategoryWithLocation(user, myCategoryId,townName);
+//
+//            return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
+//    }
 
     /**
      * 내 카테고리 생성
