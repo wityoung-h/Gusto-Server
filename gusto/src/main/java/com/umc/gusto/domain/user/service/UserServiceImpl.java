@@ -267,7 +267,9 @@ public class UserServiceImpl implements UserService{
 
         // target의 팔로워 수 1 증가
         target.updateFollower(target.getFollower() + 1);
+        user.updateFollowing(user.getFollowing() + 1);
         userRepository.save(target);
+        userRepository.save(user);
     }
 
     @Override
@@ -283,7 +285,9 @@ public class UserServiceImpl implements UserService{
 
         // target의 팔로워 수 1 감소
         target.updateFollower(target.getFollower() - 1);
+        user.updateFollowing(user.getFollowing() - 1);
         userRepository.save(target);
+        userRepository.save(user);
     }
 
     @Override
