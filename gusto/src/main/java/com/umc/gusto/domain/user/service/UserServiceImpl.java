@@ -170,7 +170,7 @@ public class UserServiceImpl implements UserService{
                 .nickname(target.getNickname())
                 .profileImg(target.getProfileImage())
                 .review(target.getReviewCnt())
-                .pin(target.getPinCnt())
+                .following(target.getFollowing())
                 .follower(target.getFollower())
                 .followed(followed.get())
                 .build();
