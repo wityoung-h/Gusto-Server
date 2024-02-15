@@ -1,8 +1,6 @@
 package com.umc.gusto.domain.review.controller;
 
 import com.umc.gusto.domain.review.model.request.CreateReviewRequest;
-import com.umc.gusto.domain.review.model.request.ReviewCalViewRequest;
-import com.umc.gusto.domain.review.model.request.ReviewViewRequest;
 import com.umc.gusto.domain.review.model.request.UpdateReviewRequest;
 import com.umc.gusto.domain.review.service.CollectReviewService;
 import com.umc.gusto.domain.review.service.ReviewService;
@@ -16,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -69,35 +68,35 @@ public class ReviewController {
      * 리뷰 모아보기 - 인스타 뷰
      */
     @GetMapping("/instaView")
-    public ResponseEntity<?> getReviewOfInstaView(@AuthenticationPrincipal AuthUser authUser, @RequestBody ReviewViewRequest reviewViewRequest){
+    public ResponseEntity<?> getReviewOfInstaView(@AuthenticationPrincipal AuthUser authUser, @RequestParam(name = "reviewId", required = false) Long reviewId, @RequestParam(name = "size") int size){
         User user = authUser.getUser();
-        return ResponseEntity.ok().body(collectReviewService.getReviewOfInstaView(user, reviewViewRequest));
+        return ResponseEntity.ok().body(collectReviewService.getReviewOfInstaView(user, reviewId, size));
     }
 
     /**
      * 리뷰 모아보기 - 캘린더 뷰
      */
     @GetMapping("/calView")
-    public ResponseEntity<?> getReviewOfCalView(@AuthenticationPrincipal AuthUser authUser, @RequestBody @Valid ReviewCalViewRequest reviewCalViewRequest){
+    public ResponseEntity<?> getReviewOfCalView(@AuthenticationPrincipal AuthUser authUser, @RequestParam(name = "reviewId", required = false) Long reviewId, @RequestParam(name = "size") int size, @RequestParam(name = "date") LocalDate date){
         User user = authUser.getUser();
-        return ResponseEntity.ok().body(collectReviewService.getReviewOfCalView(user, reviewCalViewRequest));
+        return ResponseEntity.ok().body(collectReviewService.getReviewOfCalView(user, reviewId, size, date));
     }
 
     /**
      * 리뷰 모아보기 - 타임라인 뷰
      */
     @GetMapping("/timelineView")
-    public ResponseEntity<?> getReviewOfTimeView(@AuthenticationPrincipal AuthUser authUser, @RequestBody ReviewViewRequest reviewViewRequest){
+    public ResponseEntity<?> getReviewOfTimeView(@AuthenticationPrincipal AuthUser authUser, @RequestParam(name = "reviewId", required = false) Long reviewId, @RequestParam(name = "size") int size){
         User user = authUser.getUser();
-        return ResponseEntity.ok().body(collectReviewService.getReviewOfTimeView(user, reviewViewRequest));
+        return ResponseEntity.ok().body(collectReviewService.getReviewOfTimeView(user, reviewId, size));
     }
   
     /**
      * 다른 유저의 리뷰 모아보기
      */
     @GetMapping()
-    public ResponseEntity<?> getOthersReview(@RequestParam(name = "userId")UUID userId, @RequestBody ReviewViewRequest reviewViewRequest){
-        return ResponseEntity.ok().body(collectReviewService.getOthersReview(userId, reviewViewRequest));
+    public ResponseEntity<?> getOthersReview(@RequestParam(name = "userId")UUID userId, @RequestParam(name = "reviewId", required = false) Long reviewId, @RequestParam(name = "size") int size){
+        return ResponseEntity.ok().body(collectReviewService.getOthersReview(userId, reviewId, size));
     }
 
     /**
