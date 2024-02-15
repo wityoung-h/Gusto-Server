@@ -151,8 +151,14 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public FeedProfileResponse getProfile(User user, String nickname) {
-        User target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
-                .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
+        User target;
+
+        if(nickname.equals("my")) {
+            target = user;
+        } else {
+            target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
+                    .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
+        }
 
         AtomicBoolean followed = new AtomicBoolean(false);
 
