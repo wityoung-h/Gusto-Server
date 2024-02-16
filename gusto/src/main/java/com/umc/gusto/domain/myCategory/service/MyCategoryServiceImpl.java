@@ -43,13 +43,19 @@ public class MyCategoryServiceImpl implements MyCategoryService {
             }
             user = userRepository.findByNickname(nickname)
                     .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
+            myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublic(user);
+        } else {
+            myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(user);   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
         }
         User finalUser = user;
-        myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(user);   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
         return myCategoryList.stream()
                 .map(myCategory -> {
-                    List<Pin> pinList = pinRepository.findAllByUserAndMyCategoryOrderByPinIdDesc(myCategory, townName);     // 먼저 카테고리로 구분
-
+                    List<Pin> pinList;
+                    if (townName != null) {
+                        pinList = pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESC(myCategory, townName);     // 먼저 카테고리로 구분
+                    } else {
+                        pinList = pinRepository.findPinsByMyCategoryAndPinIdDESC(myCategory);     // 먼저 카테고리로 구분
+                    }
                     return MyCategoryResponse.builder()
                             .myCategoryId(myCategory.getMyCategoryId())
                             .myCategoryName(myCategory.getMyCategoryName())
@@ -65,20 +71,27 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
     @Transactional(readOnly = true)
     public List<PinByMyCategoryResponse> getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName) {
+        Optional<MyCategory> myCategory;
         List<Pin> pinList;
         if (nickname != null) {
             if (nickname.equals(user.getNickname())) {
                 throw new GeneralException(Code.USER_NOT_FOUND_SELF);
-            }
+                }
             user = userRepository.findByNickname(nickname)
                     .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
+            myCategory = myCategoryRepository.findByMyCategoryPublicIdAndUserNickname(nickname, myCategoryId);
+        } else {
+            myCategory = myCategoryRepository.findByMyCategoryIdAndUserNickname(user.getNickname(), myCategoryId);
         }
 
-        if (townName == null) {
-            pinList = pinRepository.findPinsByUserAndMyCategoryIdAndPinIdDESC(user, myCategoryId);
+        if (townName != null) {
+            pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESC(category, townName))
+                    .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
         } else {
-            pinList = pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName);
+            pinList = myCategory.map(pinRepository::findPinsByMyCategoryAndPinIdDESC)
+                    .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
         }
+
 
         User finalUser = user;
         return pinList.stream()                                     // townName을 기준으로 보일 수 있는 store가 포함된 pin만 보이기
@@ -105,7 +118,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
         // 중복 이름 체크
         myCategoryRepository.findByMyCategoryNameAndUser(createMyCategory.getMyCategoryName(), user)
                 .ifPresent(existingCategory -> {
-                    throw new GeneralException(Code.MYCATEGORY_DUPLICATE_NAME);
+                    throw new GeneralException(Code.MY_CATEGORY_DUPLICATE_NAME);
                 });
 
         // 중복된 이름이 없으면 새로운 MyCategory 생성
@@ -123,13 +136,13 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     @Transactional
     public void modifyMyCategory(User user, Long myCategoryId, UpdateMyCategoryRequest updateMyCategory) {
         MyCategory existingMyCategory = myCategoryRepository.findByUserAndMyCategoryId(user,myCategoryId)
-                .orElseThrow(() -> new GeneralException(Code.MYCATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
 
         // 중복 이름 체크
         if (updateMyCategory.getMyCategoryName() != null && !updateMyCategory.getMyCategoryName().equals(existingMyCategory.getMyCategoryName())) {
             myCategoryRepository.findByMyCategoryNameAndUser(updateMyCategory.getMyCategoryName(), user)
                     .ifPresent(existingCategory -> {
-                throw new GeneralException(Code.MYCATEGORY_DUPLICATE_NAME);
+                throw new GeneralException(Code.MY_CATEGORY_DUPLICATE_NAME);
             });
         }
         // 변경하려는 필드만 업데이트
@@ -154,7 +167,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     public void deleteMyCategories(User user, List<Long> myCategoryIds) {
         for (Long myCategoryId : myCategoryIds) {
             MyCategory existingMyCategory = myCategoryRepository.findByUserAndMyCategoryId(user, myCategoryId)
-                    .orElseThrow(() -> new GeneralException(Code.MYCATEGORY_NOT_FOUND));
+                    .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
 
             existingMyCategory.updateStatus(BaseEntity.Status.INACTIVE);
 
