@@ -73,8 +73,10 @@ public class ReviewServiceImpl implements ReviewService{
         }
 
         //리뷰와 해시태그 연결
-        String[] hashTags = createReviewRequest.getHashTagId().split(",");
-        connectHashTag(review, hashTags);
+        if(createReviewRequest.getHashTagId()!=null){
+            String[] hashTags = createReviewRequest.getHashTagId().split(",");
+            connectHashTag(review, hashTags);
+        }
 
         reviewRepository.save(review);
     }
