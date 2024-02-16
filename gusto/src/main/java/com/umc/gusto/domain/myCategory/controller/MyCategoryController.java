@@ -22,7 +22,7 @@ public class MyCategoryController {
 
     /**
      * 카테고리 전체 조회
-     * [GET] /myCategories/{nickname}
+     * [GET] /myCategories?nickname={nickname}&townName={townName}
      */
     @GetMapping
     public ResponseEntity<List<MyCategoryResponse>> allMyCategory(
@@ -34,20 +34,6 @@ public class MyCategoryController {
 
         return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
     }
-
-    /**
-     * 위치 기반 내 카테고리 전체 조회
-     * [GET] /myCategories?townName={townName}
-     */
-//    @GetMapping
-//    public ResponseEntity<List<MyCategoryResponse>> allMyCategoryWithLocation(
-//            @AuthenticationPrincipal AuthUser authUser,
-//            @RequestParam(name = "townName") String townName) {
-//            User user = authUser.getUser();
-//            List<MyCategoryResponse> myCategoryList = myCategoryService.getAllMyCategoryWithLocation(user, townName);
-//
-//            return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
-//    }
 
     /**
      * 카테고리 별 가게 목록 조회
@@ -65,21 +51,6 @@ public class MyCategoryController {
 
             return ResponseEntity.status(HttpStatus.OK).body(myStoreList);
     }
-
-    /**
-     * 위치 기반 내 카테고리 별 가게 목록 조회
-     * [GET] /myCategories/pins?myCategoryId={mycategoryId}&townName={townName}
-     */
-//    @GetMapping("/pins")
-//    public ResponseEntity<List<PinByMyCategoryResponse>> allPinByCategoryWithLocation(
-//            @AuthenticationPrincipal AuthUser authUser,
-//            @RequestParam(name = "myCategoryId") Long myCategoryId,
-//            @RequestParam(name = "townName") String townName) {
-//            User user = authUser.getUser();
-//            List<PinByMyCategoryResponse> myCategoryList = myCategoryService.getAllPinByMyCategoryWithLocation(user, myCategoryId,townName);
-//
-//            return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
-//    }
 
     /**
      * 내 카테고리 생성
