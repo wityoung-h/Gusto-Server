@@ -4,7 +4,6 @@ import com.umc.gusto.domain.route.model.request.RouteRequest;
 import com.umc.gusto.domain.route.model.response.RouteResponse;
 import com.umc.gusto.domain.route.service.RouteService;
 import com.umc.gusto.global.auth.model.AuthUser;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,7 @@ public class RouteController {
     // 루트 생성
     @PostMapping("")
     public ResponseEntity<?> createRoute(
-            @RequestBody @Valid RouteRequest.createRouteDto request,
+            @RequestBody RouteRequest.createRouteDto request,
             @AuthenticationPrincipal AuthUser authUSer)
     {
         routeService.createRoute(request,authUSer.getUser());

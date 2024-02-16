@@ -56,4 +56,7 @@ public interface GroupService {
     //그룹 구성원 조회
     List<GetGroupMemberResponse> getGroupMembers(Long groupId);
 
+    //그룹 루트 삭제
+    void deleteRoute(Long routeId, User user, Long groupId);
+
 }
