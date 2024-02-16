@@ -13,6 +13,7 @@ import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
+import com.umc.gusto.global.exception.customException.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 @Service
@@ -200,5 +200,23 @@ public class StoreServiceImpl implements StoreService{
                 .build();
 
         return Collections.singletonList(pinStoreResponse);
+    }
+
+    @Override
+    public List<GetStoreInfoResponse> searchStore(String keyword) {
+        List<Store> searchResult = storeRepository.findByStoreNameContains(keyword);
+
+        return searchResult.stream()
+                .map(result -> {
+                    Review review = reviewRepository.findFirstByStoreOrderByLikedDesc(result).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+                    return GetStoreInfoResponse.builder()
+                            .storeId(result.getStoreId())
+                            .storeName(result.getStoreName())
+                            .categoryName(result.getCategory().getCategoryName())
+                            .address(result.getAddress())
+                            .reviewImg(review.getImg1())
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }
