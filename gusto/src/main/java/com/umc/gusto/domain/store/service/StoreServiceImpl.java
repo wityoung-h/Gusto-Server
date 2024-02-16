@@ -107,10 +107,10 @@ public class StoreServiceImpl implements StoreService{
                         .nickname(reviewer.getNickname())
                         .liked(review.getLiked())
                         .comment(review.getComment())
-                        .img1(review.getImg1())
-                        .img2(review.getImg2())
-                        .img3(review.getImg3())
-                        .img4(review.getImg4())
+                        .img1(Optional.ofNullable(review.getImg1()).orElse(""))
+                        .img2(Optional.ofNullable(review.getImg2()).orElse(""))
+                        .img3(Optional.ofNullable(review.getImg3()).orElse(""))
+                        .img4(Optional.ofNullable(review.getImg4()).orElse(""))
                         .build();
                 })
                 .toList();
