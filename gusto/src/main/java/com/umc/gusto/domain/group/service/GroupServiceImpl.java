@@ -140,26 +140,26 @@ public class GroupServiceImpl implements GroupService{
         group.updateStatus(BaseEntity.Status.INACTIVE);
     }
 
-    public void joinGroup(User user, Long groupId, JoinGroupRequest joinGroupRequest){
-        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+    public void joinGroup(User user, JoinGroupRequest joinGroupRequest){
+        Group group = groupRepository.findGroupByCodeAndStatus(joinGroupRequest.getCode(), BaseEntity.Status.ACTIVE)
                 .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
-        String invitationCode = invitationCodeRepository.findCodeByGroup(group);
 
-        // 초대 코드 확인
-        if(joinGroupRequest.getCode().equals(invitationCode)){
-            // 그룹 참여
-            User joinUser = userRepository.findById(user.getUserId())
-                    .orElseThrow(()->new GeneralException(Code.DONT_EXIST_USER));
-
-            GroupMember groupMember = GroupMember.builder()
-                    .group(group)
-                    .user(joinUser)
-                    .build();
-
-            groupMemberRepository.save(groupMember);
-        }else{
-            throw new GeneralException(Code.INVALID_INVITATION_CODE);
+        // 이미 그룹에 참여한 유저인지 확인
+        boolean isMember = groupMemberRepository.existsGroupMemberByGroupAndUser(group, user);
+        if (isMember) {
+            throw new GeneralException(Code.ALREADY_JOINED_GROUP);
         }
+
+        // 그룹 참여
+        User joinUser = userRepository.findById(user.getUserId())
+                .orElseThrow(()->new GeneralException(Code.DONT_EXIST_USER));
+
+        GroupMember groupMember = GroupMember.builder()
+                .group(group)
+                .user(joinUser)
+                .build();
+
+        groupMemberRepository.save(groupMember);
     }
 
     public void leaveGroup(User user, Long groupId){

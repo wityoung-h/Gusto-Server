@@ -107,12 +107,12 @@ public class GroupController {
 
     /**
      * 그룹 참여
-     * [POST] /groups/{groupId}/join
+     * [POST] /groups/join
      */
-    @PostMapping("/{groupId}/join")
-    public ResponseEntity<?> joinGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId, @RequestBody JoinGroupRequest joinGroupRequest){
+    @PostMapping("/join")
+    public ResponseEntity<?> joinGroup(@AuthenticationPrincipal AuthUser authUser, @RequestBody JoinGroupRequest joinGroupRequest){
         User user = authUser.getUser();
-        groupService.joinGroup(user, groupId, joinGroupRequest);
+        groupService.joinGroup(user, joinGroupRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
