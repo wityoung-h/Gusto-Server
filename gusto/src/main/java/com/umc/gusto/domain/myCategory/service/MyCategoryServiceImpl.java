@@ -97,8 +97,8 @@ public class MyCategoryServiceImpl implements MyCategoryService {
         return pinList.stream()                                     // townName을 기준으로 보일 수 있는 store가 포함된 pin만 보이기
                 .map(pin -> {
                     Store store = pin.getStore();
-                    Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(store);       // 가장 좋아요가 많은 review
-                    String reviewImg = topReviewOptional.map(Review::getImg1).orElse(null);                               // 가장 좋아요가 많은 review 이미지
+                    Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(store);               // 가장 좋아요가 많은 review
+                    String reviewImg = topReviewOptional.map(Review::getImg1).orElse("");                               // 가장 좋아요가 많은 review 이미지
                     Integer reviewCnt = reviewRepository.countByStoreAndUserNickname(store, finalUser.getNickname());                        // 내가 작성한 리뷰의 개수 == 방문 횟수
 
                     return  PinByMyCategoryResponse.builder()

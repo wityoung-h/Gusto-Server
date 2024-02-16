@@ -51,9 +51,8 @@ public class StoreServiceImpl implements StoreService{
         List<Review> top3Reviews = reviewRepository.findFirst3ByStoreOrderByLikedDesc(store);
 
         List<String> reviewImg = top3Reviews.stream()
-                .map(Review::getImg1)
+                .map(review -> Optional.ofNullable(review.getImg1()).orElse(""))
                 .collect(Collectors.toList());
-
         boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
 
@@ -82,7 +81,7 @@ public class StoreServiceImpl implements StoreService{
         List<Review> top4Reviews = reviewRepository.findFirst4ByStoreOrderByLikedDesc(store);
 
         List<String> reviewImg = top4Reviews.stream()
-                .map(Review::getImg1)
+                .map(review -> Optional.ofNullable(review.getImg1()).orElse(""))
                 .collect(Collectors.toList());
 
         // reviews 페이징 처리 (3,6,6...)
