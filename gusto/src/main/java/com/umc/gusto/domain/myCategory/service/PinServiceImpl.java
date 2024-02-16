@@ -25,7 +25,7 @@ public class PinServiceImpl implements PinService{
     @Transactional
     public void createPin(User user, Long myCategoryId, CreatePinRequest createPin) {
         MyCategory myCategory = myCategoryRepository.findByUserAndMyCategoryId(user, myCategoryId)
-                .orElseThrow(() -> new GeneralException(Code.MYCATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
         Store store = storeRepository.findById(createPin.getStoreId())
                         .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
 

@@ -20,10 +20,11 @@ public enum Code {
     USER_FOLLOW_NO_MORE_CONTENT(HttpStatus.NOT_FOUND, 404003, "리스트가 더이상 존재하지 않습니다."),
     USER_FOLLOW_ALREADY(HttpStatus.CONFLICT, 409002, "이미 팔로우했습니다."),
     USER_FOLLOW_SELF(HttpStatus.FORBIDDEN, 403001, "자신을 팔로우할 수 없습니다."),
+    USER_NOT_FOUND_SELF(HttpStatus.FORBIDDEN, 403002, "자신의 닉네임을 사용해 접근할 수 없습니다."),
 
     //Store 관련 에러 +1
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND, 404101, "존재하지 않는 가게입니다."),
-    OPENINGHOURS_NOT_FOUND(HttpStatus.NOT_FOUND, 404102,"해당 가게에 대한 운영시간이 존재하지 않습니다."),
+    OPENING_HOURS_NOT_FOUND(HttpStatus.NOT_FOUND, 404102,"해당 가게에 대한 운영시간이 존재하지 않습니다."),
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 404103,"해당 가게에 대한 카테고리가 존재하지 않습니다."),
 
     //Review 관련 에러 +2
@@ -55,10 +56,10 @@ public enum Code {
     ALREADY_JOINED_GROUP(HttpStatus.BAD_REQUEST, 400410, "이미 해당 그룹에 참여한 유저입니다."),
   
     //myCategory 관련 에러 +5
-    MYCATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 404501, "존재하지 않는 카테고리입니다."),
+    MY_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 404501, "존재하지 않는 카테고리입니다."),
     PIN_NOT_FOUND(HttpStatus.NOT_FOUND, 404502,"존재하지 않는 찜 입니다"),
-    MYCATEGORY_DUPLICATE_NAME(HttpStatus.CONFLICT, 409501, "이미 존재하는 카테고리입니다."),
-    USER_NO_PERMISSION_FOR_MYCATEGORY(HttpStatus.FORBIDDEN, 403501, "해당 유저는 해당 카테고리에 대한 권한이 없습니다."),
+    MY_CATEGORY_DUPLICATE_NAME(HttpStatus.CONFLICT, 409501, "이미 존재하는 카테고리입니다."),
+    USER_NO_PERMISSION_FOR_MY_CATEGORY(HttpStatus.FORBIDDEN, 403501, "해당 유저는 해당 카테고리에 대한 권한이 없습니다."),
 
     // token 관련 에러 +6
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, 401601, "유효하지 않은 토큰입니다."),

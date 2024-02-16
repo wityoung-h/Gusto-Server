@@ -10,16 +10,18 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PinRepository extends JpaRepository<Pin, Long> {
-    @Query("SELECT p FROM Pin p ORDER BY p.pinId DESC")
-    List<Pin> findByMyCategoryOrderByPinIdDesc(MyCategory myCategory);
-
     @Query("SELECT p FROM Pin p " +
             "JOIN p.store s " +
             "JOIN s.town t " +
-            "WHERE p.myCategory = :myCategory AND t.townName = :townName " +
+            "WHERE p.myCategory = :myCategory " +
+            "AND t.townName = :townName " +
             "ORDER BY p.pinId DESC")
-    List<Pin> findAllByUserAndMyCategoryOrderByPinIdDesc(MyCategory myCategory, String townName);
-
+    List<Pin> findPinsByMyCategoryAndTownNameAndPinIdDESC(MyCategory myCategory, String townName);
+    @Query("SELECT p FROM Pin p " +
+            "JOIN p.store s " +
+            "WHERE p.myCategory = :myCategory " +
+            "ORDER BY p.pinId DESC")
+    List<Pin> findPinsByMyCategoryAndPinIdDESC(MyCategory myCategory);
     @Query("SELECT p FROM Pin p " +
             "JOIN p.store s " +
             "JOIN s.town t " +
@@ -31,7 +33,7 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
     List<Pin> findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(User user, Long myCategoryId, String townName);
     Optional<Pin> findByUserAndPinId(User user, Long pinId);
     boolean existsByUserAndStoreStoreId(User user, Long storeId);       // 존재 여부
-    @Query("SELECT p.store.storeId FROM Pin p WHERE p.user = :user AND p.myCategory.myCategoryId = :myCategoryId")
+    @Query("SELECT p.store.storeId FROM Pin p WHERE p.user = :user AND p.myCategory.myCategoryId = :myCategoryId AND p.user.publishCategory = 'PUBLIC'")
     List<Long> findStoreIdsByUserAndMyCategoryId(User user, Long myCategoryId);
     @Query("SELECT p.store.storeId FROM Pin p WHERE p.user = :user")
     List<Long> findStoreIdsByUser(User user);
