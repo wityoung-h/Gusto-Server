@@ -13,7 +13,6 @@ import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
-import com.umc.gusto.global.exception.customException.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
@@ -208,13 +207,14 @@ public class StoreServiceImpl implements StoreService{
 
         return searchResult.stream()
                 .map(result -> {
-                    Review review = reviewRepository.findFirstByStoreOrderByLikedDesc(result).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+                    Optional<Review> review = reviewRepository.findFirstByStoreOrderByLikedDesc(result);
+                    String reviewImg = review.map(Review::getImg1).orElse("");
                     return GetStoreInfoResponse.builder()
                             .storeId(result.getStoreId())
                             .storeName(result.getStoreName())
                             .categoryName(result.getCategory().getCategoryName())
                             .address(result.getAddress())
-                            .reviewImg(review.getImg1())
+                            .reviewImg(reviewImg)
                             .build();
                 })
                 .collect(Collectors.toList());
