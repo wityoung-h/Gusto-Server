@@ -41,4 +41,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findRandomFeedByUser(@Param("user") UUID user); //WHERE r.user_id <> :userZ
 
     boolean existsByStoreAndUserNickname(Store store, String nickname);
+
+    //검색 기능
+    @Query("SELECT r FROM Review r WHERE r.store.storeName like concat('%', :keyword, '%') OR r.comment like concat('%', :keyword, '%')")
+    List<Review> searchByStoreContains(String keyword); //TODO: 후에 페이징 처리 하기
+    @Query("SELECT t.review FROM Tagging t WHERE t.review.store.storeName like concat('%', :keyword, '%') AND t.hashTag.hasTagId = :hashTagId")
+    List<Review> searchByStoreAndHashTagContains(String keyword, Long hashTagId);
+    @Query("SELECT t.review FROM Tagging t WHERE t.hashTag.hasTagId = :hashTagId")
+    List<Review> searchByHashTagContains(Long hashTagId);
 }
