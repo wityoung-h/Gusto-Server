@@ -143,6 +143,12 @@ public class GroupServiceImpl implements GroupService{
         Group group = groupRepository.findGroupByCodeAndStatus(joinGroupRequest.getCode(), BaseEntity.Status.ACTIVE)
                 .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
 
+        // 이미 그룹에 참여한 유저인지 확인
+        boolean isMember = groupMemberRepository.existsGroupMemberByGroupAndUser(group, user);
+        if (isMember) {
+            throw new GeneralException(Code.ALREADY_JOINED_GROUP);
+        }
+
         // 그룹 참여
         User joinUser = userRepository.findById(user.getUserId())
                 .orElseThrow(()->new GeneralException(Code.DONT_EXIST_USER));
