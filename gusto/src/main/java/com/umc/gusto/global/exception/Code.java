@@ -39,7 +39,9 @@ public enum Code {
     ROUTE_NOT_FOUND(HttpStatus.NOT_FOUND,404302,"존재하지 않는 루트입니다."),
     ROUTELIST_NOT_FOUND(HttpStatus.NOT_FOUND,404302,"루트에 존재하지 않은 상점 항목입니다"),
     USER_NO_PERMISSION_FOR_ROUTE(HttpStatus.FORBIDDEN,403303,"해당 유저는 해당 루트에 대한 권한이 없습니다"),
-    ROUTELIST_TO_MANY_REQUEST(HttpStatus.TOO_MANY_REQUESTS,403304,"루트 내 상점 항목은 최대 6개까지 가능합니다."),
+    ROUTE_ORDINAL_BAD_REQUEST(HttpStatus.BAD_REQUEST,403304,"루트 내 이동 경로는 1부터 6까지만 가능합니다"),
+    ROUTE_MYROUTE_BAD_REQUEST(HttpStatus.BAD_REQUEST,403305,"내 루트는 최소 1개 이상의 경로를 포함해야 합니다."),
+    ROUTELIST_TO_MANY_REQUEST(HttpStatus.TOO_MANY_REQUESTS,403306,"루트 내 상점 항목은 최대 6개까지 가능합니다."),
 
     //Group 관련 에러 +4
     FIND_FAIL_GROUP(HttpStatus.NOT_FOUND, 404401, "존재하지 않는 그룹입니다."),
@@ -49,8 +51,8 @@ public enum Code {
     INVALID_INVITATION_CODE(HttpStatus.FORBIDDEN, 403405, "그룹의 초대 코드가 올바르지 않습니다."),
     USER_NOT_IN_GROUP(HttpStatus.NOT_FOUND, 404406, "그룹에 가입되지 않은 유저입니다."),
     NO_TRANSFER_PERMISSION(HttpStatus.FORBIDDEN, 403407, "그룹 소유자만이 그룹 소유권을 이전할 수 있습니다."),
-    USER_NO_PERMISSION_FOR_GROUP(HttpStatus.FORBIDDEN,403408,"해당 유저는 그룹 구성원이 아닙니다."),
     GROUPLIST_NOT_FROUND(HttpStatus.NOT_FOUND,403409,"존재하지 않는 그룹 내 상점입니다."),
+    ALREADY_JOINED_GROUP(HttpStatus.BAD_REQUEST, 400410, "이미 해당 그룹에 참여한 유저입니다."),
   
     //myCategory 관련 에러 +5
     MYCATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 404501, "존재하지 않는 카테고리입니다."),

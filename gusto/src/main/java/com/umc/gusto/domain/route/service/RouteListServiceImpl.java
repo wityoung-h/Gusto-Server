@@ -1,5 +1,8 @@
 package com.umc.gusto.domain.route.service;
 
+import com.umc.gusto.domain.group.entity.Group;
+import com.umc.gusto.domain.group.repository.GroupMemberRepository;
+import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.route.entity.RouteList;
 import com.umc.gusto.domain.route.model.request.ModifyRoueListRequest;
@@ -28,6 +31,8 @@ public class RouteListServiceImpl implements RouteListService{
     private final RouteListRepository routeListRepository;
     private final RouteRepository routeRepository;
     private final StoreRepository storeRepository;
+    private final GroupRepository groupRepository;
+    private final GroupMemberRepository groupMemberRepository;
 
 
     @Transactional
@@ -35,8 +40,35 @@ public class RouteListServiceImpl implements RouteListService{
     public void createRouteList(Route route, List<RouteListRequest.createRouteListDto> request) {
         //루트리스트 생성
         request.forEach(dto -> {
+            if(dto.getOrdinal() >= 1 && dto.getOrdinal() <= 6){
+                RouteList routeList = RouteList.builder()
+                        .route(route)
+                        .store(storeRepository.findById(dto.getStoreId())
+                                .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND)))
+                        .ordinal(dto.getOrdinal())
+                        .build();
+                routeListRepository.save(routeList);
+            } else throw new GeneralException(Code.ROUTE_ORDINAL_BAD_REQUEST);
+        });
+    }
+
+    // 루트리스트만 추가
+    @Transactional
+    @Override
+    public void createRouteList(Long groupId,Long routeId, List<RouteListRequest.createRouteListDto> request,User user) {
+        if(groupId != null){
+            Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                    .orElseThrow(() -> new GeneralException(Code.FIND_FAIL_GROUP));
+            if(!groupMemberRepository.existsGroupMemberByGroupAndUser(group,user)){
+                throw new GeneralException(Code.USER_NOT_IN_GROUP);
+            }
+        }
+
+        //루트리스트 생성
+        request.forEach(dto -> {
             RouteList routeList = RouteList.builder()
-                    .route(route)
+                    .route(routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE)
+                            .orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND)))
                     .store(storeRepository.findById(dto.getStoreId())
                             .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND)))
                     .ordinal(dto.getOrdinal())
@@ -70,7 +102,17 @@ public class RouteListServiceImpl implements RouteListService{
     }
 
     @Override
-    public RouteListResponse.RouteListResponseDto getRouteListDetail(Long routeId) {
+    public RouteListResponse.RouteListResponseDto getRouteListDetail(Long routeId,User user, Long groupId) {
+        // 그룹 내 루트 상세 조회인 경우에만
+        if(groupId != null){
+            Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                    .orElseThrow(() -> new GeneralException(Code.FIND_FAIL_GROUP));
+            if(!groupMemberRepository.existsGroupMemberByGroupAndUser(group,user)){
+                throw new GeneralException(Code.USER_NOT_IN_GROUP);
+            }
+        }
+
+
         Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE).orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
         List<RouteList> routeList = routeListRepository.findByRoute(route);
         List<RouteListResponse.RouteList> routeLists = routeList.stream().map(rL ->
@@ -84,6 +126,7 @@ public class RouteListServiceImpl implements RouteListService{
         ).toList();
 
         return RouteListResponse.RouteListResponseDto.builder()
+                .routeId(route.getRouteId())
                 .routeName(route.getRouteName())
                 .routes(routeLists)
                 .build();

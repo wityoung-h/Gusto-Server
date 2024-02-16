@@ -107,12 +107,12 @@ public class GroupController {
 
     /**
      * 그룹 참여
-     * [POST] /groups/{groupId}/join
+     * [POST] /groups/join
      */
-    @PostMapping("/{groupId}/join")
-    public ResponseEntity<?> joinGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId, @RequestBody JoinGroupRequest joinGroupRequest){
+    @PostMapping("/join")
+    public ResponseEntity<?> joinGroup(@AuthenticationPrincipal AuthUser authUser, @RequestBody JoinGroupRequest joinGroupRequest){
         User user = authUser.getUser();
-        groupService.joinGroup(user, groupId, joinGroupRequest);
+        groupService.joinGroup(user, joinGroupRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -168,5 +168,19 @@ public class GroupController {
     public ResponseEntity<List<GetGroupMemberResponse>> getGroupMembers (@PathVariable Long groupId){
         List<GetGroupMemberResponse> getGroupMembers = groupService.getGroupMembers(groupId);
         return ResponseEntity.status(HttpStatus.OK).body(getGroupMembers);
+    }
+
+    /**
+     * 그룹 루트 삭제
+     * [DELETE] /groups/routes/{routeId}??groupId={groupId}
+     */
+    @DeleteMapping("/routes/{routeId}")
+    public ResponseEntity<?> getDeleteGroupRoute
+    (@PathVariable Long routeId,
+     @AuthenticationPrincipal AuthUser authUser,
+     @RequestParam Long groupId
+    ){
+        groupService.deleteRoute(routeId,authUser.getUser(),groupId);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 }

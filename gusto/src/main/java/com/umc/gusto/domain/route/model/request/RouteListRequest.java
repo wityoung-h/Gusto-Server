@@ -1,5 +1,7 @@
 package com.umc.gusto.domain.route.model.request;
 
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
@@ -11,6 +13,8 @@ public class RouteListRequest {
         private Long storeId;
 
         @NotNull(message = "루트 작성 시 식당 순서를 기입해주세요.")
+        @DecimalMin(value = "1", message = "이동 순서가 1보다 작을 수 없습니다.")
+        @DecimalMax(value = "6", message = "이동 순서가 6보다 클 수 없습니다.")
         private Integer ordinal;
     }
 }

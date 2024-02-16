@@ -1,9 +1,12 @@
 package com.umc.gusto.domain.route.controller;
 
+
+import com.umc.gusto.domain.route.model.request.RouteListRequest;
 import com.umc.gusto.domain.route.model.request.ModifyRouteRequest;
 import com.umc.gusto.domain.route.model.response.RouteListResponse;
 import com.umc.gusto.domain.route.service.RouteListService;
 import com.umc.gusto.global.auth.model.AuthUser;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,18 @@ import java.util.List;
 public class RouteListController {
 
     private final RouteListService routeListService;
+
+    // 루트리스트만 추가
+    @PostMapping("/{routeId}")
+    public ResponseEntity<?> createRouteList
+    (@PathVariable Long routeId,
+     @RequestParam(required = false) Long groupId,
+     @RequestBody @Valid List<RouteListRequest.createRouteListDto> request,
+     @AuthenticationPrincipal AuthUser authUSer
+    ){
+        routeListService.createRouteList(groupId,routeId,request,authUSer.getUser());
+        return ResponseEntity.ok().build();
+    }
 
     // 루르리스트 항목 삭제
     @DeleteMapping("/{routeListId}")
@@ -41,9 +56,11 @@ public class RouteListController {
     // 루트리스트 상세 조회
     @GetMapping("/{routeId}")
     public ResponseEntity<?> getRouteListDetail(
-            @PathVariable Long routeId
+            @PathVariable Long routeId,
+            @RequestParam(required = false) Long groupId,
+             @AuthenticationPrincipal AuthUser authUSer
     ){
-        return ResponseEntity.ok().body(routeListService.getRouteListDetail(routeId));
+        return ResponseEntity.ok().body(routeListService.getRouteListDetail(routeId,authUSer.getUser(),groupId));
     }
 
     // 루트 수정

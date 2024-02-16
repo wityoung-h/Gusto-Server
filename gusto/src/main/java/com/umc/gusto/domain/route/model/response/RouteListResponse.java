@@ -35,6 +35,7 @@ public class RouteListResponse {
     @NoArgsConstructor
     @Getter
     public static class RouteListResponseDto{
+        private Long routeId;
         private String routeName;
         private List<RouteList> routes;
     }

@@ -11,7 +11,7 @@ public class FeedProfileResponse {
     private String nickname;
     private String profileImg;
     private int review;
-    private int pin;
+    private long following;
     private long follower;
     private boolean followed;
 }
