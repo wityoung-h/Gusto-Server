@@ -30,6 +30,7 @@ public enum Code {
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, 404201, "존재하지 않는 리뷰입니다."),
     HASHTAG_NOT_FOUND(HttpStatus.NOT_FOUND, 404202, "존재하지 않는 해시태그입니다."),
     USER_NO_PERMISSION_FOR_REVIEW(HttpStatus.FORBIDDEN, 403203, "해당 유저는 해당 리뷰에 대한 권한이 없습니다."),
+    NO_PUBLIC_REVIEW(HttpStatus.FORBIDDEN, 403204, "해당 리뷰는 public입니다."),
     NO_ONESELF_LIKE(HttpStatus.BAD_REQUEST, 400204, "자기자신의 리뷰는 좋아요할 수 없습니다."),
     NO_LIKE_REVIEW(HttpStatus.BAD_REQUEST, 400205, "해당 리뷰에 좋아요를 한 적이 없습니다."),
 
@@ -40,6 +41,7 @@ public enum Code {
     USER_NO_PERMISSION_FOR_ROUTE(HttpStatus.FORBIDDEN,403303,"해당 유저는 해당 루트에 대한 권한이 없습니다"),
     ROUTE_ORDINAL_BAD_REQUEST(HttpStatus.BAD_REQUEST,403304,"루트 내 이동 경로는 1부터 6까지만 가능합니다"),
     ROUTE_MYROUTE_BAD_REQUEST(HttpStatus.BAD_REQUEST,403305,"내 루트는 최소 1개 이상의 경로를 포함해야 합니다."),
+    ROUTELIST_TO_MANY_REQUEST(HttpStatus.TOO_MANY_REQUESTS,403306,"루트 내 상점 항목은 최대 6개까지 가능합니다."),
 
     //Group 관련 에러 +4
     FIND_FAIL_GROUP(HttpStatus.NOT_FOUND, 404401, "존재하지 않는 그룹입니다."),
@@ -59,7 +61,9 @@ public enum Code {
 
     // token 관련 에러 +6
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, 401601, "유효하지 않은 토큰입니다."),
-
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, 401603, "refresh-token이 유효하지 않습니다."),
+    EXPIRED_ACCESS_TOKEN(HttpStatus.FORBIDDEN, 403601, "X-AUTH-TOKEN이 만료되었습니다. 토큰 재발급을 실행해주세요."),
+    EXPIRED_REFRESH_TOKEN(HttpStatus.FORBIDDEN, 403602, "refresh-token이 만료되었습니다. 재로그인이 필요합니다"),
 
     FOR_TEST_ERROR(HttpStatus.BAD_REQUEST,49999, "테스트용 에러")
 

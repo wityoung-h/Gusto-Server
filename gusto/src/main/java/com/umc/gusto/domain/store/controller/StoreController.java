@@ -1,9 +1,7 @@
 package com.umc.gusto.domain.store.controller;
 
 
-import com.umc.gusto.domain.store.model.response.GetStoreDetailResponse;
-import com.umc.gusto.domain.store.model.response.GetStoreResponse;
-import com.umc.gusto.domain.store.model.response.GetStoresInMapResponse;
+import com.umc.gusto.domain.store.model.response.*;
 import com.umc.gusto.domain.store.service.StoreService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
@@ -22,6 +20,9 @@ import java.util.List;
 @RequestMapping("/stores")
 public class StoreController {
     private final StoreService storeService;
+
+    private static final int DEFAULT_PAGE_NUMBER = 0;
+    private static final int DEFAULT_PAGE_SIZE = 3;
 
     /**
      * 가게 1건 조회
@@ -46,7 +47,7 @@ public class StoreController {
             @PathVariable Long storeId,
             @RequestParam(name = "reviewId", required = false) Long reviewId){
         User user = authUser.getUser();
-        Pageable pageable = PageRequest.of(0, 3);
+        Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
 
         // 상점 세부 정보 가져오기
         GetStoreDetailResponse getStoreDetail = storeService.getStoreDetail(user, storeId, reviewId, pageable);
@@ -68,4 +69,17 @@ public class StoreController {
         return  ResponseEntity.status(HttpStatus.OK).body(getStoresInMaps);
     }
 
+    /**
+     * 현재 지역의 찜한 식당 방문 여부 조회
+     * [GET] /stores/pins?myCategoryId={categoryId}&townName={townName}
+     */
+    @GetMapping("/pins")
+    public ResponseEntity<List<GetPinStoreResponse>> getPinStoresByCategoryAndLocation(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam(name = "myCategoryId", required = false) Long myCategoryId,
+            @RequestParam(name = "townName") String townName){
+        User user = authUser.getUser();
+        List<GetPinStoreResponse> storeList = storeService.getPinStoresByCategoryAndLocation(user, myCategoryId, townName);
+        return ResponseEntity.status(HttpStatus.OK).body(storeList);
+    }
 }

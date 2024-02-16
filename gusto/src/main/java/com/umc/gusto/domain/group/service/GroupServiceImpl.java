@@ -198,6 +198,7 @@ public class GroupServiceImpl implements GroupService{
                     return GetGroupsResponse.builder()
                             .groupId(group.getGroupId())
                             .groupName(group.getGroupName())
+                            .isOwner(user.getUserId().equals(group.getOwner().getUserId()))
                             .numMembers(numMembers)
                             .numRestaurants(numRestaurants)
                             .numRoutes(numRoutes)
@@ -290,8 +291,10 @@ public class GroupServiceImpl implements GroupService{
             String reviewImg = reviewRepository.findTopReviewImageByStoreId(gl.getStore().getStoreId()).get(0);
             return GroupListResponse.builder()
                     .groupListId(gl.getGroupListId())
+                    .storeId(gl.getStore().getStoreId())
                     .storeName(gl.getStore().getStoreName())
-                    .profileImg(reviewImg)
+                    .storeProfileImg(reviewImg)
+                    .userProfileImg(gl.getUser().getProfileImage())
                     .address(gl.getStore().getAddress())
                     .build();
         }).collect(Collectors.toList());

@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.route.service;
 
+import com.umc.gusto.domain.group.entity.Group;
 import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.route.model.request.RouteRequest;
@@ -34,6 +35,10 @@ public class RouteServiceImpl implements RouteService{
         if (routeRepository.existsByRouteName(request.getRouteName(),BaseEntity.Status.ACTIVE,user)) {
             throw new GeneralException(Code.ROUTE_DUPLICATE_ROUTENAME);
         }
+        // 루트 리스트 갯수 6개 제한 확인
+        if(request.getRouteList().size()>=7){
+            throw new GeneralException(Code.ROUTELIST_TO_MANY_REQUEST);
+        }
 
         // 루트 생성
         Route route = Route.builder()
@@ -43,7 +48,7 @@ public class RouteServiceImpl implements RouteService{
                 .build();
         Route savedRoute = routeRepository.save(route);
 
-
+      
         if(request.getRouteList() != null){
             // 루트리스트 생성 비지니스 로직 호출
             routeListService.createRouteList(savedRoute, request.getRouteList());
@@ -51,7 +56,6 @@ public class RouteServiceImpl implements RouteService{
             // 내 루트 생성시에는 최소 1개 이상의 경로가 포함되어야 함
             throw new GeneralException(Code.ROUTE_MYROUTE_BAD_REQUEST);
         }
-
     }
 
     @Transactional
@@ -79,6 +83,24 @@ public class RouteServiceImpl implements RouteService{
                                 .routeId(Route.getRouteId())
                                 .routeName(Route.getRouteName())
                                 .numStore(routeListRepository.countRouteListByRoute(Route))
+                                .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<RouteResponse.RouteResponseDto> getGroupRoute(Long groupId) {
+        // 그룹 존재 여부 확인
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+
+        //특정 그룹 내 루트 조회
+        List<Route> routes = routeRepository.findRoutesByGroupAndStatus(group,BaseEntity.Status.ACTIVE);
+        return routes.stream().map(
+                        Route -> RouteResponse.RouteResponseDto.builder()
+                                .routeId(Route.getRouteId())
+                                .routeName(Route.getRouteName())
+                                .numStore(routeListRepository.countRouteListByRoute(Route))
+                                .groupId(Route.getRouteId())
                                 .build())
                 .collect(Collectors.toList());
     }

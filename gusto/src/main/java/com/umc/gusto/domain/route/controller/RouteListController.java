@@ -1,11 +1,14 @@
 package com.umc.gusto.domain.route.controller;
 
+
 import com.umc.gusto.domain.route.model.request.RouteListRequest;
+import com.umc.gusto.domain.route.model.request.ModifyRouteRequest;
 import com.umc.gusto.domain.route.model.response.RouteListResponse;
 import com.umc.gusto.domain.route.service.RouteListService;
 import com.umc.gusto.global.auth.model.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -60,5 +63,10 @@ public class RouteListController {
         return ResponseEntity.ok().body(routeListService.getRouteListDetail(routeId,authUSer.getUser(),groupId));
     }
 
-
+    // 루트 수정
+    @PatchMapping("/{routeId}")
+    public ResponseEntity<?> modifyRoute(@PathVariable Long routeId, @RequestBody ModifyRouteRequest request){
+        routeListService.modifyRouteList(routeId,request);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
 }

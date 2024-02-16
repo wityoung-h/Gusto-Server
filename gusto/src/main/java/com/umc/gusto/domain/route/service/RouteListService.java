@@ -1,7 +1,9 @@
 package com.umc.gusto.domain.route.service;
 
 import com.umc.gusto.domain.route.entity.Route;
+import com.umc.gusto.domain.route.model.request.ModifyRouteRequest;
 import com.umc.gusto.domain.route.model.request.RouteListRequest;
+import com.umc.gusto.domain.route.model.request.RouteRequest;
 import com.umc.gusto.domain.route.model.response.RouteListResponse;
 import com.umc.gusto.domain.user.entity.User;
 
@@ -25,4 +27,8 @@ public interface RouteListService {
 
     // 루트 상세 조회
     RouteListResponse.RouteListResponseDto getRouteListDetail(Long routeId,User user, Long groupId);
+
+    // 루트 상세 수정
+    void modifyRouteList(Long routeId,ModifyRouteRequest request);
+
 }

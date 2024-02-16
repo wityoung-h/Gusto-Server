@@ -7,6 +7,7 @@ import com.umc.gusto.domain.user.model.NicknameBucket;
 import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
+import com.umc.gusto.domain.user.model.response.FeedProfileResponse;
 import com.umc.gusto.domain.user.model.response.ProfileResponse;
 import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
 import com.umc.gusto.domain.user.model.response.FollowResponse;
@@ -52,7 +53,7 @@ public class UserServiceImpl implements UserService{
     private static final int FOLLOW_LIST_PAGE = 30;
 
 
-    @Value("${default.img.url.profile}")
+    @Value("${default.img.url}")
     private String DEFAULT_PROFILE_IMG;
 
     @Override
@@ -149,9 +150,15 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public ProfileResponse getProfile(User user, String nickname) {
-        User target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
-                .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
+    public FeedProfileResponse getProfile(User user, String nickname) {
+        User target;
+
+        if(nickname.equals("my")) {
+            target = user;
+        } else {
+            target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
+                    .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
+        }
 
         AtomicBoolean followed = new AtomicBoolean(false);
 
@@ -159,8 +166,9 @@ public class UserServiceImpl implements UserService{
             followRepository.findByFollowerAndFollowing(user, target).ifPresent(a -> followed.set(true));
         }
 
-        return ProfileResponse.builder()
+        return FeedProfileResponse.builder()
                 .nickname(target.getNickname())
+                .profileImg(target.getProfileImage())
                 .review(target.getReviewCnt())
                 .pin(target.getPinCnt())
                 .follower(target.getFollower())
@@ -177,6 +185,16 @@ public class UserServiceImpl implements UserService{
         user.updateNickname(nickname);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public ProfileResponse getProfile(User user) {
+        return ProfileResponse.builder()
+                .profileImg(user.getProfileImage())
+                .nickname(user.getNickname())
+                .age(user.getAge().toString())
+                .gender(user.getGender().toString())
+                .build();
     }
 
     @Override
@@ -206,6 +224,7 @@ public class UserServiceImpl implements UserService{
         return PublishingInfoResponse.builder()
                 .publishReview(user.getPublishReview() == PublishStatus.PUBLIC)
                 .publishPin(user.getPublishCategory() == PublishStatus.PUBLIC)
+                .publishRoute(user.getPublishRoute() == PublishStatus.PUBLIC)
                 .build();
     }
 
@@ -213,9 +232,11 @@ public class UserServiceImpl implements UserService{
     public void updatePublishingInfo(User user, PublishingInfoRequest request) {
         PublishStatus reviewStatus = (request.getPublishReview()) ?PublishStatus.PUBLIC : PublishStatus.PRIVATE;
         PublishStatus pinStatus = (request.getPublishPin()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
+        PublishStatus routeStatus = (request.getPublishRoute()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
 
         user.updatePublishReview(reviewStatus);
         user.updatePublishPin(pinStatus);
+        user.updatePublishRoute(routeStatus);
 
         userRepository.save(user);
     }
