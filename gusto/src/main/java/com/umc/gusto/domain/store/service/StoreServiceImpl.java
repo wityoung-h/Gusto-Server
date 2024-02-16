@@ -37,6 +37,7 @@ public class StoreServiceImpl implements StoreService{
     public GetStoreResponse getStore(User user, Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
+        Long pinId = pinRepository.findByUserAndStoreStoreId(user, storeId);
         List<OpeningHours> openingHoursList = openingHoursRepository.findByStoreStoreId(storeId);
 
         Map<OpeningHours.BusinessDay, GetStoreResponse.Timing> businessDays = new LinkedHashMap<>();
@@ -56,10 +57,14 @@ public class StoreServiceImpl implements StoreService{
 
         boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
+
         return GetStoreResponse.builder()
+                .pinId(pinId)
                 .storeId(storeId)
                 .storeName(store.getStoreName())
                 .address(store.getAddress())
+                .longitude(store.getLongitude())
+                .latitude(store.getLatitude())
                 .businessDay(businessDays)
                 .reviewImg3(reviewImg)
                 .pin(isPinned)
@@ -73,6 +78,7 @@ public class StoreServiceImpl implements StoreService{
                 .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
         Category category = storeRepository.findCategoryByStoreId(storeId)
                 .orElseThrow(() -> new GeneralException(Code.CATEGORY_NOT_FOUND));
+        Long pinId = pinRepository.findByUserAndStoreStoreId(user, storeId);
 
         List<Review> top4Reviews = reviewRepository.findFirst4ByStoreOrderByLikedDesc(store);
 
@@ -114,6 +120,7 @@ public class StoreServiceImpl implements StoreService{
         boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
         return GetStoreDetailResponse.builder()
+                .pinId(pinId)
                 .storeId(storeId)
                 .categoryName(category.getCategoryName())
                 .storeName(store.getStoreName())

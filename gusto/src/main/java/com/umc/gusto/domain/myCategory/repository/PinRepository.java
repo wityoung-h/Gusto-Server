@@ -42,6 +42,8 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
     List<Long> findStoreIdsByUserAndMyCategoryId(User user, Long myCategoryId);
     @Query("SELECT p.store.storeId FROM Pin p WHERE p.user = :user")
     List<Long> findStoreIdsByUser(User user);
+    @Query("SELECT p.pinId FROM Pin p WHERE p.user = :user AND p.store.storeId = :storeId")
+    Long findByUserAndStoreStoreId(User user, Long storeId);
     @Query("SELECT p FROM Pin p " +
             "JOIN p.store s " +
             "JOIN s.town t " +

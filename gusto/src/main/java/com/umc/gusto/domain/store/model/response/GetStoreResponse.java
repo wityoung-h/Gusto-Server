@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.store.model.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.umc.gusto.domain.store.entity.OpeningHours;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,9 +16,13 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetStoreResponse{
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    Long pinId;
     Long storeId;
     String storeName;
     String address;
+    Float longitude;
+    Float latitude;
     Map<OpeningHours.BusinessDay, Timing> businessDay;
     String contact;
     List<String> reviewImg3;
