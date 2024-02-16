@@ -10,5 +10,5 @@ import java.util.List;
 public interface FeedService {
     List<RandomFeedResponse> getRandomFeed(User user);
     SearchFeedResponse searchFeed(String keyword, List<Long> hashTags);
-    FeedDetailResponse getFeedDetail(Long reviewId);
+    FeedDetailResponse getFeedDetail(User user, Long reviewId);
 }

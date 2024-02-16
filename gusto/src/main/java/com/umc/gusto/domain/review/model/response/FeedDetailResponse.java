@@ -15,6 +15,8 @@ public class FeedDetailResponse {
     String address;
     String nickName;
     String profileImage;
+    Integer likeCnt;
+    boolean liked;
     List<String> images;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String menuName;
@@ -31,15 +33,16 @@ public class FeedDetailResponse {
     Integer parking;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String comment;
-    Integer likeCnt;
 
-    public static FeedDetailResponse of(Review review, String hashTags){
+    public static FeedDetailResponse of(Review review, String hashTags, boolean liked){
         return FeedDetailResponse.builder()
                 .storeId(review.getStore().getStoreId())
                 .storeName(review.getStore().getStoreName())
                 .address(review.getStore().getAddress())
                 .nickName(review.getUser().getNickname())
                 .profileImage(review.getUser().getProfileImage())
+                .likeCnt(review.getLiked())
+                .liked(liked)
                 .images(review.getImageList())
                 .menuName(review.getMenuName())
                 .hashTags(hashTags)
@@ -49,7 +52,6 @@ public class FeedDetailResponse {
                 .toilet(review.getToilet())
                 .parking(review.getParking())
                 .comment(review.getComment())
-                .likeCnt(review.getLiked())
                 .build();
     }
 }

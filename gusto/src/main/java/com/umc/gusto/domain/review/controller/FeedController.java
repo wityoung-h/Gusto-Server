@@ -29,7 +29,8 @@ public class FeedController {
     }
 
     @GetMapping("{reviewId}")
-    public ResponseEntity<?> getFeedDetail(@PathVariable(name = "reviewId") Long reviewId){
-        return ResponseEntity.status(HttpStatus.OK).body(feedService.getFeedDetail(reviewId));
+    public ResponseEntity<?> getFeedDetail(@AuthenticationPrincipal AuthUser authUser, @PathVariable(name = "reviewId") Long reviewId){
+        User user = authUser.getUser();
+        return ResponseEntity.status(HttpStatus.OK).body(feedService.getFeedDetail(user, reviewId));
     }
 }

@@ -2,6 +2,7 @@ package com.umc.gusto.domain.review.service;
 
 import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.review.model.response.*;
+import com.umc.gusto.domain.review.repository.LikedRepository;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.PublishStatus;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FeedServiceImpl implements FeedService{
     private final ReviewRepository reviewRepository;
+    private final LikedRepository likedRepository;
 
     @Override
     public List<RandomFeedResponse> getRandomFeed(User user) {
@@ -48,8 +50,8 @@ public class FeedServiceImpl implements FeedService{
     }
 
     @Override
-    public FeedDetailResponse getFeedDetail(Long reviewId) {
-        //TOOD: reviewServiceImpl와 중복되는 코드
+    public FeedDetailResponse getFeedDetail(User user, Long reviewId) {
+        //TOOD: reviewServiceImpl와 중복되는 코드 분리하기
         Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
         //TODO: 후에 각 리뷰마다의 공개, 비공개를 확인해서 주는거로 수정하기
         if(!review.getUser().getPublishReview().equals(PublishStatus.PUBLIC)){
@@ -60,6 +62,10 @@ public class FeedServiceImpl implements FeedService{
         review.getTaggingSet().stream().map(r-> r.getHashTag().getHasTagId()).forEach(o-> hashTags.append(o).append(","));
         //마지막 문자 , 제거
         hashTags.deleteCharAt(hashTags.length()-1);
-        return FeedDetailResponse.of(review, hashTags.toString());
+
+        //이 리뷰를 보는 유저가 해당 리뷰를 좋아요했는지 체크
+        boolean liked = likedRepository.existsByUserAndReview(user, review);
+
+        return FeedDetailResponse.of(review, hashTags.toString(), liked);
     }
 }
