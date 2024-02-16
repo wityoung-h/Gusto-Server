@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class GetStoresInMapResponse{
     Long storeId;
     String storeName;
-    Float longitude;
-    Float latitude;
+    Double longitude;
+    Double latitude;
 }
