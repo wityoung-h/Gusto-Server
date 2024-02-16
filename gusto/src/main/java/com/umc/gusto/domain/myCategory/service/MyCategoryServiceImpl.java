@@ -40,10 +40,9 @@ public class MyCategoryServiceImpl implements MyCategoryService {
         if (nickname != null) {
             if (nickname.equals(user.getNickname())) {
                 throw new GeneralException(Code.USER_NOT_FOUND_SELF);
-            } else {
-                user = userRepository.findByNickname(nickname)
-                        .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
             }
+            user = userRepository.findByNickname(nickname)
+                    .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
         }
         User finalUser = user;
         myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(user);   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
@@ -70,10 +69,9 @@ public class MyCategoryServiceImpl implements MyCategoryService {
         if (nickname != null) {
             if (nickname.equals(user.getNickname())) {
                 throw new GeneralException(Code.USER_NOT_FOUND_SELF);
-            } else {
-                user = userRepository.findByNickname(nickname)
-                        .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
             }
+            user = userRepository.findByNickname(nickname)
+                    .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
         }
 
         if (townName == null) {
