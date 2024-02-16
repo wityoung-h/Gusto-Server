@@ -16,4 +16,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     Optional<Category> findCategoryByStoreId(Long storeId);
     @Query("SELECT s FROM Store s WHERE s.town.townName = :townName AND s.storeId IN :storeIds")
     List<Store> findByTownNameAndStoreIds(String townName, List<Long> storeIds);
+
+    List<Store> findByStoreNameContains(String keyword);
 }

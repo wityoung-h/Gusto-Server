@@ -1,6 +1,7 @@
 package com.umc.gusto.domain.myCategory.controller;
 
 import com.umc.gusto.domain.myCategory.model.request.CreatePinRequest;
+import com.umc.gusto.domain.myCategory.model.response.CreatePinResponse;
 import com.umc.gusto.domain.myCategory.service.PinService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
@@ -23,15 +24,15 @@ public class PinController {
      * [POST] /myCategories/{myCategoryId}/pin
      */
     @PostMapping("/{myCategoryId}/pin")
-    public ResponseEntity<?> createPin(
+    public ResponseEntity<CreatePinResponse> createPin(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long myCategoryId,
             @RequestBody CreatePinRequest createPin
     ) {
             User user = authUser.getUser();
-            pinService.createPin(user, myCategoryId, createPin);
+            CreatePinResponse createPinResponse = pinService.createPin(user, myCategoryId, createPin);
 
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            return ResponseEntity.status(HttpStatus.OK).body(createPinResponse);
     }
 
     /**
