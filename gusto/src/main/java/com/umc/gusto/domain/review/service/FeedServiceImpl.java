@@ -1,11 +1,13 @@
 package com.umc.gusto.domain.review.service;
 
 import com.umc.gusto.domain.review.entity.Review;
-import com.umc.gusto.domain.review.model.response.BasicViewResponse;
-import com.umc.gusto.domain.review.model.response.RandomFeedResponse;
-import com.umc.gusto.domain.review.model.response.SearchFeedResponse;
+import com.umc.gusto.domain.review.model.response.*;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.global.common.PublishStatus;
+import com.umc.gusto.global.exception.Code;
+import com.umc.gusto.global.exception.customException.NotFoundException;
+import com.umc.gusto.global.exception.customException.PrivateItemException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,5 +45,21 @@ public class FeedServiceImpl implements FeedService{
 
         List<BasicViewResponse> basicViewResponse = searchResult.stream().map(BasicViewResponse::of).toList();
         return SearchFeedResponse.of(basicViewResponse);
+    }
+
+    @Override
+    public FeedDetailResponse getFeedDetail(Long reviewId) {
+        //TOOD: reviewServiceImpl와 중복되는 코드
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+        //TODO: 후에 각 리뷰마다의 공개, 비공개를 확인해서 주는거로 수정하기
+        if(!review.getUser().getPublishReview().equals(PublishStatus.PUBLIC)){
+            throw new PrivateItemException(Code.NO_PUBLIC_REVIEW);
+        }
+
+        StringBuilder hashTags = new StringBuilder();
+        review.getTaggingSet().stream().map(r-> r.getHashTag().getHasTagId()).forEach(o-> hashTags.append(o).append(","));
+        //마지막 문자 , 제거
+        hashTags.deleteCharAt(hashTags.length()-1);
+        return FeedDetailResponse.of(review, hashTags.toString());
     }
 }
