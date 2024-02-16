@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 @Service
@@ -207,5 +206,24 @@ public class StoreServiceImpl implements StoreService{
                 .build();
 
         return Collections.singletonList(pinStoreResponse);
+    }
+
+    @Override
+    public List<GetStoreInfoResponse> searchStore(String keyword) {
+        List<Store> searchResult = storeRepository.findByStoreNameContains(keyword);
+
+        return searchResult.stream()
+                .map(result -> {
+                    Optional<Review> review = reviewRepository.findFirstByStoreOrderByLikedDesc(result);
+                    String reviewImg = review.map(Review::getImg1).orElse("");
+                    return GetStoreInfoResponse.builder()
+                            .storeId(result.getStoreId())
+                            .storeName(result.getStoreName())
+                            .categoryName(result.getCategory().getCategoryName())
+                            .address(result.getAddress())
+                            .reviewImg(reviewImg)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }
