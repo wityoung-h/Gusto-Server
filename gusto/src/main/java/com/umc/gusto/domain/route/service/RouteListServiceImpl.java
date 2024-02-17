@@ -80,10 +80,21 @@ public class RouteListServiceImpl implements RouteListService{
     @Transactional
     @Override
     public void deleteRouteList(Long routeListId, User user) {
-        RouteList routeList = routeListRepository.findById(routeListId).orElseThrow(() -> new NotFoundException(Code.ROUTELIST_NOT_FOUND));
-        routeListRepository.delete(routeList);
+        RouteList deleteRouteList = routeListRepository.findById(routeListId).orElseThrow(() -> new NotFoundException(Code.ROUTELIST_NOT_FOUND));
+        routeListRepository.delete(deleteRouteList);
 
+        Route route = routeRepository.findRouteByRouteIdAndStatus(deleteRouteList.getRoute().getRouteId(), BaseEntity.Status.ACTIVE)
+                .orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
+
+        List<RouteList> routeLists = routeListRepository.findByRoute(route);
+        for (RouteList list : routeLists) {
+            // 삭제된 아이템의 순서보다 큰 아이템들의 순서를 조정
+            if(deleteRouteList.getOrdinal()< list.getOrdinal() && list.getOrdinal() >1)
+                list.updateOrdinal(list.getOrdinal()-1);
+
+        }
     }
+
 
     @Override
     public List<RouteListResponse.RouteList> getRouteListDistance(Long routeId) {

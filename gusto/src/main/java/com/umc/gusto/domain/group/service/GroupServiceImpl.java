@@ -49,9 +49,7 @@ public class GroupServiceImpl implements GroupService{
     private final InvitationCodeRepository invitationCodeRepository;
     private final GroupListRepository groupListRepository;
     private final RouteRepository routeRepository;
-  
     private static final int INVITE_CODE_LENGTH = 12;
-
     private final StoreRepository storeRepository;
     private final ReviewRepository reviewRepository;
 

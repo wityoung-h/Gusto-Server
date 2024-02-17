@@ -49,7 +49,7 @@ public class RouteController {
     }
 
     // 그룹 내 루트 조회
-    @GetMapping("/{groupId}")
+    @GetMapping("/groups/{groupId}")
     public ResponseEntity<List<RouteResponse.RouteResponseDto>> allMyRoute(@PathVariable Long groupId){
         List<RouteResponse.RouteResponseDto> route = routeService.getGroupRoute(groupId);
         return ResponseEntity.ok().body(route);

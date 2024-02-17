@@ -77,6 +77,9 @@ public class RouteServiceImpl implements RouteService{
 
     @Override
     public List<RouteResponse.RouteResponseDto> getRoute(User user) {
+        //TODO 유저 관련 에러처리 추가하기
+        //TODO: 유저 활성화 설정 반영
+
         List<Route> routes = routeRepository.findRouteByUserAndStatus(user, BaseEntity.Status.ACTIVE);
         return routes.stream().map(
                         Route -> RouteResponse.RouteResponseDto.builder()
