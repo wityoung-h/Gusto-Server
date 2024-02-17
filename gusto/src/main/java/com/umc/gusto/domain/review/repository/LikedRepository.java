@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface LikedRepository extends JpaRepository<Liked, Long> {
     Optional<Liked> findByUserAndReview(User user, Review review);
+    boolean existsByUserAndReview(User user, Review review);
 }

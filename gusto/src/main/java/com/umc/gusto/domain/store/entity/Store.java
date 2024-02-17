@@ -24,9 +24,11 @@ public class Store extends BaseTime {
     @Column(columnDefinition = "VARCHAR(30)")
     private String storeName;
 
-    private Float longitude;
+    @Column(columnDefinition = "DOUBLE(17,14)")
+    private Double longitude;
 
-    private Float latitude;
+    @Column(columnDefinition = "DOUBLE(17,15)")
+    private Double latitude;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "categoryId")
