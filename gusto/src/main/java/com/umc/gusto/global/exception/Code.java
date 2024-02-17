@@ -13,9 +13,8 @@ public enum Code {
 
     //User 관련 에러 +0
     USER_DUPLICATE_NICKNAME(HttpStatus.CONFLICT, 409001, "이미 사용중인 닉네임입니다."),
-    DONT_EXIST_USER(HttpStatus.NOT_FOUND, 404001, "존재하지 않는 유저입니다."),
-    USER_ALREADY_SIGNUP(HttpStatus.CONFLICT, 409003, "가입이 완료된 유저입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 404001, "존재하지 않는 유저입니다."),
+    USER_ALREADY_SIGNUP(HttpStatus.CONFLICT, 409003, "가입이 완료된 유저입니다."),
     USER_FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, 404002, "팔로우한 유저가 아닙니다."),
     USER_FOLLOW_NO_MORE_CONTENT(HttpStatus.NOT_FOUND, 404003, "리스트가 더이상 존재하지 않습니다."),
     USER_FOLLOW_ALREADY(HttpStatus.CONFLICT, 409002, "이미 팔로우했습니다."),
@@ -43,6 +42,7 @@ public enum Code {
     ROUTE_ORDINAL_BAD_REQUEST(HttpStatus.BAD_REQUEST,403304,"루트 내 이동 경로는 1부터 6까지만 가능합니다"),
     ROUTE_MYROUTE_BAD_REQUEST(HttpStatus.BAD_REQUEST,403305,"내 루트는 최소 1개 이상의 경로를 포함해야 합니다."),
     ROUTELIST_TO_MANY_REQUEST(HttpStatus.TOO_MANY_REQUESTS,403306,"루트 내 상점 항목은 최대 6개까지 가능합니다."),
+    NO_PUBLIC_ROUTE(HttpStatus.FORBIDDEN,403307,"해당 루트는 비공개 상태입니다."),
 
     //Group 관련 에러 +4
     FIND_FAIL_GROUP(HttpStatus.NOT_FOUND, 404401, "존재하지 않는 그룹입니다."),
