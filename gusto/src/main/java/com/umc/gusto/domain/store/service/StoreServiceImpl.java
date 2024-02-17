@@ -218,7 +218,7 @@ public class StoreServiceImpl implements StoreService{
                     return GetStoreInfoResponse.builder()
                             .storeId(result.getStoreId())
                             .storeName(result.getStoreName())
-                            .categoryName(result.getCategory().getCategoryName())
+                            .categoryName(result.getCategoryString())
                             .address(result.getAddress())
                             .reviewImg(reviewImg)
                             .build();
