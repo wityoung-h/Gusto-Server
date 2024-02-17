@@ -33,23 +33,22 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT r.img1 FROM Review r WHERE r.store.storeId = :storeId ORDER BY r.liked DESC")
     List<String> findTopReviewImageByStoreId(Long storeId);
 
-    //리뷰 crud
     Optional<Review> findByReviewIdAndStatus(Long reviewId, BaseEntity.Status status);
-    Optional<Page<Review>> findAllByUser(User user, PageRequest pageRequest);
-    Optional<Page<Review>> findAllByUserAndReviewIdLessThan(User user, Long reviewId,PageRequest pageRequest);
-    List<Review> findByUserAndVisitedAtBetween(User user, LocalDate startDate, LocalDate lastDate);
+    Optional<Page<Review>> findAllByUserAndStatus(User user, BaseEntity.Status status, PageRequest pageRequest);
+    Optional<Page<Review>> findAllByUserAndStatusAndReviewIdLessThan(User user, BaseEntity.Status status, Long reviewId,PageRequest pageRequest);
+    List<Review> findByUserAndStatusAndVisitedAtBetween(User user, BaseEntity.Status status, LocalDate startDate, LocalDate lastDate);
 
     boolean existsByUserAndReviewIdLessThan(User user, Long reviewId);
-    @Query(value = "SELECT * FROM review r WHERE r.user_id <> :user ORDER BY RAND() limit 15", nativeQuery = true)
+    @Query(value = "SELECT * FROM review r WHERE r.user_id <> :user AND r.status = 'ACTIVE' ORDER BY RAND() limit 15", nativeQuery = true)
     List<Review> findRandomFeedByUser(@Param("user") UUID user); //WHERE r.user_id <> :userZ
 
     boolean existsByStoreAndUserNickname(Store store, String nickname);
 
     //검색 기능
-    @Query("SELECT r FROM Review r WHERE r.store.storeName like concat('%', :keyword, '%') OR r.comment like concat('%', :keyword, '%')")
+    @Query("SELECT r FROM Review r WHERE r.status = 'ACTIVE' AND r.store.storeName like concat('%', :keyword, '%') OR r.comment like concat('%', :keyword, '%')")
     List<Review> searchByStoreContains(String keyword); //TODO: 후에 페이징 처리 하기
-    @Query("SELECT t.review FROM Tagging t WHERE t.review.store.storeName like concat('%', :keyword, '%') AND t.hashTag.hasTagId = :hashTagId")
+    @Query("SELECT t.review FROM Tagging t WHERE t.review.status = 'ACTIVE' AND t.review.store.storeName like concat('%', :keyword, '%') AND t.hashTag.hasTagId = :hashTagId")
     List<Review> searchByStoreAndHashTagContains(String keyword, Long hashTagId);
-    @Query("SELECT t.review FROM Tagging t WHERE t.hashTag.hasTagId = :hashTagId")
+    @Query("SELECT t.review FROM Tagging t WHERE t.review.status = 'ACTIVE' AND t.hashTag.hasTagId = :hashTagId")
     List<Review> searchByHashTagContains(Long hashTagId);
 }
