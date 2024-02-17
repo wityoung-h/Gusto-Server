@@ -3,6 +3,7 @@ package com.umc.gusto.domain.review.repository;
 import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.global.common.BaseEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,6 +30,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     boolean existsByReviewIdAndUser(Long reviewId, User user);
     Integer countByStoreAndUserNickname(Store store, String nickname);      // 방문횟수는 리뷰 공개여부과 상관 X
     Integer countByStoreAndUser(Store store, User user);
+    @Query("SELECT r.img1 FROM Review r WHERE r.store.storeId = :storeId ORDER BY r.liked DESC")
+    List<String> findTopReviewImageByStoreId(Long storeId);
+
+    //리뷰 crud
+    Optional<Review> findByReviewIdAndStatus(Long reviewId, BaseEntity.Status status);
     Optional<Page<Review>> findAllByUser(User user, PageRequest pageRequest);
     Optional<Page<Review>> findAllByUserAndReviewIdLessThan(User user, Long reviewId,PageRequest pageRequest);
     List<Review> findByUserAndVisitedAtBetween(User user, LocalDate startDate, LocalDate lastDate);

@@ -84,7 +84,7 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     @Transactional
     public void updateReview(Long reviewId, List<MultipartFile> images, UpdateReviewRequest updateReviewRequest) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+        Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
 
         //방문일자 변경
         if(updateReviewRequest.getVisitedAt()!=null){
