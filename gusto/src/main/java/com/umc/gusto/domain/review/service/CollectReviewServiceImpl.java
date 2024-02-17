@@ -65,7 +65,7 @@ public class CollectReviewServiceImpl implements CollectReviewService{
   
     @Override
     public CollectReviewsOfInstaResponse getOthersReview(String nickName, Long reviewId, int size) {
-        User other = userRepository.findByNicknameAndMemberStatusIs(nickName, User.MemberStatus.ACTIVE).orElseThrow(()-> new NotFoundException(Code.DONT_EXIST_USER));
+        User other = userRepository.findByNicknameAndMemberStatusIs(nickName, User.MemberStatus.ACTIVE).orElseThrow(()-> new NotFoundException(Code.USER_NOT_FOUND));
         //다른 유저의 공개 여부 확인
         if(!other.getPublishReview().equals(PublishStatus.PUBLIC)){
             throw new PrivateItemException(Code.NO_PUBLIC_REVIEW);

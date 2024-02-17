@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService{
             target = user;
         } else {
             target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
-                    .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
+                    .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
         }
 
         AtomicBoolean followed = new AtomicBoolean(false);
