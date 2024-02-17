@@ -18,7 +18,7 @@ public class ReviewDetailResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String menuName;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    String hashTags;
+    List<Long> hashTags;
     Integer taste;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     Integer spiciness;
@@ -32,7 +32,7 @@ public class ReviewDetailResponse {
     String comment;
     Integer likeCnt;
 
-    public static ReviewDetailResponse of(Review review, String hashTags){
+    public static ReviewDetailResponse of(Review review, List<Long> hashTags){
         return ReviewDetailResponse.builder()
                 .storeId(review.getStore().getStoreId())
                 .storeName(review.getStore().getStoreName())
@@ -40,23 +40,6 @@ public class ReviewDetailResponse {
                 .images(review.getImageList())
                 .menuName(review.getMenuName())
                 .hashTags(hashTags)
-                .taste(review.getTaste())
-                .spiciness(review.getSpiciness())
-                .mood(review.getMood())
-                .toilet(review.getToilet())
-                .parking(review.getParking())
-                .comment(review.getComment())
-                .likeCnt(review.getLiked())
-                .build();
-    }
-
-    public static ReviewDetailResponse of(Review review){
-        return ReviewDetailResponse.builder()
-                .storeId(review.getStore().getStoreId())
-                .storeName(review.getStore().getStoreName())
-                .visitedAt(review.getVisitedAt())
-                .images(review.getImageList())
-                .menuName(review.getMenuName())
                 .taste(review.getTaste())
                 .spiciness(review.getSpiciness())
                 .mood(review.getMood())
