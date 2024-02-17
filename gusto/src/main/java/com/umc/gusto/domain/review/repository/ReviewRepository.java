@@ -27,7 +27,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT r FROM Review r WHERE r.status = 'ACTIVE' AND r.user.publishReview = 'PUBLIC' AND r.store = :store AND r.reviewId < :reviewId ORDER BY r.reviewId DESC")
     List<Review> findReviewsAfterIdByStore(Store store, Long reviewId, Pageable pageable);
     boolean existsByReviewIdAndUser(Long reviewId, User user);
+    @Query("SELECT count(r.reviewId) FROM Review r WHERE r.status = 'ACTIVE' AND r.store = :store AND r.user.nickname = :nickname")
     Integer countByStoreAndUserNickname(Store store, String nickname);      // 방문횟수는 리뷰 공개여부과 상관 X
+    @Query("SELECT count(r.reviewId) FROM Review r WHERE r.status = 'ACTIVE' AND r.store = :store AND r.user = :user")
     Integer countByStoreAndUser(Store store, User user);
     @Query("SELECT r.img1 FROM Review r WHERE r.store.storeId = :storeId ORDER BY r.liked DESC")
     List<String> findTopReviewImageByStoreId(Long storeId);
