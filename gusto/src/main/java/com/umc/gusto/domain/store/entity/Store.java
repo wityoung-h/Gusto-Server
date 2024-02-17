@@ -24,7 +24,7 @@ public class Store extends BaseTime {
     @Column(columnDefinition = "VARCHAR(30)")
     private String storeName;
 
-    @Column(columnDefinition = "DOUBLE(17,15)")
+    @Column(columnDefinition = "DOUBLE(17,14)")
     private Double longitude;
 
     @Column(columnDefinition = "DOUBLE(17,15)")
@@ -33,9 +33,6 @@ public class Store extends BaseTime {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "categoryId")
     private Category category;
-
-    @Column(columnDefinition = "VARCHAR(20)")
-    private String categoryString;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "stateId", nullable = false)
