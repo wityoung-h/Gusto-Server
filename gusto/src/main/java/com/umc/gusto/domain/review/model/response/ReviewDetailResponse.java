@@ -49,4 +49,21 @@ public class ReviewDetailResponse {
                 .likeCnt(review.getLiked())
                 .build();
     }
+
+    public static ReviewDetailResponse of(Review review){
+        return ReviewDetailResponse.builder()
+                .storeId(review.getStore().getStoreId())
+                .storeName(review.getStore().getStoreName())
+                .visitedAt(review.getVisitedAt())
+                .images(review.getImageList())
+                .menuName(review.getMenuName())
+                .taste(review.getTaste())
+                .spiciness(review.getSpiciness())
+                .mood(review.getMood())
+                .toilet(review.getToilet())
+                .parking(review.getParking())
+                .comment(review.getComment())
+                .likeCnt(review.getLiked())
+                .build();
+    }
 }

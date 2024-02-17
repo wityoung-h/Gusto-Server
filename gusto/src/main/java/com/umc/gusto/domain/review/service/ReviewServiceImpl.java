@@ -146,11 +146,16 @@ public class ReviewServiceImpl implements ReviewService{
             throw new PrivateItemException(Code.NO_PUBLIC_REVIEW);
         }
 
-        StringBuilder hashTags = new StringBuilder();
-        review.getTaggingSet().stream().map(r-> r.getHashTag().getHasTagId()).forEach(o-> hashTags.append(o).append(","));
-        //마지막 문자 , 제거
-        hashTags.deleteCharAt(hashTags.length()-1);
-        return ReviewDetailResponse.of(review, hashTags.toString());
+        boolean hashTagEmpty = review.getTaggingSet().isEmpty(); //true면 해시태그 없음
+        if(!hashTagEmpty) {
+            StringBuilder hashTags = new StringBuilder();
+            review.getTaggingSet().stream().map(r -> r.getHashTag().getHasTagId()).forEach(o -> hashTags.append(o).append(","));
+            //마지막 문자 , 제거
+            hashTags.deleteCharAt(hashTags.length() - 1);
+            return ReviewDetailResponse.of(review, hashTags.toString());
+        }else{
+            return ReviewDetailResponse.of(review);
+        }
     }
 
     @Override
