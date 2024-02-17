@@ -10,6 +10,7 @@ import com.umc.gusto.domain.route.repository.RouteRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
+import com.umc.gusto.global.common.PublishStatus;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
@@ -79,18 +80,23 @@ public class RouteServiceImpl implements RouteService{
 
     @Override
     public List<RouteResponse.RouteResponseDto> getRoute(User user) {
-        //TODO 유저 관련 에러처리 추가하기
         userRepository.findByNicknameAndMemberStatusIs(user.getNickname(), User.MemberStatus.ACTIVE)
                 .orElseThrow(()->new GeneralException(Code.DONT_EXIST_USER));
-        //TODO: 유저 활성화 설정 반영
 
         List<Route> routes = routeRepository.findRouteByUserAndStatus(user, BaseEntity.Status.ACTIVE);
-        return routes.stream().map(
-                        Route -> RouteResponse.RouteResponseDto.builder()
-                                .routeId(Route.getRouteId())
-                                .routeName(Route.getRouteName())
-                                .numStore(routeListRepository.countRouteListByRoute(Route))
-                                .build())
+
+        return routes.stream()
+                .map(route -> {
+                    // 유저 활성화 설정 변경
+                    if (!route.getUser().getPublishRoute().equals(PublishStatus.PUBLIC)) {
+                        throw new GeneralException(Code.NO_PUBLIC_ROUTE);
+                    }
+                    return RouteResponse.RouteResponseDto.builder()
+                            .routeId(route.getRouteId())
+                            .routeName(route.getRouteName())
+                            .numStore(routeListRepository.countRouteListByRoute(route))
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 

@@ -15,6 +15,7 @@ import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
+import com.umc.gusto.global.common.PublishStatus;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import com.umc.gusto.global.exception.customException.NotFoundException;
@@ -123,8 +124,13 @@ public class RouteListServiceImpl implements RouteListService{
             }
         }
 
-
         Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE).orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
+
+        //유저 활성화 설정 반영
+        if(!route.getUser().getPublishRoute().equals(PublishStatus.PUBLIC)){
+            throw new GeneralException(Code.NO_PUBLIC_ROUTE);
+        }
+
         List<RouteList> routeList = routeListRepository.findByRoute(route);
         List<RouteListResponse.RouteList> routeLists = routeList.stream().map(rL ->
                 RouteListResponse.RouteList.builder()
