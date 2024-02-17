@@ -89,7 +89,7 @@ public class RouteServiceImpl implements RouteService{
     @Override
     public List<RouteResponse> getRoute(User user) {
         userRepository.findByNicknameAndMemberStatusIs(user.getNickname(), User.MemberStatus.ACTIVE)
-                .orElseThrow(()->new GeneralException(Code.DONT_EXIST_USER));
+                .orElseThrow(()->new GeneralException(Code.USER_NOT_FOUND));
 
         List<Route> routes = routeRepository.findRouteByUserAndStatus(user, BaseEntity.Status.ACTIVE);
 

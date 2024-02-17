@@ -29,9 +29,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     boolean existsByReviewIdAndUser(Long reviewId, User user);
     Integer countByStoreAndUserNickname(Store store, String nickname);      // 방문횟수는 리뷰 공개여부과 상관 X
     Integer countByStoreAndUser(Store store, User user);
-    @Query("SELECT r.img1 FROM Review r WHERE r.store.storeId = :storeId ORDER BY r.liked DESC")
-    List<String> findTopReviewImageByStoreId(Long storeId);
-
     Optional<Page<Review>> findAllByUser(User user, PageRequest pageRequest);
     Optional<Page<Review>> findAllByUserAndReviewIdLessThan(User user, Long reviewId,PageRequest pageRequest);
     List<Review> findByUserAndVisitedAtBetween(User user, LocalDate startDate, LocalDate lastDate);

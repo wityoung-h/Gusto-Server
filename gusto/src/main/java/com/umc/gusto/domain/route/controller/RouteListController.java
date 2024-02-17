@@ -60,7 +60,11 @@ public class RouteListController {
         return ResponseEntity.ok().body(routeListService.getRouteListDistance(routeId));
     }
 
-    // 루트리스트 상세 조회
+    /**
+     * 내 루트/그룹 루트 상세 조회
+     * [GET] /routeLists/{routeId}
+     */
+    //
     @GetMapping("/{routeId}")
     public ResponseEntity<?> getRouteListDetail(
             @PathVariable Long routeId,
