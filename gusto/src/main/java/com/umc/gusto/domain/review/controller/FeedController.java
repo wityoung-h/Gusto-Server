@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,5 +26,11 @@ public class FeedController {
     @GetMapping("/search")
     public ResponseEntity<?> searchFeed(@RequestParam(name = "keyword", required = false) String keyword, @RequestParam(name = "hashTags", required = false) List<Long> hashTags){
         return ResponseEntity.status(HttpStatus.OK).body(feedService.searchFeed(keyword, hashTags));
+    }
+
+    @GetMapping("{reviewId}")
+    public ResponseEntity<?> getFeedDetail(@AuthenticationPrincipal AuthUser authUser, @PathVariable(name = "reviewId") Long reviewId){
+        User user = authUser.getUser();
+        return ResponseEntity.status(HttpStatus.OK).body(feedService.getFeedDetail(user, reviewId));
     }
 }
