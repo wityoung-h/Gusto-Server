@@ -64,8 +64,8 @@ public class FeedServiceImpl implements FeedService{
         hashTags.deleteCharAt(hashTags.length()-1);
 
         //이 리뷰를 보는 유저가 해당 리뷰를 좋아요했는지 체크
-        boolean liked = likedRepository.existsByUserAndReview(user, review);
+        boolean likeCheck = likedRepository.existsByUserAndReview(user, review);
 
-        return FeedDetailResponse.of(review, hashTags.toString(), liked);
+        return FeedDetailResponse.of(review, hashTags.toString(), likeCheck);
     }
 }
