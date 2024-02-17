@@ -34,6 +34,9 @@ public class Store extends BaseTime {
     @JoinColumn(name = "categoryId")
     private Category category;
 
+    @Column(nullable = false)
+    private String categoryString;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "stateId", nullable = false)
     private State state;
