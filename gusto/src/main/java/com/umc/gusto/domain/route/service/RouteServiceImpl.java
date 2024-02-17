@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -128,9 +129,14 @@ public class RouteServiceImpl implements RouteService{
     @Transactional
     @Override
     public void modifyRouteList(Long routeId, ModifyRouteRequest request) {
+
+        // 루트 리스트.size()가 null 일때,즉 루트명만 수정 시
+        if (request.getRouteList() == null) {
+            // 빈 리스트로 routeList를 초기화합니다.
+            request.setRouteList(Collections.emptyList());
+        }
+
         // 루트리스트 갯수가 6개 이하인지 확인
-        // TODO: 루트 리스트.size()가 null 일때,즉 입력 시 루트리스트가 없을 때
-        
         if (request.getRouteList().size() >= 7) {
             throw new GeneralException(Code.ROUTELIST_TO_MANY_REQUEST);
         }
