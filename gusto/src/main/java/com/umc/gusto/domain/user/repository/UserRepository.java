@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
-    User findByNickname(String nickname);
 
     Optional<User> findByUserIdAndMemberStatusIs(UUID uuid, User.MemberStatus status);
 

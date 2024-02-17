@@ -8,6 +8,7 @@ import com.umc.gusto.domain.route.model.response.RouteResponse;
 import com.umc.gusto.domain.route.repository.RouteListRepository;
 import com.umc.gusto.domain.route.repository.RouteRepository;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
@@ -27,6 +28,7 @@ public class RouteServiceImpl implements RouteService{
     private final GroupRepository groupRepository;
     private final RouteListRepository routeListRepository;
     private final RouteListService routeListService;
+    private final UserRepository userRepository;
 
     @Transactional
     @Override
@@ -78,6 +80,8 @@ public class RouteServiceImpl implements RouteService{
     @Override
     public List<RouteResponse.RouteResponseDto> getRoute(User user) {
         //TODO 유저 관련 에러처리 추가하기
+        userRepository.findByNicknameAndMemberStatusIs(user.getNickname(), User.MemberStatus.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.DONT_EXIST_USER));
         //TODO: 유저 활성화 설정 반영
 
         List<Route> routes = routeRepository.findRouteByUserAndStatus(user, BaseEntity.Status.ACTIVE);
