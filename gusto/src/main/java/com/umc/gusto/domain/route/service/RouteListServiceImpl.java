@@ -7,6 +7,7 @@ import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.route.entity.RouteList;
 import com.umc.gusto.domain.route.model.request.RouteListRequest;
 import com.umc.gusto.domain.route.model.response.RouteListResponse;
+import com.umc.gusto.domain.route.model.response.RouteRouteListResponse;
 import com.umc.gusto.domain.route.repository.RouteListRepository;
 import com.umc.gusto.domain.route.repository.RouteRepository;
 import com.umc.gusto.domain.store.repository.StoreRepository;
@@ -35,7 +36,7 @@ public class RouteListServiceImpl implements RouteListService{
 
     @Transactional
     @Override
-    public void createRouteList(Route route, List<RouteListRequest.createRouteListDto> request) {
+    public void createRouteList(Route route, List<RouteListRequest> request) {
         //루트리스트 생성
         request.forEach(dto -> {
             if(dto.getOrdinal() >= 1 && dto.getOrdinal() <= 6){
@@ -53,7 +54,7 @@ public class RouteListServiceImpl implements RouteListService{
     // 루트리스트만 추가
     @Transactional
     @Override
-    public void createRouteList(Long groupId,Long routeId, List<RouteListRequest.createRouteListDto> request,User user) {
+    public void createRouteList(Long groupId,Long routeId, List<RouteListRequest> request,User user) {
         if(groupId != null){
             Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
                     .orElseThrow(() -> new GeneralException(Code.FIND_FAIL_GROUP));
@@ -95,11 +96,11 @@ public class RouteListServiceImpl implements RouteListService{
 
 
     @Override
-    public List<RouteListResponse.RouteList> getRouteListDistance(Long routeId) {
+    public List<RouteListResponse> getRouteListDistance(Long routeId) {
         Route route = routeRepository.findRouteByRouteIdAndStatus(routeId,BaseEntity.Status.ACTIVE).orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
         List<RouteList> routeList = routeListRepository.findByRoute(route);
         return  routeList.stream().map(rL ->
-                RouteListResponse.RouteList.builder()
+                RouteListResponse.builder()
                         .longitude(rL.getStore().getLongitude())
                         .latitude(rL.getStore().getLatitude())
                         .routeListId(rL.getRouteListId())
@@ -111,7 +112,7 @@ public class RouteListServiceImpl implements RouteListService{
     }
 
     @Override
-    public RouteListResponse.RouteListResponseDto getRouteListDetail(Long routeId,User user, Long groupId) {
+    public RouteRouteListResponse getRouteListDetail(Long routeId, User user, Long groupId) {
         // 그룹 내 루트 상세 조회인 경우에만
         if(groupId != null){
             Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
@@ -129,8 +130,8 @@ public class RouteListServiceImpl implements RouteListService{
         }
 
         List<RouteList> routeList = routeListRepository.findByRoute(route);
-        List<RouteListResponse.RouteList> routeLists = routeList.stream().map(rL ->
-                RouteListResponse.RouteList.builder()
+        List<RouteListResponse> routeLists = routeList.stream().map(rL ->
+                RouteListResponse.builder()
                         .routeListId(rL.getRouteListId())
                         .storeId(rL.getStore().getStoreId())
                         .storeName(rL.getStore().getStoreName())
@@ -139,7 +140,7 @@ public class RouteListServiceImpl implements RouteListService{
                         .build()
         ).toList();
 
-        return RouteListResponse.RouteListResponseDto.builder()
+        return RouteRouteListResponse.builder()
                 .routeId(route.getRouteId())
                 .routeName(route.getRouteName())
                 .routes(routeLists)

@@ -29,7 +29,7 @@ public class RouteListController {
     public ResponseEntity<?> createRouteList
     (@PathVariable Long routeId,
      @RequestParam(required = false) Long groupId,
-     @RequestBody @Valid List<RouteListRequest.createRouteListDto> request,
+     @RequestBody @Valid List<RouteListRequest> request,
      @AuthenticationPrincipal AuthUser authUSer
     ){
         routeListService.createRouteList(groupId,routeId,request,authUSer.getUser());
@@ -54,7 +54,7 @@ public class RouteListController {
      * [GET] /routeLists/{routeId}/order
      */
     @GetMapping("/{routeId}/order")
-    public ResponseEntity<List<RouteListResponse.RouteList>> getRouteListOrder(
+    public ResponseEntity<List<RouteListResponse>> getRouteListOrder(
             @PathVariable Long routeId)
     {
         return ResponseEntity.ok().body(routeListService.getRouteListDistance(routeId));

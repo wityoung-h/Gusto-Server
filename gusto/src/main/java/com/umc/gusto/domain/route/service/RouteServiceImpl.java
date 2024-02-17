@@ -41,7 +41,7 @@ public class RouteServiceImpl implements RouteService{
 
     @Transactional
     @Override
-    public void createRoute(RouteRequest.createRouteDto request,User user) {
+    public void createRoute(RouteRequest request,User user) {
         // 루트명은 내 루트명 중에서 중복 불가능
         if (routeRepository.existsByRouteName(request.getRouteName(),BaseEntity.Status.ACTIVE,user)) {
             throw new GeneralException(Code.ROUTE_DUPLICATE_ROUTENAME);
@@ -87,7 +87,7 @@ public class RouteServiceImpl implements RouteService{
     }
 
     @Override
-    public List<RouteResponse.RouteResponseDto> getRoute(User user) {
+    public List<RouteResponse> getRoute(User user) {
         userRepository.findByNicknameAndMemberStatusIs(user.getNickname(), User.MemberStatus.ACTIVE)
                 .orElseThrow(()->new GeneralException(Code.DONT_EXIST_USER));
 
@@ -99,7 +99,7 @@ public class RouteServiceImpl implements RouteService{
                     if (!route.getUser().getPublishRoute().equals(PublishStatus.PUBLIC)) {
                         throw new GeneralException(Code.NO_PUBLIC_ROUTE);
                     }
-                    return RouteResponse.RouteResponseDto.builder()
+                    return RouteResponse.builder()
                             .routeId(route.getRouteId())
                             .routeName(route.getRouteName())
                             .numStore(routeListRepository.countRouteListByRoute(route))
@@ -109,7 +109,7 @@ public class RouteServiceImpl implements RouteService{
     }
 
     @Override
-    public List<RouteResponse.RouteResponseDto> getGroupRoute(Long groupId) {
+    public List<RouteResponse> getGroupRoute(Long groupId) {
         // 그룹 존재 여부 확인
         Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
                 .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
@@ -117,7 +117,7 @@ public class RouteServiceImpl implements RouteService{
         //특정 그룹 내 루트 조회
         List<Route> routes = routeRepository.findRoutesByGroupAndStatus(group,BaseEntity.Status.ACTIVE);
         return routes.stream().map(
-                        Route -> RouteResponse.RouteResponseDto.builder()
+                        Route -> RouteResponse.builder()
                                 .routeId(Route.getRouteId())
                                 .routeName(Route.getRouteName())
                                 .numStore(routeListRepository.countRouteListByRoute(Route))

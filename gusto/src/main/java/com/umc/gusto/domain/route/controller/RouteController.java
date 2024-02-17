@@ -27,7 +27,7 @@ public class RouteController {
     // 루트 생성
     @PostMapping("")
     public ResponseEntity<?> createRoute(
-            @RequestBody RouteRequest.createRouteDto request,
+            @RequestBody RouteRequest request,
             @AuthenticationPrincipal AuthUser authUSer)
     {
         routeService.createRoute(request,authUSer.getUser());
@@ -52,10 +52,10 @@ public class RouteController {
      * [GET] /routes
      */
     @GetMapping("")
-    public ResponseEntity<List<RouteResponse.RouteResponseDto>> allMyRoute(
+    public ResponseEntity<List<RouteResponse>> allMyRoute(
             @AuthenticationPrincipal AuthUser authUSer
     ){
-        List<RouteResponse.RouteResponseDto> route = routeService.getRoute(authUSer.getUser());
+        List<RouteResponse> route = routeService.getRoute(authUSer.getUser());
         return ResponseEntity.ok().body(route);
     }
 
@@ -64,8 +64,8 @@ public class RouteController {
      * [GET] /routes/groups{groupId}
      */
     @GetMapping("/groups/{groupId}")
-    public ResponseEntity<List<RouteResponse.RouteResponseDto>> allMyRoute(@PathVariable Long groupId){
-        List<RouteResponse.RouteResponseDto> route = routeService.getGroupRoute(groupId);
+    public ResponseEntity<List<RouteResponse>> allMyRoute(@PathVariable Long groupId){
+        List<RouteResponse> route = routeService.getGroupRoute(groupId);
         return ResponseEntity.ok().body(route);
     }
 
