@@ -134,13 +134,13 @@ public class ReviewServiceImpl implements ReviewService{
 
     @Override
     public void deleteReview(Long reviewId) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+        Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
         review.updateStatus(BaseEntity.Status.INACTIVE);
     }
 
     @Override
     public ReviewDetailResponse getReview(Long reviewId) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+        Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
         //TODO: 후에 각 리뷰마다의 공개, 비공개를 확인해서 주는거로 수정하기
         if(!review.getUser().getPublishReview().equals(PublishStatus.PUBLIC)){
             throw new PrivateItemException(Code.NO_PUBLIC_REVIEW);
@@ -162,7 +162,7 @@ public class ReviewServiceImpl implements ReviewService{
     @Transactional
     public void likeReview(User user, Long reviewId) {
 
-        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+        Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
 
         //본인 리뷰를 좋아요하는지 확인
         if(review.getUser().getUserId().equals(user.getUserId())){ //TODO: .equals로 하는 동등성 비교가 안되서 DB의 @ID를 비교하는 식으로 했으나 비즈니스 키로 equals를 구현해보자.
@@ -178,7 +178,7 @@ public class ReviewServiceImpl implements ReviewService{
 
     @Override
     public void unlikeReview(User user, Long reviewId) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+        Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
 
         //해당 리뷰를 좋아요 클릭한 적이 있는지 확인
         Liked liked = likedRepository.findByUserAndReview(user, review).orElseThrow(()->new GeneralException(Code.NO_LIKE_REVIEW));
