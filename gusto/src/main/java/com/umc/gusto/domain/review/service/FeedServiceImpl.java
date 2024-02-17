@@ -58,14 +58,14 @@ public class FeedServiceImpl implements FeedService{
             throw new PrivateItemException(Code.NO_PUBLIC_REVIEW);
         }
 
-        StringBuilder hashTags = new StringBuilder();
-        review.getTaggingSet().stream().map(r-> r.getHashTag().getHasTagId()).forEach(o-> hashTags.append(o).append(","));
-        //마지막 문자 , 제거
-        hashTags.deleteCharAt(hashTags.length()-1);
+        List<Long> hashTags = new ArrayList<>();
+        review.getTaggingSet().stream().map(r-> r.getHashTag().getHasTagId()).forEach(hashTags::add);
 
         //이 리뷰를 보는 유저가 해당 리뷰를 좋아요했는지 체크
         boolean likeCheck = likedRepository.existsByUserAndReview(user, review);
 
-        return FeedDetailResponse.of(review, hashTags.toString(), likeCheck);
+        //리뷰에 해시태그가 없다면 response에 해시태그 없이 반환
+        if(hashTags.isEmpty()) return FeedDetailResponse.of(review, null, likeCheck);
+        return FeedDetailResponse.of(review, hashTags, likeCheck);
     }
 }
