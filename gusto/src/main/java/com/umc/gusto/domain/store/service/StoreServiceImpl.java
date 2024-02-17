@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +36,7 @@ public class StoreServiceImpl implements StoreService{
     public GetStoreResponse getStore(User user, Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
+        Long pinId = pinRepository.findByUserAndStoreStoreId(user, storeId);
         List<OpeningHours> openingHoursList = openingHoursRepository.findByStoreStoreId(storeId);
 
         Map<OpeningHours.BusinessDay, GetStoreResponse.Timing> businessDays = new LinkedHashMap<>();
@@ -51,15 +51,18 @@ public class StoreServiceImpl implements StoreService{
         List<Review> top3Reviews = reviewRepository.findFirst3ByStoreOrderByLikedDesc(store);
 
         List<String> reviewImg = top3Reviews.stream()
-                .map(Review::getImg1)
+                .map(review -> Optional.ofNullable(review.getImg1()).orElse(""))
                 .collect(Collectors.toList());
-
         boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
+
         return GetStoreResponse.builder()
+                .pinId(pinId)
                 .storeId(storeId)
                 .storeName(store.getStoreName())
                 .address(store.getAddress())
+                .longitude(store.getLongitude())
+                .latitude(store.getLatitude())
                 .businessDay(businessDays)
                 .reviewImg3(reviewImg)
                 .pin(isPinned)
@@ -73,11 +76,12 @@ public class StoreServiceImpl implements StoreService{
                 .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
         Category category = storeRepository.findCategoryByStoreId(storeId)
                 .orElseThrow(() -> new GeneralException(Code.CATEGORY_NOT_FOUND));
+        Long pinId = pinRepository.findByUserAndStoreStoreId(user, storeId);
 
         List<Review> top4Reviews = reviewRepository.findFirst4ByStoreOrderByLikedDesc(store);
 
         List<String> reviewImg = top4Reviews.stream()
-                .map(Review::getImg1)
+                .map(review -> Optional.ofNullable(review.getImg1()).orElse(""))
                 .collect(Collectors.toList());
 
         // reviews 페이징 처리 (3,6,6...)
@@ -114,6 +118,7 @@ public class StoreServiceImpl implements StoreService{
         boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
         return GetStoreDetailResponse.builder()
+                .pinId(pinId)
                 .storeId(storeId)
                 .categoryName(category.getCategoryName())
                 .storeName(store.getStoreName())
@@ -162,7 +167,7 @@ public class StoreServiceImpl implements StoreService{
         for (Pin pin : pins){
             Store store = pin.getStore();
             Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(store);
-            String reviewImg = topReviewOptional.map(Review::getImg1).orElse(null);
+            String reviewImg = topReviewOptional.map(Review::getImg1).orElse("");
             boolean hasVisited = reviewRepository.existsByStoreAndUserNickname(store, user.getNickname());
 
             GetStoreInfoResponse getStoreInfoResponse = GetStoreInfoResponse.builder()
@@ -200,5 +205,24 @@ public class StoreServiceImpl implements StoreService{
                 .build();
 
         return Collections.singletonList(pinStoreResponse);
+    }
+
+    @Override
+    public List<GetStoreInfoResponse> searchStore(String keyword) {
+        List<Store> searchResult = storeRepository.findByStoreNameContains(keyword);
+
+        return searchResult.stream()
+                .map(result -> {
+                    Optional<Review> review = reviewRepository.findFirstByStoreOrderByLikedDesc(result);
+                    String reviewImg = review.map(Review::getImg1).orElse("");
+                    return GetStoreInfoResponse.builder()
+                            .storeId(result.getStoreId())
+                            .storeName(result.getStoreName())
+                            .categoryName(result.getCategory().getCategoryName())
+                            .address(result.getAddress())
+                            .reviewImg(reviewImg)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }

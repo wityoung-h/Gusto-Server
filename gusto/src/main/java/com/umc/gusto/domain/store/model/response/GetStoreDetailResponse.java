@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.store.model.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetStoreDetailResponse{
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    Long pinId;
     Long storeId;
     String categoryName;
     String storeName;

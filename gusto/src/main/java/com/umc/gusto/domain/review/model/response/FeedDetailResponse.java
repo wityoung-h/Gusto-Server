@@ -5,15 +5,18 @@ import com.umc.gusto.domain.review.entity.Review;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Builder
 @Getter
-public class ReviewDetailResponse {
+public class FeedDetailResponse {
     Long storeId;
     String storeName;
-    LocalDate visitedAt;
+    String address;
+    String nickName;
+    String profileImage;
+    Integer likeCnt;
+    boolean likeCheck;
     List<String> images;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String menuName;
@@ -30,13 +33,16 @@ public class ReviewDetailResponse {
     Integer parking;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String comment;
-    Integer likeCnt;
 
-    public static ReviewDetailResponse of(Review review, String hashTags){
-        return ReviewDetailResponse.builder()
+    public static FeedDetailResponse of(Review review, String hashTags, boolean likeCheck){
+        return FeedDetailResponse.builder()
                 .storeId(review.getStore().getStoreId())
                 .storeName(review.getStore().getStoreName())
-                .visitedAt(review.getVisitedAt())
+                .address(review.getStore().getAddress())
+                .nickName(review.getUser().getNickname())
+                .profileImage(review.getUser().getProfileImage())
+                .likeCnt(review.getLiked())
+                .likeCheck(likeCheck)
                 .images(review.getImageList())
                 .menuName(review.getMenuName())
                 .hashTags(hashTags)
@@ -46,24 +52,6 @@ public class ReviewDetailResponse {
                 .toilet(review.getToilet())
                 .parking(review.getParking())
                 .comment(review.getComment())
-                .likeCnt(review.getLiked())
-                .build();
-    }
-
-    public static ReviewDetailResponse of(Review review){
-        return ReviewDetailResponse.builder()
-                .storeId(review.getStore().getStoreId())
-                .storeName(review.getStore().getStoreName())
-                .visitedAt(review.getVisitedAt())
-                .images(review.getImageList())
-                .menuName(review.getMenuName())
-                .taste(review.getTaste())
-                .spiciness(review.getSpiciness())
-                .mood(review.getMood())
-                .toilet(review.getToilet())
-                .parking(review.getParking())
-                .comment(review.getComment())
-                .likeCnt(review.getLiked())
                 .build();
     }
 }
