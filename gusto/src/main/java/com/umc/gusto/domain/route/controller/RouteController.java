@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.route.controller;
 
+import com.umc.gusto.domain.route.model.request.ModifyRouteRequest;
 import com.umc.gusto.domain.route.model.request.RouteRequest;
 import com.umc.gusto.domain.route.model.response.RouteResponse;
 import com.umc.gusto.domain.route.service.RouteService;
@@ -19,6 +20,10 @@ import java.util.List;
 public class RouteController {
     private final RouteService routeService;
 
+    /**
+     * 루트 생성/그룹 내 루트 추가
+     * [POST] /routes
+     */
     // 루트 생성
     @PostMapping("")
     public ResponseEntity<?> createRoute(
@@ -29,7 +34,10 @@ public class RouteController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    // 루트 삭제
+    /**
+     * 내 루트 삭제
+     * [DELETE] /routes/{routeId}
+     */
     @DeleteMapping("/{routeId}")
     public ResponseEntity<?> deleteRoute(
             @PathVariable Long routeId,
@@ -39,7 +47,10 @@ public class RouteController {
         return ResponseEntity.ok().build();
     }
 
-    // 내 루트 조회
+    /**
+     * 내 루트 조회
+     * [GET] /routes
+     */
     @GetMapping("")
     public ResponseEntity<List<RouteResponse.RouteResponseDto>> allMyRoute(
             @AuthenticationPrincipal AuthUser authUSer
@@ -48,13 +59,25 @@ public class RouteController {
         return ResponseEntity.ok().body(route);
     }
 
-    // 그룹 내 루트 조회
+    /**
+     * 그룹 내 루트 목록
+     * [GET] /routes/groups{groupId}
+     */
     @GetMapping("/groups/{groupId}")
     public ResponseEntity<List<RouteResponse.RouteResponseDto>> allMyRoute(@PathVariable Long groupId){
         List<RouteResponse.RouteResponseDto> route = routeService.getGroupRoute(groupId);
         return ResponseEntity.ok().body(route);
     }
 
+    /**
+     * 루트 수정
+     * /{routeId}
+     */
+    @PatchMapping("/{routeId}")
+    public ResponseEntity<?> modifyRoute(@PathVariable Long routeId, @RequestBody ModifyRouteRequest request){
+        routeService.modifyRouteList(routeId,request);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
 
 
 
