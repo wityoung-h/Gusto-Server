@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -71,7 +72,7 @@ public class StoreServiceImpl implements StoreService{
 
 
     @Transactional(readOnly = true)
-    public GetStoreDetailResponse getStoreDetail(User user, Long storeId, Long reviewId, Pageable pageable) {
+    public GetStoreDetailResponse getStoreDetail(User user, Long storeId, LocalDate visitedAt, Long reviewId, Pageable pageable) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
         Category category = storeRepository.findCategoryByStoreId(storeId)
@@ -89,9 +90,9 @@ public class StoreServiceImpl implements StoreService{
         int pageNumber = pageable.getPageNumber();
         List<Review> reviews;
 
-        if (reviewId != null) {
+        if (reviewId != null && visitedAt != null) {
             pageSize = PAGE_SIZE;
-            reviews = reviewRepository.findReviewsAfterIdByStore(store, reviewId, PageRequest.of(pageNumber, pageSize));
+            reviews = reviewRepository.findReviewsAfterIdByStore(store, visitedAt, reviewId, PageRequest.of(pageNumber, pageSize));
         } else {
             pageSize = PAGE_SIZE_FIRST;
             reviews = reviewRepository.findFirstReviewsByStore(store, PageRequest.of(pageNumber, pageSize));
