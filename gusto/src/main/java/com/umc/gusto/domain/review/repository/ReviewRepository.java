@@ -41,16 +41,16 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByUserAndStatusAndVisitedAtBetween(User user, BaseEntity.Status status, LocalDate startDate, LocalDate lastDate);
 
     boolean existsByUserAndReviewIdLessThan(User user, Long reviewId);
-    @Query(value = "SELECT * FROM review r WHERE r.user_id <> :user AND r.status = 'ACTIVE' ORDER BY RAND() limit 15", nativeQuery = true)
+    @Query(value = "SELECT * FROM review r WHERE r.user_id <> :user AND r.status = 'ACTIVE' AND r.skip_check=false ORDER BY RAND() limit 15", nativeQuery = true)
     List<Review> findRandomFeedByUser(@Param("user") UUID user); //WHERE r.user_id <> :userZ
 
     boolean existsByStoreAndUserNickname(Store store, String nickname);
 
     //검색 기능
-    @Query("SELECT r FROM Review r WHERE r.status = 'ACTIVE' AND r.store.storeName like concat('%', :keyword, '%') OR r.comment like concat('%', :keyword, '%')")
+    @Query("SELECT r FROM Review r WHERE r.status = 'ACTIVE' AND r.skipCheck = false AND r.store.storeName like concat('%', :keyword, '%') OR r.comment like concat('%', :keyword, '%')")
     List<Review> searchByStoreContains(String keyword); //TODO: 후에 페이징 처리 하기
-    @Query("SELECT t.review FROM Tagging t WHERE t.review.status = 'ACTIVE' AND t.review.store.storeName like concat('%', :keyword, '%') AND t.hashTag.hasTagId = :hashTagId")
+    @Query("SELECT t.review FROM Tagging t WHERE t.review.status = 'ACTIVE' AND t.review.skipCheck=false AND t.review.store.storeName like concat('%', :keyword, '%') AND t.hashTag.hasTagId = :hashTagId")
     List<Review> searchByStoreAndHashTagContains(String keyword, Long hashTagId);
-    @Query("SELECT t.review FROM Tagging t WHERE t.review.status = 'ACTIVE' AND t.hashTag.hasTagId = :hashTagId")
+    @Query("SELECT t.review FROM Tagging t WHERE t.review.status = 'ACTIVE' AND t.review.skipCheck=false AND t.hashTag.hasTagId = :hashTagId")
     List<Review> searchByHashTagContains(Long hashTagId);
 }

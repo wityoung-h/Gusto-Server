@@ -5,10 +5,10 @@ plugins {
 }
 
 group = 'com.umc'
-version = '0.1.0-alpha.13-SNAPSHOT'
+version = '0.1.0-alpha.14-SNAPSHOT'
 
 java {
-	sourceCompatibility = '17'
+	sourceCompatibility = '17' 
 }
 
 configurations {

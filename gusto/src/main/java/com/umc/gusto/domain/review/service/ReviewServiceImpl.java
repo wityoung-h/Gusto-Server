@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,12 +51,16 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     public void createReview(User user, List<MultipartFile> images, CreateReviewRequest createReviewRequest) {
         Store store= storeRepository.findById(createReviewRequest.getStoreId()).orElseThrow(()-> new NotFoundException(Code.STORE_NOT_FOUND));
-
+        LocalDate visitedAt = createReviewRequest.getVisitedAt();
+        if(createReviewRequest.getVisitedAt()==null){
+            visitedAt = LocalDate.now();
+        }
         //리뷰 생성
         Review review = Review.builder()
+                .skipCheck(createReviewRequest.isSkipCheck())
                 .store(store)
                 .user(user)
-                .visitedAt(createReviewRequest.getVisitedAt())
+                .visitedAt(visitedAt)
                 .menuName(createReviewRequest.getMenuName())
                 .taste(createReviewRequest.getTaste())
                 .spiciness(createReviewRequest.getSpiciness())
