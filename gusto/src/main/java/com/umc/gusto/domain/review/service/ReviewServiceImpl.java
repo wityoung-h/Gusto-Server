@@ -135,6 +135,7 @@ public class ReviewServiceImpl implements ReviewService{
     public void deleteReview(Long reviewId) {
         Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
         review.updateStatus(BaseEntity.Status.INACTIVE);
+        reviewRepository.save(review);
     }
 
     @Override
