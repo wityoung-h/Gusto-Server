@@ -24,9 +24,6 @@ public interface RouteListService {
     List<RouteListResponse> getRouteListDistance(Long routeId);
 
     // 루트 상세 조회
-    RouteRouteListResponse getRouteListDetail(Long routeId, User user, Long groupId);
-
-    // 루트 상세 조회
-    RouteRouteListResponse getRouteListDetail(Long routeId,String nickname);
+    RouteRouteListResponse getRouteListDetail(Long routeId, User user, Long groupId, String nickname);
 
 }

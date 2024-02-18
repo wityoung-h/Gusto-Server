@@ -71,7 +71,7 @@ public class RouteController {
 
     /**
      * 루트 수정
-     * /{routeId}
+     * /routes/{routeId}
      */
     @PatchMapping("/{routeId}")
     public ResponseEntity<?> modifyRoute(@PathVariable Long routeId, @RequestBody ModifyRouteRequest request){
