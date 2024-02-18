@@ -16,7 +16,7 @@ public class GetStoreDetailResponse{
     @JsonInclude(JsonInclude.Include.NON_NULL)
     Long pinId;
     Long storeId;
-    String categoryName;
+    String categoryString;
     String storeName;
     String address;
     Boolean pin;        // 찜 여부

@@ -6,6 +6,7 @@ import com.umc.gusto.domain.store.service.StoreService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -45,12 +47,13 @@ public class StoreController {
     public ResponseEntity<GetStoreDetailResponse> getStoreDetail(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long storeId,
+            @RequestParam(name = "visitedAt", required = false) LocalDate visitedAt,
             @RequestParam(name = "reviewId", required = false) Long reviewId){
         User user = authUser.getUser();
         Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
 
         // 상점 세부 정보 가져오기
-        GetStoreDetailResponse getStoreDetail = storeService.getStoreDetail(user, storeId, reviewId, pageable);
+        GetStoreDetailResponse getStoreDetail = storeService.getStoreDetail(user, storeId, visitedAt, reviewId, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(getStoreDetail);
     }
 

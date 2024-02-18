@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -74,8 +75,7 @@ public class ReviewServiceImpl implements ReviewService{
 
         //리뷰와 해시태그 연결
         if(createReviewRequest.getHashTagId()!=null){
-            String[] hashTags = createReviewRequest.getHashTagId().split(",");
-            connectHashTag(review, hashTags);
+            createReviewRequest.getHashTagId().forEach(hashTag -> connectHashTag(review, hashTag));
         }
 
         reviewRepository.save(review);
@@ -84,7 +84,7 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     @Transactional
     public void updateReview(Long reviewId, List<MultipartFile> images, UpdateReviewRequest updateReviewRequest) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+        Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
 
         //방문일자 변경
         if(updateReviewRequest.getVisitedAt()!=null){
@@ -103,8 +103,7 @@ public class ReviewServiceImpl implements ReviewService{
             //기존 해시태그 지우기
             review.getTaggingSet().clear();
             //새로운 해시태그로 생성
-            String[] changeHashTags = updateReviewRequest.getHashTagId().split(",");
-            connectHashTag(review, changeHashTags);
+            updateReviewRequest.getHashTagId().forEach(changeHashTag -> connectHashTag(review, changeHashTag));
         }
         if(updateReviewRequest.getTaste()!=null){
             review.updateTaste(updateReviewRequest.getTaste());
@@ -134,35 +133,31 @@ public class ReviewServiceImpl implements ReviewService{
 
     @Override
     public void deleteReview(Long reviewId) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+        Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
         review.updateStatus(BaseEntity.Status.INACTIVE);
     }
 
     @Override
     public ReviewDetailResponse getReview(Long reviewId) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+        Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
         //TODO: 후에 각 리뷰마다의 공개, 비공개를 확인해서 주는거로 수정하기
         if(!review.getUser().getPublishReview().equals(PublishStatus.PUBLIC)){
             throw new PrivateItemException(Code.NO_PUBLIC_REVIEW);
         }
 
-        boolean hashTagEmpty = review.getTaggingSet().isEmpty(); //true면 해시태그 없음
-        if(!hashTagEmpty) {
-            StringBuilder hashTags = new StringBuilder();
-            review.getTaggingSet().stream().map(r -> r.getHashTag().getHasTagId()).forEach(o -> hashTags.append(o).append(","));
-            //마지막 문자 , 제거
-            hashTags.deleteCharAt(hashTags.length() - 1);
-            return ReviewDetailResponse.of(review, hashTags.toString());
-        }else{
-            return ReviewDetailResponse.of(review);
-        }
+        List<Long> hashTags = new ArrayList<>();
+        review.getTaggingSet().stream().map(r-> r.getHashTag().getHasTagId()).forEach(hashTags::add);
+
+        //리뷰에 해시태그가 없다면 response에 해시태그 없이 반환
+        if(hashTags.isEmpty()) ReviewDetailResponse.of(review, null);
+        return ReviewDetailResponse.of(review, hashTags);
     }
 
     @Override
     @Transactional
     public void likeReview(User user, Long reviewId) {
 
-        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+        Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
 
         //본인 리뷰를 좋아요하는지 확인
         if(review.getUser().getUserId().equals(user.getUserId())){ //TODO: .equals로 하는 동등성 비교가 안되서 DB의 @ID를 비교하는 식으로 했으나 비즈니스 키로 equals를 구현해보자.
@@ -178,7 +173,7 @@ public class ReviewServiceImpl implements ReviewService{
 
     @Override
     public void unlikeReview(User user, Long reviewId) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
+        Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
 
         //해당 리뷰를 좋아요 클릭한 적이 있는지 확인
         Liked liked = likedRepository.findByUserAndReview(user, review).orElseThrow(()->new GeneralException(Code.NO_LIKE_REVIEW));
@@ -188,15 +183,13 @@ public class ReviewServiceImpl implements ReviewService{
         reviewRepository.save(review);
     }
 
-    private void connectHashTag(Review review, String[] hashTags){
-        for(String hashTagId : hashTags){
-            HashTag hashTag = hashTagRepository.findById(Long.parseLong(hashTagId)).orElseThrow(()-> new NotFoundException(Code.HASHTAG_NOT_FOUND));
-            Tagging tagging = Tagging.builder()
-                    .hashTag(hashTag)
-                    .review(review)
-                    .build();
-            review.connectHashTag(tagging);
-        }
+    private void connectHashTag(Review review, Long hashTagId){
+        HashTag hashTag = hashTagRepository.findById(hashTagId).orElseThrow(()-> new NotFoundException(Code.HASHTAG_NOT_FOUND));
+        Tagging tagging = Tagging.builder()
+                .hashTag(hashTag)
+                .review(review)
+                .build();
+        review.connectHashTag(tagging);
     }
 
     private void updateImages(List<MultipartFile> images, Review review){
