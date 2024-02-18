@@ -33,6 +33,7 @@ public enum Code {
     NO_PUBLIC_REVIEW(HttpStatus.FORBIDDEN, 403204, "해당 리뷰는 private입니다."),
     NO_ONESELF_LIKE(HttpStatus.BAD_REQUEST, 400204, "자기자신의 리뷰는 좋아요할 수 없습니다."),
     NO_LIKE_REVIEW(HttpStatus.BAD_REQUEST, 400205, "해당 리뷰에 좋아요를 한 적이 없습니다."),
+    ALREADY_LIKED_REVIEW(HttpStatus.BAD_REQUEST, 400206, "이미 좋아요한 리뷰입니다. 좋아요를 클릭할 수 없습니다."),
 
     //Route 관련 에러 +3
     ROUTE_DUPLICATE_ROUTENAME(HttpStatus.CONFLICT, 409301,"이미 사용중인 루트명입니다."),
@@ -59,6 +60,7 @@ public enum Code {
     //myCategory 관련 에러 +5
     MY_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 404501, "존재하지 않는 카테고리입니다."),
     PIN_NOT_FOUND(HttpStatus.NOT_FOUND, 404502,"존재하지 않는 찜 입니다"),
+    PIN_ALREADY_EXISTS(HttpStatus.CONFLICT, 409502, "이미 해당 가게를 찜했습니다"),
     MY_CATEGORY_DUPLICATE_NAME(HttpStatus.CONFLICT, 409501, "이미 존재하는 카테고리입니다."),
     USER_NO_PERMISSION_FOR_MY_CATEGORY(HttpStatus.FORBIDDEN, 403501, "해당 유저는 해당 카테고리에 대한 권한이 없습니다."),
 
