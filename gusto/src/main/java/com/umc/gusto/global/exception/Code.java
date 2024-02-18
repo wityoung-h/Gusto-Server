@@ -54,6 +54,7 @@ public enum Code {
     NO_TRANSFER_PERMISSION(HttpStatus.FORBIDDEN, 403407, "그룹 소유자만이 그룹 소유권을 이전할 수 있습니다."),
     GROUPLIST_NOT_FROUND(HttpStatus.NOT_FOUND,403409,"존재하지 않는 그룹 내 상점입니다."),
     ALREADY_JOINED_GROUP(HttpStatus.BAD_REQUEST, 400410, "이미 해당 그룹에 참여한 유저입니다."),
+    ALREADY_ADD_GROUP_LIST(HttpStatus.BAD_REQUEST, 400411,"이미 해당 그룹에 존재하는 그룹리스트입니다."),
   
     //myCategory 관련 에러 +5
     MY_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 404501, "존재하지 않는 카테고리입니다."),
