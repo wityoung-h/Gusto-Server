@@ -12,6 +12,7 @@ import com.umc.gusto.domain.route.repository.RouteListRepository;
 import com.umc.gusto.domain.route.repository.RouteRepository;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.common.PublishStatus;
 import com.umc.gusto.global.exception.Code;
@@ -32,6 +33,7 @@ public class RouteListServiceImpl implements RouteListService{
     private final StoreRepository storeRepository;
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final UserRepository userRepository;
 
 
     @Transactional
@@ -85,7 +87,7 @@ public class RouteListServiceImpl implements RouteListService{
         Route route = routeRepository.findRouteByRouteIdAndStatus(deleteRouteList.getRoute().getRouteId(), BaseEntity.Status.ACTIVE)
                 .orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
 
-        List<RouteList> routeLists = routeListRepository.findByRoute(route);
+        List<RouteList> routeLists = routeListRepository.findByRouteOrderByOrdinalAsc(route);
         for (RouteList list : routeLists) {
             // 삭제된 아이템의 순서보다 큰 아이템들의 순서를 조정
             if(deleteRouteList.getOrdinal()< list.getOrdinal() && list.getOrdinal() >1)
@@ -98,7 +100,7 @@ public class RouteListServiceImpl implements RouteListService{
     @Override
     public List<RouteListResponse> getRouteListDistance(Long routeId) {
         Route route = routeRepository.findRouteByRouteIdAndStatus(routeId,BaseEntity.Status.ACTIVE).orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
-        List<RouteList> routeList = routeListRepository.findByRoute(route);
+        List<RouteList> routeList = routeListRepository.findByRouteOrderByOrdinalAsc(route);
         return  routeList.stream().map(rL ->
                 RouteListResponse.builder()
                         .longitude(rL.getStore().getLongitude())
@@ -112,7 +114,7 @@ public class RouteListServiceImpl implements RouteListService{
     }
 
     @Override
-    public RouteRouteListResponse getRouteListDetail(Long routeId, User user, Long groupId) {
+    public RouteRouteListResponse getRouteListDetail(Long routeId, User user, Long groupId,String nickname) {
         // 그룹 내 루트 상세 조회인 경우에만
         if(groupId != null){
             Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
@@ -122,14 +124,20 @@ public class RouteListServiceImpl implements RouteListService{
             }
         }
 
-        Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE).orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
-
-        //유저 활성화 설정 반영
-        if(!route.getUser().getPublishRoute().equals(PublishStatus.PUBLIC)){
-            throw new GeneralException(Code.NO_PUBLIC_ROUTE);
+        // 타인 조회 시
+        if(nickname != null){
+            User other = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE).orElseThrow(()-> new NotFoundException(Code.USER_NOT_FOUND));
+            //다른 유저의 공개 여부 확인
+            if(!other.getPublishReview().equals(PublishStatus.PUBLIC)){
+                throw new GeneralException(Code.NO_PUBLIC_ROUTE);
+            }
         }
 
-        List<RouteList> routeList = routeListRepository.findByRoute(route);
+
+        // 조회 공통 로직
+        Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE).orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
+
+        List<RouteList> routeList = routeListRepository.findByRouteOrderByOrdinalAsc(route);
         List<RouteListResponse> routeLists = routeList.stream().map(rL ->
                 RouteListResponse.builder()
                         .routeListId(rL.getRouteListId())
@@ -147,8 +155,6 @@ public class RouteListServiceImpl implements RouteListService{
                 .build();
 
     }
-
-
 
 
 }

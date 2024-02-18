@@ -22,6 +22,7 @@ import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.route.entity.Route;
+import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.group.repository.InvitationCodeRepository;
 import com.umc.gusto.domain.route.repository.RouteRepository;
@@ -254,9 +255,16 @@ public class GroupServiceImpl implements GroupService{
         if(!groupMemberRepository.existsGroupMemberByGroupAndUser(group,user))
             throw new GeneralException(Code.USER_NOT_IN_GROUP);
 
+        Store store = storeRepository.findById(request.getStoreId()).orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND));
+
+        //이미 존재하는 상점인지 확인
+        if(groupListRepository.existsGroupListByGroupAndStore(group,store)){
+            throw new GeneralException(Code.ALREADY_ADD_GROUP_LIST);
+        }
+
         GroupList groupList =GroupList.builder()
                 .group(group)
-                .store(storeRepository.findById(request.getStoreId()).orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND)))
+                .store(store)
                 .user(user)
                 .build();
 
@@ -284,7 +292,7 @@ public class GroupServiceImpl implements GroupService{
         Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
                 .orElseThrow(() -> new GeneralException(Code.FIND_FAIL_GROUP));
         // 그룹 내 모든 찜한 상점 조회 = 그룹리스트 조회
-        List<GroupList> groupLists = groupListRepository.findGroupListByGroup(group);
+        List<GroupList> groupLists = groupListRepository.findGroupListByGroupOrderByCreatedAtDesc(group);
 
         // 그룹 리스트에 해당하는 각 상점 정보 조회
         return groupLists.stream().map(gl -> {
