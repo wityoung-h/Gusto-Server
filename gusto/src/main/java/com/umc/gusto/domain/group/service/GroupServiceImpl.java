@@ -22,6 +22,7 @@ import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.route.entity.Route;
+import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.group.repository.InvitationCodeRepository;
 import com.umc.gusto.domain.route.repository.RouteRepository;
@@ -254,9 +255,16 @@ public class GroupServiceImpl implements GroupService{
         if(!groupMemberRepository.existsGroupMemberByGroupAndUser(group,user))
             throw new GeneralException(Code.USER_NOT_IN_GROUP);
 
+        Store store = storeRepository.findById(request.getStoreId()).orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND));
+
+        //이미 존재하는 상점인지 확인
+        if(groupListRepository.existsGroupListByGroupAndStore(group,store)){
+            throw new GeneralException(Code.ALREADY_ADD_GROUP_LIST);
+        }
+
         GroupList groupList =GroupList.builder()
                 .group(group)
-                .store(storeRepository.findById(request.getStoreId()).orElseThrow(() -> new NotFoundException(Code.STORE_NOT_FOUND)))
+                .store(store)
                 .user(user)
                 .build();
 
