@@ -87,7 +87,7 @@ public class RouteListServiceImpl implements RouteListService{
         Route route = routeRepository.findRouteByRouteIdAndStatus(deleteRouteList.getRoute().getRouteId(), BaseEntity.Status.ACTIVE)
                 .orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
 
-        List<RouteList> routeLists = routeListRepository.findByRoute(route);
+        List<RouteList> routeLists = routeListRepository.findByRouteOrderByOrdinalAsc(route);
         for (RouteList list : routeLists) {
             // 삭제된 아이템의 순서보다 큰 아이템들의 순서를 조정
             if(deleteRouteList.getOrdinal()< list.getOrdinal() && list.getOrdinal() >1)
@@ -100,7 +100,7 @@ public class RouteListServiceImpl implements RouteListService{
     @Override
     public List<RouteListResponse> getRouteListDistance(Long routeId) {
         Route route = routeRepository.findRouteByRouteIdAndStatus(routeId,BaseEntity.Status.ACTIVE).orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
-        List<RouteList> routeList = routeListRepository.findByRoute(route);
+        List<RouteList> routeList = routeListRepository.findByRouteOrderByOrdinalAsc(route);
         return  routeList.stream().map(rL ->
                 RouteListResponse.builder()
                         .longitude(rL.getStore().getLongitude())
@@ -137,7 +137,7 @@ public class RouteListServiceImpl implements RouteListService{
         // 조회 공통 로직
         Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE).orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
 
-        List<RouteList> routeList = routeListRepository.findByRoute(route);
+        List<RouteList> routeList = routeListRepository.findByRouteOrderByOrdinalAsc(route);
         List<RouteListResponse> routeLists = routeList.stream().map(rL ->
                 RouteListResponse.builder()
                         .routeListId(rL.getRouteListId())

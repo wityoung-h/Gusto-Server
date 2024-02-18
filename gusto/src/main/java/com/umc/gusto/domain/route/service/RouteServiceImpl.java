@@ -109,7 +109,7 @@ public class RouteServiceImpl implements RouteService{
                 .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
 
         //특정 그룹 내 루트 조회
-        List<Route> routes = routeRepository.findRoutesByGroupAndStatus(group,BaseEntity.Status.ACTIVE);
+        List<Route> routes = routeRepository.findRoutesByGroupAndStatusOrderByCreatedAtDesc(group,BaseEntity.Status.ACTIVE);
         return routes.stream().map(
                         Route -> RouteResponse.builder()
                                 .routeId(Route.getRouteId())

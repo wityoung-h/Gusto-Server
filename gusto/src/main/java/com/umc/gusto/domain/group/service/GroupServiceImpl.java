@@ -284,7 +284,7 @@ public class GroupServiceImpl implements GroupService{
         Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
                 .orElseThrow(() -> new GeneralException(Code.FIND_FAIL_GROUP));
         // 그룹 내 모든 찜한 상점 조회 = 그룹리스트 조회
-        List<GroupList> groupLists = groupListRepository.findGroupListByGroup(group);
+        List<GroupList> groupLists = groupListRepository.findGroupListByGroupOrderByCreatedAtDesc(group);
 
         // 그룹 리스트에 해당하는 각 상점 정보 조회
         return groupLists.stream().map(gl -> {
