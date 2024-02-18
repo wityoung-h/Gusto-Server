@@ -31,7 +31,7 @@ public class PinServiceImpl implements PinService{
         Store store = storeRepository.findById(createPin.getStoreId())
                         .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
 
-        // 해당 사용자가 이미 해당 카테고리에서 해당 가게를 찜했는지 확인합니다.
+        // 해당 사용자가 이미 해당 가게를 찜했는지 확인합니다.
         boolean existingPin = pinRepository.existsByUserAndStoreStoreId(user, store.getStoreId());
 
         if (existingPin) {
