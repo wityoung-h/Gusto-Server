@@ -156,12 +156,16 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     @Transactional
     public void likeReview(User user, Long reviewId) {
-
         Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
 
         //본인 리뷰를 좋아요하는지 확인
         if(review.getUser().getUserId().equals(user.getUserId())){ //TODO: .equals로 하는 동등성 비교가 안되서 DB의 @ID를 비교하는 식으로 했으나 비즈니스 키로 equals를 구현해보자.
             throw new GeneralException(Code.NO_ONESELF_LIKE);
+        }
+
+        //이미 리뷰를 했었는지 확인
+        if(likedRepository.existsByUserAndReview(user, review)){
+            throw new GeneralException(Code.ALREADY_LIKED_REVIEW);
         }
 
         review.updateLiked("like");
