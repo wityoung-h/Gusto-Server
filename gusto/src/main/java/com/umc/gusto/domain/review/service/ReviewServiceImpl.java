@@ -53,6 +53,7 @@ public class ReviewServiceImpl implements ReviewService{
 
         //리뷰 생성
         Review review = Review.builder()
+                .skipCheck(createReviewRequest.isSkipCheck())
                 .store(store)
                 .user(user)
                 .visitedAt(createReviewRequest.getVisitedAt())
