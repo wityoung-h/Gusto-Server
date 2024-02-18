@@ -26,4 +26,7 @@ public interface RouteListService {
     // 루트 상세 조회
     RouteRouteListResponse getRouteListDetail(Long routeId, User user, Long groupId);
 
+    // 루트 상세 조회
+    RouteRouteListResponse getRouteListDetail(Long routeId,String nickname);
+
 }

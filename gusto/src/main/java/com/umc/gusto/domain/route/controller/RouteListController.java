@@ -69,10 +69,21 @@ public class RouteListController {
     public ResponseEntity<?> getRouteListDetail(
             @PathVariable Long routeId,
             @RequestParam(required = false) Long groupId,
-             @AuthenticationPrincipal AuthUser authUSer
+            @AuthenticationPrincipal AuthUser authUSer
     ){
         return ResponseEntity.ok().body(routeListService.getRouteListDetail(routeId,authUSer.getUser(),groupId));
     }
 
+    /**
+     * 타인의 루트 상세 조회
+     * [GET] /routeLists/{routeId}?nickname={nickname}
+     */
+    @GetMapping("/{routeId}")
+    public ResponseEntity<?> getRouteListDetail(
+            @PathVariable Long routeId,
+            @RequestParam String nickname
+    ){
+        return ResponseEntity.ok().body(routeListService.getRouteListDetail(routeId,nickname));
+    }
 
 }

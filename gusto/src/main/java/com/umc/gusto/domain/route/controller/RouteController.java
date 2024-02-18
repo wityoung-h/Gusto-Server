@@ -79,7 +79,15 @@ public class RouteController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-
+    /**
+     * 타인의 루트 조회
+     * [GET] /routes/{nickname}
+     */
+    @GetMapping("/{nickname}")
+    public ResponseEntity<List<RouteResponse>> allUserRoute(@PathVariable String nickname){
+        List<RouteResponse> route = routeService.getRoute(nickname);
+        return ResponseEntity.ok().body(route);
+    }
 
 
 }

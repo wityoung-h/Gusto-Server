@@ -12,6 +12,7 @@ import com.umc.gusto.domain.route.repository.RouteListRepository;
 import com.umc.gusto.domain.route.repository.RouteRepository;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.common.PublishStatus;
 import com.umc.gusto.global.exception.Code;
@@ -32,6 +33,7 @@ public class RouteListServiceImpl implements RouteListService{
     private final StoreRepository storeRepository;
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final UserRepository userRepository;
 
 
     @Transactional
@@ -124,11 +126,6 @@ public class RouteListServiceImpl implements RouteListService{
 
         Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE).orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
 
-        //유저 활성화 설정 반영
-        if(!route.getUser().getPublishRoute().equals(PublishStatus.PUBLIC)){
-            throw new GeneralException(Code.NO_PUBLIC_ROUTE);
-        }
-
         List<RouteList> routeList = routeListRepository.findByRoute(route);
         List<RouteListResponse> routeLists = routeList.stream().map(rL ->
                 RouteListResponse.builder()
@@ -148,7 +145,36 @@ public class RouteListServiceImpl implements RouteListService{
 
     }
 
+    @Override
+    public RouteRouteListResponse getRouteListDetail(Long routeId, String nickname) {
+        User other = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE).orElseThrow(()-> new NotFoundException(Code.USER_NOT_FOUND));
+        //다른 유저의 공개 여부 확인
+        if(!other.getPublishReview().equals(PublishStatus.PUBLIC)){
+            throw new GeneralException(Code.NO_PUBLIC_ROUTE);
+        }
 
+        Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND));
+
+        List<RouteList> routeList = routeListRepository.findByRoute(route);
+        List<RouteListResponse> routeLists = routeList.stream().map(rL ->
+                RouteListResponse.builder()
+                        .routeListId(rL.getRouteListId())
+                        .storeId(rL.getStore().getStoreId())
+                        .storeName(rL.getStore().getStoreName())
+                        .address(rL.getStore().getAddress())
+                        .ordinal(rL.getOrdinal())
+                        .build()
+        ).toList();
+
+        return RouteRouteListResponse.builder()
+                .routeId(route.getRouteId())
+                .routeName(route.getRouteName())
+                .routes(routeLists)
+                .build();
+
+
+    }
 
 
 }

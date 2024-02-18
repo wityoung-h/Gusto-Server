@@ -22,4 +22,7 @@ public interface RouteService {
 
     // 루트 상세 수정
     void modifyRouteList(Long routeId, ModifyRouteRequest request);
+
+    // 타인의 루트 조회
+    List<RouteResponse> getRoute(String nickname);
 }
