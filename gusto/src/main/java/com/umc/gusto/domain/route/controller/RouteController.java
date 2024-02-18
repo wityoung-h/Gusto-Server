@@ -1,10 +1,10 @@
 package com.umc.gusto.domain.route.controller;
 
+import com.umc.gusto.domain.route.model.request.ModifyRouteRequest;
 import com.umc.gusto.domain.route.model.request.RouteRequest;
 import com.umc.gusto.domain.route.model.response.RouteResponse;
 import com.umc.gusto.domain.route.service.RouteService;
 import com.umc.gusto.global.auth.model.AuthUser;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,17 +20,24 @@ import java.util.List;
 public class RouteController {
     private final RouteService routeService;
 
+    /**
+     * 루트 생성/그룹 내 루트 추가
+     * [POST] /routes
+     */
     // 루트 생성
     @PostMapping("")
     public ResponseEntity<?> createRoute(
-            @RequestBody @Valid RouteRequest.createRouteDto request,
+            @RequestBody RouteRequest request,
             @AuthenticationPrincipal AuthUser authUSer)
     {
         routeService.createRoute(request,authUSer.getUser());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    // 루트 삭제
+    /**
+     * 내 루트 삭제
+     * [DELETE] /routes/{routeId}
+     */
     @DeleteMapping("/{routeId}")
     public ResponseEntity<?> deleteRoute(
             @PathVariable Long routeId,
@@ -40,22 +47,37 @@ public class RouteController {
         return ResponseEntity.ok().build();
     }
 
-    // 내 루트 조회
+    /**
+     * 내 루트 조회
+     * [GET] /routes
+     */
     @GetMapping("")
-    public ResponseEntity<List<RouteResponse.RouteResponseDto>> allMyRoute(
+    public ResponseEntity<List<RouteResponse>> allMyRoute(
             @AuthenticationPrincipal AuthUser authUSer
     ){
-        List<RouteResponse.RouteResponseDto> route = routeService.getRoute(authUSer.getUser());
+        List<RouteResponse> route = routeService.getRoute(authUSer.getUser());
         return ResponseEntity.ok().body(route);
     }
 
-    // 그룹 내 루트 조회
-    @GetMapping("/{groupId}")
-    public ResponseEntity<List<RouteResponse.RouteResponseDto>> allMyRoute(@PathVariable Long groupId){
-        List<RouteResponse.RouteResponseDto> route = routeService.getGroupRoute(groupId);
+    /**
+     * 그룹 내 루트 목록
+     * [GET] /routes/groups{groupId}
+     */
+    @GetMapping("/groups/{groupId}")
+    public ResponseEntity<List<RouteResponse>> allMyRoute(@PathVariable Long groupId){
+        List<RouteResponse> route = routeService.getGroupRoute(groupId);
         return ResponseEntity.ok().body(route);
     }
 
+    /**
+     * 루트 수정
+     * /{routeId}
+     */
+    @PatchMapping("/{routeId}")
+    public ResponseEntity<?> modifyRoute(@PathVariable Long routeId, @RequestBody ModifyRouteRequest request){
+        routeService.modifyRouteList(routeId,request);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
 
 
 

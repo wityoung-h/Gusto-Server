@@ -57,6 +57,9 @@ public class User extends BaseTime {
     @Column(nullable = false, columnDefinition = "bigint default 0")
     private Long follower;
 
+    @Column(nullable = false, columnDefinition = "bigint default 0")
+    private Long following;
+
     @Column(nullable = false, columnDefinition = "int default 0")
     private Integer pinCnt;
 
@@ -110,5 +113,9 @@ public class User extends BaseTime {
 
     public void updateFollower(long follower) {
         this.follower = follower;
+    }
+
+    public void updateFollowing(long following) {
+        this.following = following;
     }
 }

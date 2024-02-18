@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService{
             target = user;
         } else {
             target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
-                    .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
+                    .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
         }
 
         AtomicBoolean followed = new AtomicBoolean(false);
@@ -170,7 +170,7 @@ public class UserServiceImpl implements UserService{
                 .nickname(target.getNickname())
                 .profileImg(target.getProfileImage())
                 .review(target.getReviewCnt())
-                .pin(target.getPinCnt())
+                .following(target.getFollowing())
                 .follower(target.getFollower())
                 .followed(followed.get())
                 .build();
@@ -267,7 +267,9 @@ public class UserServiceImpl implements UserService{
 
         // target의 팔로워 수 1 증가
         target.updateFollower(target.getFollower() + 1);
+        user.updateFollowing(user.getFollowing() + 1);
         userRepository.save(target);
+        userRepository.save(user);
     }
 
     @Override
@@ -283,7 +285,9 @@ public class UserServiceImpl implements UserService{
 
         // target의 팔로워 수 1 감소
         target.updateFollower(target.getFollower() - 1);
+        user.updateFollowing(user.getFollowing() - 1);
         userRepository.save(target);
+        userRepository.save(user);
     }
 
     @Override

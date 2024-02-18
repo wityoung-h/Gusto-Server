@@ -36,10 +36,10 @@ public class MyCategory extends BaseEntity{
     @Column(length = 20)
     private String myCategoryScript;
 
-    @Builder.Default
-    @Enumerated(EnumType.STRING)
-    @Column(name = "publishCategory",nullable = false, length = 10)
-    private PublishStatus publishCategory = PublishStatus.PUBLIC;
+//    @Builder.Default
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "publishCategory",nullable = false, length = 10)
+//    private PublishStatus publishCategory = PublishStatus.PUBLIC;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")

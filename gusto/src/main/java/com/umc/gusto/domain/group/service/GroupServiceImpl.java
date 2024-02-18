@@ -19,7 +19,9 @@ import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.group.repository.GroupListRepository;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
+import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
+import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.group.repository.InvitationCodeRepository;
 import com.umc.gusto.domain.route.repository.RouteRepository;
@@ -36,6 +38,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,9 +51,7 @@ public class GroupServiceImpl implements GroupService{
     private final InvitationCodeRepository invitationCodeRepository;
     private final GroupListRepository groupListRepository;
     private final RouteRepository routeRepository;
-  
     private static final int INVITE_CODE_LENGTH = 12;
-
     private final StoreRepository storeRepository;
     private final ReviewRepository reviewRepository;
 
@@ -139,26 +140,26 @@ public class GroupServiceImpl implements GroupService{
         group.updateStatus(BaseEntity.Status.INACTIVE);
     }
 
-    public void joinGroup(User user, Long groupId, JoinGroupRequest joinGroupRequest){
-        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+    public void joinGroup(User user, JoinGroupRequest joinGroupRequest){
+        Group group = groupRepository.findGroupByCodeAndStatus(joinGroupRequest.getCode(), BaseEntity.Status.ACTIVE)
                 .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
-        String invitationCode = invitationCodeRepository.findCodeByGroup(group);
 
-        // 초대 코드 확인
-        if(joinGroupRequest.getCode().equals(invitationCode)){
-            // 그룹 참여
-            User joinUser = userRepository.findById(user.getUserId())
-                    .orElseThrow(()->new GeneralException(Code.DONT_EXIST_USER));
-
-            GroupMember groupMember = GroupMember.builder()
-                    .group(group)
-                    .user(joinUser)
-                    .build();
-
-            groupMemberRepository.save(groupMember);
-        }else{
-            throw new GeneralException(Code.INVALID_INVITATION_CODE);
+        // 이미 그룹에 참여한 유저인지 확인
+        boolean isMember = groupMemberRepository.existsGroupMemberByGroupAndUser(group, user);
+        if (isMember) {
+            throw new GeneralException(Code.ALREADY_JOINED_GROUP);
         }
+
+        // 그룹 참여
+        User joinUser = userRepository.findById(user.getUserId())
+                .orElseThrow(()->new GeneralException(Code.USER_NOT_FOUND));
+
+        GroupMember groupMember = GroupMember.builder()
+                .group(group)
+                .user(joinUser)
+                .build();
+
+        groupMemberRepository.save(groupMember);
     }
 
     public void leaveGroup(User user, Long groupId){
@@ -251,7 +252,7 @@ public class GroupServiceImpl implements GroupService{
                 .orElseThrow(() -> new GeneralException(Code.FIND_FAIL_GROUP));
         // 그룹 구성원인지 확인
         if(!groupMemberRepository.existsGroupMemberByGroupAndUser(group,user))
-            throw new GeneralException(Code.USER_NO_PERMISSION_FOR_GROUP);
+            throw new GeneralException(Code.USER_NOT_IN_GROUP);
 
         GroupList groupList =GroupList.builder()
                 .group(group)
@@ -270,7 +271,7 @@ public class GroupServiceImpl implements GroupService{
             GroupList groupList = groupListRepository.findGroupListByGroupListId(gl).orElseThrow(() -> new GeneralException(Code.GROUPLIST_NOT_FROUND));
             // 그룹 구성원인지 확인
             if(!groupMemberRepository.existsGroupMemberByGroupAndUser(groupList.getGroup(),user))
-                throw new GeneralException(Code.USER_NO_PERMISSION_FOR_GROUP);
+                throw new GeneralException(Code.USER_NOT_IN_GROUP);
             // 그룹리스트 삭제
             groupListRepository.delete(groupList);
         }
@@ -287,7 +288,8 @@ public class GroupServiceImpl implements GroupService{
 
         // 그룹 리스트에 해당하는 각 상점 정보 조회
         return groupLists.stream().map(gl -> {
-            String reviewImg = reviewRepository.findTopReviewImageByStoreId(gl.getStore().getStoreId()).get(0);
+            Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(gl.getStore()); // 가장 좋아요가 많은 review
+            String reviewImg = topReviewOptional.map(Review::getImg1).orElse("");
             return GroupListResponse.builder()
                     .groupListId(gl.getGroupListId())
                     .storeId(gl.getStore().getStoreId())
@@ -298,6 +300,22 @@ public class GroupServiceImpl implements GroupService{
                     .build();
         }).collect(Collectors.toList());
 
+
+    }
+
+    @Override
+    public void deleteRoute(Long routeId, User user, Long groupId) {
+        // 그룹 구성원인지 확인
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+        if(!groupMemberRepository.existsGroupMemberByGroupAndUser(group,user)){
+            throw new GeneralException(Code.USER_NOT_IN_GROUP);
+        }
+
+        Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.ROUTE_NOT_FOUND));
+        //루트 삭제 : soft delete // TODO:DB 최종 삭제 주기 체크
+        route.updateStatus(BaseEntity.Status.INACTIVE);
 
     }
 }

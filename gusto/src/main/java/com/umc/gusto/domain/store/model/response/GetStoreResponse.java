@@ -21,8 +21,8 @@ public class GetStoreResponse{
     Long storeId;
     String storeName;
     String address;
-    Float longitude;
-    Float latitude;
+    Double longitude;
+    Double latitude;
     Map<OpeningHours.BusinessDay, Timing> businessDay;
     String contact;
     List<String> reviewImg3;

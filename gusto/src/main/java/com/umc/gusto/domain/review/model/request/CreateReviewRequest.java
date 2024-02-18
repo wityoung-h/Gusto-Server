@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 public class CreateReviewRequest {
@@ -14,7 +15,7 @@ public class CreateReviewRequest {
     Long storeId;
     LocalDate visitedAt;
     String menuName;
-    String hashTagId;
+    List<Long> hashTagId;
     @NotNull
     @DecimalMin(value = "0", message = "점수가 0보다 작을 수 없습니다.")
     @DecimalMax(value = "5", message = "점수가 5보다 클 수 없습니다.")
