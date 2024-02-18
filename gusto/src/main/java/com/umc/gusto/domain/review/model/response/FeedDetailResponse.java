@@ -21,7 +21,7 @@ public class FeedDetailResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String menuName;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    String hashTags;
+    List<Long> hashTags;
     Integer taste;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     Integer spiciness;
@@ -34,7 +34,7 @@ public class FeedDetailResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     String comment;
 
-    public static FeedDetailResponse of(Review review, String hashTags, boolean likeCheck){
+    public static FeedDetailResponse of(Review review, List<Long> hashTags, boolean likeCheck){
         return FeedDetailResponse.builder()
                 .storeId(review.getStore().getStoreId())
                 .storeName(review.getStore().getStoreName())
