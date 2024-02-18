@@ -69,9 +69,10 @@ public class RouteListController {
     public ResponseEntity<?> getRouteListDetail(
             @PathVariable Long routeId,
             @RequestParam(required = false) Long groupId,
-             @AuthenticationPrincipal AuthUser authUSer
+            @RequestParam(required = false) String nickname,
+            @AuthenticationPrincipal AuthUser authUSer
     ){
-        return ResponseEntity.ok().body(routeListService.getRouteListDetail(routeId,authUSer.getUser(),groupId));
+        return ResponseEntity.ok().body(routeListService.getRouteListDetail(routeId,authUSer.getUser(),groupId,nickname));
     }
 
 

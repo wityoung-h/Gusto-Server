@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface GroupListRepository extends JpaRepository<GroupList,Long> {
     Optional<GroupList> findGroupListByGroupListId(Long groupListId);
-    List<GroupList> findGroupListByGroup(Group group);
+    List<GroupList> findGroupListByGroupOrderByCreatedAtDesc(Group group);
     int countGroupListsByGroup(Group group);
     Boolean existsGroupListByGroupAndStore(Group group, Store store);
 }
