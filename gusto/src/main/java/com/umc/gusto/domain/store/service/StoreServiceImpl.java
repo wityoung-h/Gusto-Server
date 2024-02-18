@@ -74,8 +74,8 @@ public class StoreServiceImpl implements StoreService{
     public GetStoreDetailResponse getStoreDetail(User user, Long storeId, Long reviewId, Pageable pageable) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
-        Category category = storeRepository.findCategoryByStoreId(storeId)
-                .orElseThrow(() -> new GeneralException(Code.CATEGORY_NOT_FOUND));
+//        Category category = storeRepository.findCategoryByStoreId(storeId)
+//                .orElseThrow(() -> new GeneralException(Code.CATEGORY_NOT_FOUND));
         Long pinId = pinRepository.findByUserAndStoreStoreId(user, storeId);
 
         List<Review> top4Reviews = reviewRepository.findFirst4ByStoreOrderByLikedDesc(store);
@@ -120,7 +120,7 @@ public class StoreServiceImpl implements StoreService{
         return GetStoreDetailResponse.builder()
                 .pinId(pinId)
                 .storeId(storeId)
-                .categoryName(category.getCategoryName())
+                .categoryString(store.getCategoryString())
                 .storeName(store.getStoreName())
                 .address(store.getAddress())
                 .reviewImg4(reviewImg)
