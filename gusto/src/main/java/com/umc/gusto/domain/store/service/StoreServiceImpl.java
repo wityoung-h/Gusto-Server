@@ -210,7 +210,7 @@ public class StoreServiceImpl implements StoreService{
 
     @Override
     public List<GetStoreInfoResponse> searchStore(String keyword) {
-        List<Store> searchResult = storeRepository.findByStoreNameContains(keyword);
+        List<Store> searchResult = storeRepository.findTop5ByStoreNameContains(keyword);
 
         return searchResult.stream()
                 .map(result -> {
