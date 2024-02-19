@@ -13,6 +13,7 @@ import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.common.PublishStatus;
 import com.umc.gusto.global.exception.Code;
@@ -41,6 +42,7 @@ public class ReviewServiceImpl implements ReviewService{
     private final HashTagRepository hashTagRepository;
     private final LikedRepository likedRepository;
     private final S3Service s3Service;
+    private final UserRepository userRepository;
 
     public void validateReviewByUser(final User user, final Long reviewId){
         if(!reviewRepository.existsByReviewIdAndUser(reviewId, user)){
@@ -84,6 +86,8 @@ public class ReviewServiceImpl implements ReviewService{
         }
 
         reviewRepository.save(review);
+        user.updateCountReview();
+        userRepository.save(user);
     }
 
     @Override
