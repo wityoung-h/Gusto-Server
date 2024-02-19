@@ -51,7 +51,7 @@ public class ReviewController {
     public ResponseEntity<?> deleteReview(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long reviewId){
         User user = authUser.getUser();
         reviewService.validateReviewByUser(user, reviewId);
-        reviewService.deleteReview(reviewId);
+        reviewService.deleteReview(user, reviewId);
         return ResponseEntity.ok().build();
     }
 
