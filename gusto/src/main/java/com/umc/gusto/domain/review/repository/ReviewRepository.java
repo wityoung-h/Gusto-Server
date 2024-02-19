@@ -41,7 +41,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByUserAndStatusAndVisitedAtBetween(User user, BaseEntity.Status status, LocalDate startDate, LocalDate lastDate);
 
     boolean existsByUserAndReviewIdLessThan(User user, Long reviewId);
-    @Query(value = "SELECT * FROM review r WHERE r.user_id <> :user AND r.status = 'ACTIVE' AND r.skip_check=false ORDER BY RAND() limit 15", nativeQuery = true)
+    @Query(value = "SELECT * FROM review r WHERE r.user_id <> :user AND r.status = 'ACTIVE' AND r.skip_check=false ORDER BY RAND() limit 33", nativeQuery = true)
     List<Review> findRandomFeedByUser(@Param("user") UUID user); //WHERE r.user_id <> :userZ
 
     boolean existsByStoreAndUserNickname(Store store, String nickname);
