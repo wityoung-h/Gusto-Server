@@ -11,6 +11,7 @@ import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.customException.NotFoundException;
 import com.umc.gusto.global.exception.customException.PrivateItemException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -32,16 +33,17 @@ public class FeedServiceImpl implements FeedService{
     @Override
     public SearchFeedResponse searchFeed(String keyword, List<Long> hashTags) {
         List<Review> searchResult = new ArrayList<>();
+        PageRequest pageRequest = PageRequest.of(0,33);
         //맛집과 해시태그를 함께 검색하는 경우
         if(keyword!=null && hashTags!=null){
             for(Long hashTagId: hashTags){
-                searchResult.addAll(reviewRepository.searchByStoreAndHashTagContains(keyword, hashTagId));
+                searchResult.addAll(reviewRepository.searchByStoreAndHashTagContains(keyword, hashTagId, pageRequest));
             }
         } else if(keyword!=null){ //맛집을 검색하는 경우
-            searchResult = reviewRepository.searchByStoreContains(keyword);
+            searchResult = reviewRepository.searchByStoreContains(keyword, pageRequest);
         } else if(hashTags!=null){
             for(Long hashTagId: hashTags){
-                searchResult.addAll(reviewRepository.searchByHashTagContains(hashTagId));
+                searchResult.addAll(reviewRepository.searchByHashTagContains(hashTagId, pageRequest));
             }
         }
 
