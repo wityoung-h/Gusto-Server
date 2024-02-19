@@ -118,8 +118,10 @@ public class User extends BaseTime {
     public void updateFollowing(long following) {
         this.following = following;
     }
-
     public void updatePinCnt(Integer pinCnt) {
         this.pinCnt = pinCnt;
+    }
+    public void updateCountReview(){
+        this.reviewCnt++;
     }
 }
