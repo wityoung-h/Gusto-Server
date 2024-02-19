@@ -121,7 +121,11 @@ public class User extends BaseTime {
     public void updatePinCnt(Integer pinCnt) {
         this.pinCnt = pinCnt;
     }
-    public void updateCountReview(){
+    public void updateCountReview() {
         this.reviewCnt++;
+    }
+    public void updateCountReview(boolean plus){
+        if(plus) this.reviewCnt++;
+        else this.reviewCnt--;
     }
 }
