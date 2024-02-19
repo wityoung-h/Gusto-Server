@@ -118,7 +118,8 @@ public class User extends BaseTime {
     public void updateFollowing(long following) {
         this.following = following;
     }
-    public void updateCountReview(){
-        this.reviewCnt++;
+    public void updateCountReview(boolean plus){
+        if(plus) this.reviewCnt++;
+        else this.reviewCnt--;
     }
 }
