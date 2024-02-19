@@ -48,9 +48,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     //검색 기능
     @Query("SELECT r FROM Review r WHERE r.status = 'ACTIVE' AND r.skipCheck = false AND r.store.storeName like concat('%', :keyword, '%') OR r.comment like concat('%', :keyword, '%')")
-    List<Review> searchByStoreContains(String keyword); //TODO: 후에 페이징 처리 하기
+    List<Review> searchByStoreContains(String keyword, PageRequest pageRequest); //TODO: 후에 페이징 처리 하기
     @Query("SELECT t.review FROM Tagging t WHERE t.review.status = 'ACTIVE' AND t.review.skipCheck=false AND t.review.store.storeName like concat('%', :keyword, '%') AND t.hashTag.hasTagId = :hashTagId")
-    List<Review> searchByStoreAndHashTagContains(String keyword, Long hashTagId);
+    List<Review> searchByStoreAndHashTagContains(String keyword, Long hashTagId, PageRequest pageRequest);
     @Query("SELECT t.review FROM Tagging t WHERE t.review.status = 'ACTIVE' AND t.review.skipCheck=false AND t.hashTag.hasTagId = :hashTagId")
-    List<Review> searchByHashTagContains(Long hashTagId);
+    List<Review> searchByHashTagContains(Long hashTagId, PageRequest pageRequest);
 }
