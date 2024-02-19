@@ -33,6 +33,7 @@ public enum Code {
     NO_PUBLIC_REVIEW(HttpStatus.FORBIDDEN, 403204, "해당 리뷰는 private입니다."),
     NO_ONESELF_LIKE(HttpStatus.BAD_REQUEST, 400204, "자기자신의 리뷰는 좋아요할 수 없습니다."),
     NO_LIKE_REVIEW(HttpStatus.BAD_REQUEST, 400205, "해당 리뷰에 좋아요를 한 적이 없습니다."),
+    ALREADY_LIKED_REVIEW(HttpStatus.BAD_REQUEST, 400206, "이미 좋아요한 리뷰입니다. 좋아요를 클릭할 수 없습니다."),
 
     //Route 관련 에러 +3
     ROUTE_DUPLICATE_ROUTENAME(HttpStatus.CONFLICT, 409301,"이미 사용중인 루트명입니다."),
@@ -54,6 +55,7 @@ public enum Code {
     NO_TRANSFER_PERMISSION(HttpStatus.FORBIDDEN, 403407, "그룹 소유자만이 그룹 소유권을 이전할 수 있습니다."),
     GROUPLIST_NOT_FROUND(HttpStatus.NOT_FOUND,403409,"존재하지 않는 그룹 내 상점입니다."),
     ALREADY_JOINED_GROUP(HttpStatus.BAD_REQUEST, 400410, "이미 해당 그룹에 참여한 유저입니다."),
+    ALREADY_ADD_GROUP_LIST(HttpStatus.BAD_REQUEST, 400411,"이미 해당 그룹에 존재하는 그룹리스트입니다."),
   
     //myCategory 관련 에러 +5
     MY_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 404501, "존재하지 않는 카테고리입니다."),

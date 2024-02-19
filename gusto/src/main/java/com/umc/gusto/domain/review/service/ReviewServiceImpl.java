@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,12 +51,16 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     public void createReview(User user, List<MultipartFile> images, CreateReviewRequest createReviewRequest) {
         Store store= storeRepository.findById(createReviewRequest.getStoreId()).orElseThrow(()-> new NotFoundException(Code.STORE_NOT_FOUND));
-
+        LocalDate visitedAt = createReviewRequest.getVisitedAt();
+        if(createReviewRequest.getVisitedAt()==null){
+            visitedAt = LocalDate.now();
+        }
         //리뷰 생성
         Review review = Review.builder()
+                .skipCheck(createReviewRequest.isSkipCheck())
                 .store(store)
                 .user(user)
-                .visitedAt(createReviewRequest.getVisitedAt())
+                .visitedAt(visitedAt)
                 .menuName(createReviewRequest.getMenuName())
                 .taste(createReviewRequest.getTaste())
                 .spiciness(createReviewRequest.getSpiciness())
@@ -135,6 +140,7 @@ public class ReviewServiceImpl implements ReviewService{
     public void deleteReview(Long reviewId) {
         Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
         review.updateStatus(BaseEntity.Status.INACTIVE);
+        reviewRepository.save(review);
     }
 
     @Override
@@ -156,12 +162,16 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     @Transactional
     public void likeReview(User user, Long reviewId) {
-
         Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
 
         //본인 리뷰를 좋아요하는지 확인
         if(review.getUser().getUserId().equals(user.getUserId())){ //TODO: .equals로 하는 동등성 비교가 안되서 DB의 @ID를 비교하는 식으로 했으나 비즈니스 키로 equals를 구현해보자.
             throw new GeneralException(Code.NO_ONESELF_LIKE);
+        }
+
+        //이미 리뷰를 했었는지 확인
+        if(likedRepository.existsByUserAndReview(user, review)){
+            throw new GeneralException(Code.ALREADY_LIKED_REVIEW);
         }
 
         review.updateLiked("like");

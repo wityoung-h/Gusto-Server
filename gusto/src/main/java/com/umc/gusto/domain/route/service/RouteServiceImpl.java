@@ -94,17 +94,11 @@ public class RouteServiceImpl implements RouteService{
         List<Route> routes = routeRepository.findRouteByUserAndStatus(user, BaseEntity.Status.ACTIVE);
 
         return routes.stream()
-                .map(route -> {
-                    // 유저 활성화 설정 변경
-                    if (!route.getUser().getPublishRoute().equals(PublishStatus.PUBLIC)) {
-                        throw new GeneralException(Code.NO_PUBLIC_ROUTE);
-                    }
-                    return RouteResponse.builder()
+                .map(route -> RouteResponse.builder()
                             .routeId(route.getRouteId())
                             .routeName(route.getRouteName())
                             .numStore(routeListRepository.countRouteListByRoute(route))
-                            .build();
-                })
+                            .build())
                 .collect(Collectors.toList());
     }
 
@@ -115,7 +109,7 @@ public class RouteServiceImpl implements RouteService{
                 .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
 
         //특정 그룹 내 루트 조회
-        List<Route> routes = routeRepository.findRoutesByGroupAndStatus(group,BaseEntity.Status.ACTIVE);
+        List<Route> routes = routeRepository.findRoutesByGroupAndStatusOrderByCreatedAtDesc(group,BaseEntity.Status.ACTIVE);
         return routes.stream().map(
                         Route -> RouteResponse.builder()
                                 .routeId(Route.getRouteId())
@@ -168,6 +162,28 @@ public class RouteServiceImpl implements RouteService{
                 }
             }
         }
+    }
+
+    @Override
+    public List<RouteResponse> getRoute(String nickname) {
+        User user = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
+
+        List<Route> routes = routeRepository.findRouteByUserAndStatus(user, BaseEntity.Status.ACTIVE);
+
+        return routes.stream()
+                .map(route -> {
+                    // 유저 활성화 설정 변경
+                    if (!route.getUser().getPublishRoute().equals(PublishStatus.PUBLIC)) {
+                        throw new GeneralException(Code.NO_PUBLIC_ROUTE);
+                    }
+                    return RouteResponse.builder()
+                            .routeId(route.getRouteId())
+                            .routeName(route.getRouteName())
+                            .numStore(routeListRepository.countRouteListByRoute(route))
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 
 }

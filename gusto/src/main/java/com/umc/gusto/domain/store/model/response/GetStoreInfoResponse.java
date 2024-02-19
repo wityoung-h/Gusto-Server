@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GetStoreInfoResponse {
     Long storeId;
-    String categoryName;
+    String categoryString;
     String storeName;
     String address;
     String reviewImg;

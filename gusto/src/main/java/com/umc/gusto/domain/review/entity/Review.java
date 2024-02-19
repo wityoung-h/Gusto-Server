@@ -52,6 +52,9 @@ public class Review extends BaseEntity {
     private String comment;
 
     @Builder.Default
+    private boolean skipCheck = false;
+
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "publishReview", nullable = false, length = 10)
     private PublishStatus publishReview = PublishStatus.PUBLIC;

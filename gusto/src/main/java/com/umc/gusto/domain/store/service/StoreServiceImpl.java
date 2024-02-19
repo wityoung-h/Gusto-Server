@@ -173,7 +173,7 @@ public class StoreServiceImpl implements StoreService{
 
             GetStoreInfoResponse getStoreInfoResponse = GetStoreInfoResponse.builder()
                     .storeId(store.getStoreId())
-                    .categoryName(store.getCategory().getCategoryName())
+                    .categoryString(store.getCategoryString())
                     .storeName(store.getStoreName())
                     .address(store.getAddress())
                     .reviewImg(reviewImg)
@@ -219,7 +219,7 @@ public class StoreServiceImpl implements StoreService{
                     return GetStoreInfoResponse.builder()
                             .storeId(result.getStoreId())
                             .storeName(result.getStoreName())
-                            .categoryName(result.getCategoryString())
+                            .categoryString(result.getCategoryString())
                             .address(result.getAddress())
                             .reviewImg(reviewImg)
                             .build();
