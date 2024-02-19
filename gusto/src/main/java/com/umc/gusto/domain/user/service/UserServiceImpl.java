@@ -340,8 +340,8 @@ public class UserServiceImpl implements UserService{
                 .map(follow -> {
                     FollowResponse item = FollowResponse.builder()
                             .followId(follow.getFollowId())
-                            .nickname(follow.getFollowing().getNickname())
-                            .profileImg(follow.getFollowing().getProfileImage())
+                            .nickname(follow.getFollower().getNickname())
+                            .profileImg(follow.getFollower().getProfileImage())
                             .build();
 
                     return item;
