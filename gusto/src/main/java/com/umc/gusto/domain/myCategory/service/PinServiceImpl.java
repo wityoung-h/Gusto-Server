@@ -1,5 +1,6 @@
 package com.umc.gusto.domain.myCategory.service;
 
+import com.nimbusds.openid.connect.sdk.UserInfoResponse;
 import com.umc.gusto.domain.myCategory.entity.MyCategory;
 import com.umc.gusto.domain.myCategory.entity.Pin;
 import com.umc.gusto.domain.myCategory.model.request.CreatePinRequest;
@@ -9,6 +10,7 @@ import com.umc.gusto.domain.myCategory.repository.PinRepository;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
+import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class PinServiceImpl implements PinService{
     private final PinRepository pinRepository;
     private final MyCategoryRepository myCategoryRepository;
     private final StoreRepository storeRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public CreatePinResponse createPin(User user, Long myCategoryId, CreatePinRequest createPin) {
@@ -46,6 +49,9 @@ public class PinServiceImpl implements PinService{
 
         Pin savedPin = pinRepository.save(pin);
 
+        user.updatePinCnt(user.getPinCnt() + 1);
+        userRepository.save(user);
+
         return CreatePinResponse.builder()
                 .pinId(savedPin.getPinId())
                 .build();
@@ -58,6 +64,9 @@ public class PinServiceImpl implements PinService{
                     .orElseThrow(() -> new GeneralException(Code.PIN_NOT_FOUND));
 
             pinRepository.delete(pin);
+
+            user.updatePinCnt(user.getPinCnt() - 1);
+            userRepository.save(user);
 
         }
 
