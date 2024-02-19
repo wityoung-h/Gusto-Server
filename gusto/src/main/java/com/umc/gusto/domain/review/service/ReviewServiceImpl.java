@@ -86,7 +86,7 @@ public class ReviewServiceImpl implements ReviewService{
         }
 
         reviewRepository.save(review);
-        user.updateCountReview();
+        user.updateCountReview(true);
         userRepository.save(user);
     }
 
@@ -141,10 +141,12 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public void deleteReview(Long reviewId) {
+    public void deleteReview(User user, Long reviewId) {
         Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
         review.updateStatus(BaseEntity.Status.INACTIVE);
         reviewRepository.save(review);
+        user.updateCountReview(false);
+        userRepository.save(user);
     }
 
     @Override
