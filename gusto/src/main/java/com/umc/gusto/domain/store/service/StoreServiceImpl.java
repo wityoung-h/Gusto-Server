@@ -140,7 +140,7 @@ public class StoreServiceImpl implements StoreService{
         List<Store> visitedStatus = new ArrayList<>();
         for (Pin pin : pins) {
             Store store = pin.getStore();
-            boolean hasVisited = reviewRepository.existsByStore(store);
+            boolean hasVisited = reviewRepository.existsByStoreAndUserNickname(store, user.getNickname());
             if (visited) {
                 if (hasVisited) {
                     visitedStatus.add(store);
