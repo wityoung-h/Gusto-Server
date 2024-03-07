@@ -131,19 +131,32 @@ public class StoreServiceImpl implements StoreService{
     }
 
     @Transactional(readOnly = true)
-    public List<GetStoresInMapResponse> getStoresInMap(User user, String townName, Long myCategoryId) {
-        List<Long> storeIds;
+    public List<GetStoresInMapResponse> getStoresInMap(User user, String townName, Long myCategoryId, Boolean visited) {
         List<Store> stores;
 
+        List<Pin> pins = pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName);
         if (myCategoryId == null) {
-            storeIds = pinRepository.findStoreIdsByUser(user);
-        } else {
-            storeIds = pinRepository.findStoreIdsByUserAndMyCategoryId(user, myCategoryId);      // 내 카테고리 별 내가 찜한 가게의 id 리스트
+            pins = pinRepository.findPinsByUserAndTownNameAndPinIdDESC(user, townName);
         }
 
-        stores = storeRepository.findByTownNameAndStoreIds(townName, storeIds);
+        List<Store> visitedStatus = new ArrayList<>();
+        for (Pin pin : pins) {
+            Store store = pin.getStore();
+            boolean hasVisited = reviewRepository.existsByStore(store);
+            if (visited) {
+                if (hasVisited) {
+                    visitedStatus.add(store);
+                }
+            } else {
+                if (!hasVisited) {
+                    visitedStatus.add(store);
+                }
+            }
 
+        }
 
+        stores = new ArrayList<>(visitedStatus);
+        
         return stores.stream()
                 .map(store -> GetStoresInMapResponse.builder()
                         .storeId(store.getStoreId())
