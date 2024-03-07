@@ -132,8 +132,6 @@ public class StoreServiceImpl implements StoreService{
 
     @Transactional(readOnly = true)
     public List<GetStoresInMapResponse> getStoresInMap(User user, String townName, Long myCategoryId, Boolean visited) {
-        List<Store> stores;
-
         List<Pin> pins = pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName);
         if (myCategoryId == null) {
             pins = pinRepository.findPinsByUserAndTownNameAndPinIdDESC(user, townName);
@@ -155,9 +153,7 @@ public class StoreServiceImpl implements StoreService{
 
         }
 
-        stores = new ArrayList<>(visitedStatus);
-        
-        return stores.stream()
+        return visitedStatus.stream()
                 .map(store -> GetStoresInMapResponse.builder()
                         .storeId(store.getStoreId())
                         .storeName(store.getStoreName())
@@ -165,7 +161,6 @@ public class StoreServiceImpl implements StoreService{
                         .latitude(store.getLatitude())
                         .build())
                 .collect(Collectors.toList());
-
     }
 
     @Transactional(readOnly = true)
