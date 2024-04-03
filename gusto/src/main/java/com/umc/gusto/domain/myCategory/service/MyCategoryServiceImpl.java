@@ -48,6 +48,8 @@ public class MyCategoryServiceImpl implements MyCategoryService {
             myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(user);   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
         }
         User finalUser = user;
+
+
         return myCategoryList.stream()
                 .map(myCategory -> {
                     List<Pin> pinList;
