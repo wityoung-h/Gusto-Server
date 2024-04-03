@@ -50,4 +50,16 @@ public class StoreController {
         return  ResponseEntity.status(HttpStatus.OK).body(getStoreDetail);
     }
 
+    /**
+     * 리스트로 받은 가게 id 상세 조회
+     * [GET] /stores
+     */
+    @GetMapping
+    public ResponseEntity<GetStoreResponse> getStores(
+            @AuthenticationPrincipal AuthUser authUser) {
+        User user = authUser.getUser();
+        GetStoreResponse getStore = storeService.getStore(user);
+        return ResponseEntity.status(HttpStatus.OK).body(getStore);
+    }
+
 }

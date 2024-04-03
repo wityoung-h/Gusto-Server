@@ -125,4 +125,37 @@ public class StoreServiceImpl implements StoreService{
                 .reviews(getReviews)
                 .build();
     }
+
+    @Transactional(readOnly = true)
+    public GetStoreResponse getStores(User user) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
+        List<OpeningHours> openingHoursList = openingHoursRepository.findByStoreStoreId(storeId);
+
+        Map<OpeningHours.BusinessDay, GetStoreResponse.Timing> businessDays = new LinkedHashMap<>();
+        for (OpeningHours openingHours : openingHoursList) {
+            GetStoreResponse.Timing timing = new GetStoreResponse.Timing(
+                    openingHours.getOpenedAt(),
+                    openingHours.getClosedAt()
+            );
+            businessDays.put(openingHours.getBusinessDay(), timing);
+        }
+
+        List<Review> top3Reviews = reviewRepository.findFirst3ByStoreOrderByLikedDesc(store);
+
+        List<String> reviewImg = top3Reviews.stream()
+                .map(Review::getImg1)
+                .collect(Collectors.toList());
+
+        boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
+
+        return GetStoreResponse.builder()
+                .storeId(storeId)
+                .storeName(store.getStoreName())
+                .address(store.getAddress())
+                .businessDay(businessDays)
+                .reviewImg3(reviewImg)
+                .pin(isPinned)
+                .build();
+    }
 }
