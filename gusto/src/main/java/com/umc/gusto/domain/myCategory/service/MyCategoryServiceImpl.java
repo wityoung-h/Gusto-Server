@@ -35,6 +35,9 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
 
+    private static final int MY_CATEGORY_PAGE_SIZE = 7;
+    private static final int PIN_PAGE_SIZE = 5;
+
     @Transactional(readOnly = true)
     public List<MyCategoryResponse> getAllMyCategory(User user, String nickname, String townName, Long myCategoryId, Pageable pageable) {
 
@@ -47,15 +50,15 @@ public class MyCategoryServiceImpl implements MyCategoryService {
             user = userRepository.findByNickname(nickname)
                     .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
             if (myCategoryId != null) {
-                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublicPaging(user, myCategoryId, PageRequest.of(pageNumber, 5));
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublicPaging(user, myCategoryId, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));
             } else {
-                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublic(user);
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublic(user, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));
             }
         } else {
             if (myCategoryId != null) {
-                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPaging(user, myCategoryId, PageRequest.of(pageNumber, 5));   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPaging(user, myCategoryId, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
             } else {
-                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(user);   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(user, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
             }
 
         }
@@ -102,18 +105,18 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
         if (townName != null) {
             if (pinId != null) {
-                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(category, townName, pinId, PageRequest.of(pageNumber, 7)))
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(category, townName, pinId, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
                         .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             } else {
-                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESC(category, townName))
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCFirstPaging(category, townName, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
                         .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             }
         } else {
             if (pinId != null) {
-                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndPinIdDESCPaging(category, pinId, PageRequest.of(pageNumber, 7)))
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndPinIdDESCPaging(category, pinId, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
                         .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             } else {
-                pinList = myCategory.map(pinRepository::findPinsByMyCategoryAndPinIdDESC)
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndPinIdDESCFirstPaging(category, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
                         .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             }
         }
