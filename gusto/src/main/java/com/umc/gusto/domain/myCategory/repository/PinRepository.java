@@ -24,7 +24,7 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
             "JOIN s.town t " +
             "WHERE p.myCategory = :myCategory " +
             "AND t.townName = :townName " +
-            "AND p.pinId < : pinId " +
+            "AND p.pinId < :pinId " +
             "ORDER BY p.pinId DESC")
     List<Pin> findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(MyCategory myCategory, String townName, Long pinId, Pageable pageable);
     @Query("SELECT p FROM Pin p " +

@@ -51,7 +51,7 @@ public class MyCategoryController {
             @RequestParam(name = "nickname", required = false) String nickname,
             @RequestParam(name = "myCategoryId") Long myCategoryId,
             @RequestParam(name = "townName", required = false) String townName,
-            @RequestParam(name = "pinId") Long pinId                                // paging 처리를 위해 마지막 리턴 pinId 사용
+            @RequestParam(name = "pinId", required = false) Long pinId                                // paging 처리를 위해 마지막 리턴 pinId 사용
             ) {
         User user = authUser.getUser();
         Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, 7);

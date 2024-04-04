@@ -11,14 +11,18 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MyCategoryRepository extends JpaRepository<MyCategory, Long> {
-    @Query("SELECT m FROM MyCategory m WHERE m.status = 'ACTIVE' AND m.user.publishCategory = 'PUBLIC' AND m.user.nickname = :nickname AND m.myCategoryId = :myCategoryId  AND m.myCategoryId < : myCategoryId BY m.myCategoryId DESC")
+    @Query("SELECT m FROM MyCategory m WHERE m.status = 'ACTIVE' AND m.user.publishCategory = 'PUBLIC' AND m.user.nickname = :nickname AND m.myCategoryId = :myCategoryId ORDER BY m.myCategoryId DESC")
     Optional<MyCategory> findByMyCategoryPublicIdAndUserNickname(String nickname, Long myCategoryId);
-    @Query("SELECT m FROM MyCategory m WHERE m.status = 'ACTIVE' AND m.user.nickname = :nickname AND m.myCategoryId = :myCategoryId AND m.myCategoryId < : myCategoryId ORDER BY m.myCategoryId DESC")
+    @Query("SELECT m FROM MyCategory m WHERE m.status = 'ACTIVE' AND m.user.nickname = :nickname AND m.myCategoryId = :myCategoryId ORDER BY m.myCategoryId DESC")
     Optional<MyCategory> findByMyCategoryIdAndUserNickname(String nickname, Long myCategoryId);
     @Query("SELECT m FROM MyCategory m WHERE m.status = 'ACTIVE' AND m.user.publishCategory = 'PUBLIC' AND m.user = :user ORDER BY m.myCategoryId DESC")
-    List<MyCategory> findByUserNicknameAndPublishCategoryPublic(User user, Long myCategoryId, Pageable pageable);
+    List<MyCategory> findByUserNicknameAndPublishCategoryPublic(User user);
+    @Query("SELECT m FROM MyCategory m WHERE m.status = 'ACTIVE' AND m.user.publishCategory = 'PUBLIC' AND m.user = :user AND m.myCategoryId < :myCategoryId ORDER BY m.myCategoryId DESC")
+    List<MyCategory> findByUserNicknameAndPublishCategoryPublicPaging(User user, Long myCategoryId, Pageable pageable);
     @Query("SELECT m FROM MyCategory m WHERE m.status = 'ACTIVE' AND m.user = :user ORDER BY m.myCategoryId DESC")
-    List<MyCategory> findByUserNicknameAndPublishCategory(User user, Long myCategoryId, Pageable pageable);
+    List<MyCategory> findByUserNicknameAndPublishCategory(User user);
+    @Query("SELECT m FROM MyCategory m WHERE m.status = 'ACTIVE' AND m.user = :user AND m.myCategoryId < :myCategoryId ORDER BY m.myCategoryId DESC")
+    List<MyCategory> findByUserNicknameAndPublishCategoryPaging(User user, Long myCategoryId, Pageable pageable);
     @Query("SELECT m FROM MyCategory m WHERE m.status = 'ACTIVE' AND m.myCategoryName = :myCategoryName AND m.user = :user")
     Optional<MyCategory> findByMyCategoryNameAndUser(String myCategoryName, User user);
     @Query("SELECT m FROM MyCategory m WHERE m.status = 'ACTIVE' AND m.myCategoryId = :myCategoryId AND m.user = :user")

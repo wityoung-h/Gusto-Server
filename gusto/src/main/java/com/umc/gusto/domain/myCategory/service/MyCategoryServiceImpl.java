@@ -46,9 +46,18 @@ public class MyCategoryServiceImpl implements MyCategoryService {
             }
             user = userRepository.findByNickname(nickname)
                     .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
-            myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublic(user, myCategoryId, PageRequest.of(pageNumber, 5));
+            if (myCategoryId != null) {
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublicPaging(user, myCategoryId, PageRequest.of(pageNumber, 5));
+            } else {
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublic(user);
+            }
         } else {
-            myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(user, myCategoryId, PageRequest.of(pageNumber, 5));   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
+            if (myCategoryId != null) {
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPaging(user, myCategoryId, PageRequest.of(pageNumber, 5));   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
+            } else {
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(user);   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
+            }
+
         }
         User finalUser = user;
 
@@ -92,11 +101,21 @@ public class MyCategoryServiceImpl implements MyCategoryService {
         }
 
         if (townName != null) {
-            pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(category, townName, pinId, PageRequest.of(pageNumber, 7)))
-                    .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
+            if (pinId != null) {
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(category, townName, pinId, PageRequest.of(pageNumber, 7)))
+                        .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
+            } else {
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESC(category, townName))
+                        .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
+            }
         } else {
-            pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndPinIdDESCPaging(category, pinId, PageRequest.of(pageNumber, 7)))
-                    .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
+            if (pinId != null) {
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndPinIdDESCPaging(category, pinId, PageRequest.of(pageNumber, 7)))
+                        .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
+            } else {
+                pinList = myCategory.map(pinRepository::findPinsByMyCategoryAndPinIdDESC)
+                        .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
+            }
         }
 
 
