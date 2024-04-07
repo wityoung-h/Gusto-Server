@@ -16,10 +16,13 @@ import com.umc.gusto.domain.group.service.GroupService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
@@ -151,12 +154,15 @@ public class GroupController {
   
     /**
      * 그룹 목록 조회
-     * [GET] /groups
+     * [GET] /groups?groupId={groupId}
      */
     @GetMapping
-    public ResponseEntity<List<GetGroupsResponse>> getGroups(@AuthenticationPrincipal AuthUser authUser){
+    public ResponseEntity<Page<GetGroupsResponse>> getGroups(@AuthenticationPrincipal AuthUser authUser,
+                                                             @RequestParam(name = "lastGroupId", required = false) Long lastGroupId,
+                                                             @RequestParam(name = "size", defaultValue = "5") int size)
+    {
         User user = authUser.getUser();
-        List<GetGroupsResponse> getGroups = groupService.getUserGroups(user);
+        Page<GetGroupsResponse> getGroups = groupService.getUserGroups(user, lastGroupId, size);
         return ResponseEntity.status(HttpStatus.OK).body(getGroups);
     }
 

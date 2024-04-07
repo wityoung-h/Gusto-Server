@@ -13,6 +13,8 @@ import com.umc.gusto.domain.group.model.response.TransferOwnershipResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupsResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -51,7 +53,7 @@ public interface GroupService {
     void leaveGroup(User user, Long groupId);
 
     // 그룹 목록 조회
-    List<GetGroupsResponse> getUserGroups(User user);
+    Page<GetGroupsResponse> getUserGroups(User user, Long groupId, int size);
 
     //그룹 구성원 조회
     List<GetGroupMemberResponse> getGroupMembers(Long groupId);
