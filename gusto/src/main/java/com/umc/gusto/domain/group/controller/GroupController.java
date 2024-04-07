@@ -154,7 +154,7 @@ public class GroupController {
   
     /**
      * 그룹 목록 조회
-     * [GET] /groups?groupId={groupId}
+     * [GET] /groups?lastGroupId={lastGroupId}
      */
     @GetMapping
     public ResponseEntity<Page<GetGroupsResponse>> getGroups(@AuthenticationPrincipal AuthUser authUser,
@@ -168,11 +168,13 @@ public class GroupController {
 
     /**
      * 그룹 구성원 조회
-     * [GET] /groups/{groupId}/members
+     * [GET] /groups/{groupId}/members?lastMemberId={lastMemberId}
      */
     @GetMapping("/{groupId}/members")
-    public ResponseEntity<List<GetGroupMemberResponse>> getGroupMembers (@PathVariable Long groupId){
-        List<GetGroupMemberResponse> getGroupMembers = groupService.getGroupMembers(groupId);
+    public ResponseEntity<Page<GetGroupMemberResponse>> getGroupMembers (@PathVariable Long groupId,
+                                                                         @RequestParam(name = "lastMemberId", required = false) Long lastMemberId,
+                                                                         @RequestParam(name = "size", defaultValue = "10") int size){
+        Page<GetGroupMemberResponse> getGroupMembers = groupService.getGroupMembers(groupId, lastMemberId, size);
         return ResponseEntity.status(HttpStatus.OK).body(getGroupMembers);
     }
 

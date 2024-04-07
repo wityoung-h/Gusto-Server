@@ -92,7 +92,13 @@ public class GroupServiceImpl implements GroupService{
         Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
                 .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
         Long ownerMemberId = groupMemberRepository.findGroupMemberIdByGroupAndUser(group, group.getOwner());
-        List<GetGroupMemberResponse> groupMembersDto = getGroupMembers(groupId);
+        List<GetGroupMemberResponse> groupMembersDto = groupMemberRepository.findGroupMembersByGroup(group).stream()
+                .map(groupMember -> GetGroupMemberResponse.builder()
+                        .groupMemberId(groupMember.getGroupMemberId())
+                        .nickname(groupMember.getUser().getNickname())
+                        .profileImg(groupMember.getUser().getProfileImage())
+                        .build())
+                .collect(Collectors.toList());
         return GetGroupResponse.builder()
                 .groupId(group.getGroupId())
                 .groupName(group.getGroupName())
@@ -223,17 +229,27 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Transactional(readOnly = true)
-    public List<GetGroupMemberResponse> getGroupMembers(Long groupId){
-        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
-                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
-        List<GroupMember> groupMembers = groupMemberRepository.findGroupMembersByGroup(group);
-        return groupMembers.stream()
-                .map(groupMember -> GetGroupMemberResponse.builder()
+    public Page<GetGroupMemberResponse> getGroupMembers(Long groupId, Long lastMemberId, int size){
+        Page<GroupMember> groupMembers = pagingGroupMember(groupId, lastMemberId, size);
+
+        return groupMembers.map(groupMember -> GetGroupMemberResponse.builder()
                         .groupMemberId(groupMember.getGroupMemberId())
                         .nickname(groupMember.getUser().getNickname())
                         .profileImg(groupMember.getUser().getProfileImage())
-                        .build())
-                .collect(Collectors.toList());
+                        .build());
+    }
+
+    private Page<GroupMember> pagingGroupMember(Long groupId, Long lastMemberId, int size){
+        // 그룹 멤버 목록 커서 페이징 처리
+        Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "groupMemberId"));
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+
+        if (lastMemberId == null) {
+            return groupMemberRepository.findGroupMembersByGroup(group, pageable);
+        }else{
+            return groupMemberRepository.findGroupMembersByGroupLessThan(group, lastMemberId, pageable);
+        }
     }
 
     public TransferOwnershipResponse transferOwnership(User owner, Long groupId, TransferOwnershipRequest transferOwnershipRequest){
