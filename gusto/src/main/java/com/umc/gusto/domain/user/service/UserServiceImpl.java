@@ -5,12 +5,10 @@ import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.NicknameBucket;
 import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
+import com.umc.gusto.domain.user.model.request.SignInRequest;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
-import com.umc.gusto.domain.user.model.response.FeedProfileResponse;
-import com.umc.gusto.domain.user.model.response.ProfileResponse;
-import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
-import com.umc.gusto.domain.user.model.response.FollowResponse;
+import com.umc.gusto.domain.user.model.response.*;
 import com.umc.gusto.domain.user.repository.FollowRepository;
 import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.domain.user.repository.UserRepository;
@@ -126,7 +124,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public String generateRandomNickname() {
+    public NicknameResponse generateRandomNickname() {
         String nickname;
 
         // 중복 없는 닉네임이 생성될 때까지 반복
@@ -147,7 +145,23 @@ public class UserServiceImpl implements UserService{
             break;
         }
 
-        return nickname;
+        return new NicknameResponse(nickname);
+    }
+
+    @Override
+    public Tokens signIn(SignInRequest signInRequest) {
+        // social 정보 확인
+        Social social = socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(signInRequest.getProvider()), signInRequest.getProviderId())
+                .orElseThrow(() -> new GeneralException(Code.USER_NOT_OUR_CLIENT));
+
+        // social 정보와 연결된 유저 정보 불러옴
+        User user = social.getUser();
+
+        // access-token 및 refresh-token 생성
+        Tokens tokens = jwtService.createToken(String.valueOf(user.getUserId()));
+        redisService.setValuesWithTimeout(tokens.getRefreshToken(), String.valueOf(user.getUserId()), JwtConfig.REFRESH_TOKEN_VALID_TIME);
+
+        return tokens;
     }
 
     @Override

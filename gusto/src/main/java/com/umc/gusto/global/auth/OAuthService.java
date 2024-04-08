@@ -50,7 +50,7 @@ public class OAuthService extends DefaultOAuth2UserService {
                      .build());
 
              if(oAuthAttributes.getNickname() == null) {
-                 oAuthAttributes.updateNickname(userService.generateRandomNickname());
+                 oAuthAttributes.updateNickname(userService.generateRandomNickname().getNickname());
              }
 
              if(oAuthAttributes.getProfileImg() == null) {

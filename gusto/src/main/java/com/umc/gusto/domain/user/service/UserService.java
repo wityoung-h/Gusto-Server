@@ -2,12 +2,10 @@ package com.umc.gusto.domain.user.service;
 
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
+import com.umc.gusto.domain.user.model.request.SignInRequest;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
-import com.umc.gusto.domain.user.model.response.FeedProfileResponse;
-import com.umc.gusto.domain.user.model.response.ProfileResponse;
-import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
-import com.umc.gusto.domain.user.model.response.FollowResponse;
+import com.umc.gusto.domain.user.model.response.*;
 import com.umc.gusto.global.auth.model.Tokens;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,7 +23,9 @@ public interface UserService {
     void confirmNickname(String nickname);
 
     // 닉네임 랜덤 생성
-    String generateRandomNickname();
+    NicknameResponse generateRandomNickname();
+
+    Tokens signIn(SignInRequest signInRequest);
 
     // 먹스또 프로필 조회
     FeedProfileResponse getProfile(User user, String nickname);
