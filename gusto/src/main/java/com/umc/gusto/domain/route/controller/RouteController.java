@@ -53,9 +53,10 @@ public class RouteController {
      */
     @GetMapping("")
     public ResponseEntity<List<RouteResponse>> allMyRoute(
-            @AuthenticationPrincipal AuthUser authUSer
+            @AuthenticationPrincipal AuthUser authUSer,
+            @RequestParam(required = false, name = "routeId") Long routeId
     ){
-        List<RouteResponse> route = routeService.getRoute(authUSer.getUser());
+        List<RouteResponse> route = routeService.getRoute(authUSer.getUser(),routeId);
         return ResponseEntity.ok().body(route);
     }
 
@@ -64,8 +65,9 @@ public class RouteController {
      * [GET] /routes/groups{groupId}
      */
     @GetMapping("/groups/{groupId}")
-    public ResponseEntity<List<RouteResponse>> allMyRoute(@PathVariable Long groupId){
-        List<RouteResponse> route = routeService.getGroupRoute(groupId);
+    public ResponseEntity<List<RouteResponse>> allMyRoute(
+            @PathVariable Long groupId, @RequestParam(required = false, name = "routeId") Long routeId){
+        List<RouteResponse> route = routeService.getGroupRoute(groupId, routeId);
         return ResponseEntity.ok().body(route);
     }
 
@@ -84,8 +86,11 @@ public class RouteController {
      * [GET] /routes/{nickname}
      */
     @GetMapping("/{nickname}")
-    public ResponseEntity<List<RouteResponse>> allUserRoute(@PathVariable String nickname){
-        List<RouteResponse> route = routeService.getRoute(nickname);
+    public ResponseEntity<List<RouteResponse>> allUserRoute
+    (@PathVariable String nickname,
+     @RequestParam(required = false, name = "routeId") Long routeId
+     ){
+        List<RouteResponse> route = routeService.getRoute(nickname,routeId);
         return ResponseEntity.ok().body(route);
     }
 

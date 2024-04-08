@@ -15,14 +15,14 @@ public interface RouteService {
     void deleteRoute(Long routeId,User user);
 
     // 내 루트 조회
-    List<RouteResponse> getRoute(User user);
+    List<RouteResponse> getRoute(User user, Long routeId);
 
     // 그룹 내 루트 조회
-    List<RouteResponse> getGroupRoute(Long groupId );
+    List<RouteResponse> getGroupRoute(Long groupId,Long routeId);
 
     // 루트 상세 수정
     void modifyRouteList(Long routeId, ModifyRouteRequest request);
 
     // 타인의 루트 조회
-    List<RouteResponse> getRoute(String nickname);
+    List<RouteResponse> getRoute(String nickname, Long routeId);
 }
