@@ -30,23 +30,20 @@ public class UserController {
     /**
      * 회원 가입 API
      * [POST] /users/sing-up
-     * @param token
      * @param multipartFile
      * @param signUpRequest
      * @return -
      */
     @PostMapping("/sign-up")
-    public ResponseEntity signUp(@RequestHeader("Temp-Token") String token,
-                         @RequestPart(name = "profileImg", required = false) MultipartFile multipartFile,
+    public ResponseEntity signUp(@RequestPart(name = "profileImg", required = false) MultipartFile multipartFile,
                          @RequestPart(name = "info") SignUpRequest signUpRequest) {
-        // 에러 핸들러 작업 예정으로 try-catch 작성하지 않음
-        Tokens tokens = userService.createUser(token, multipartFile, signUpRequest);
+        Tokens tokens = userService.createUser(multipartFile, signUpRequest);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Auth-Token", tokens.getAccessToken());
         headers.set("refresh-token", tokens.getRefreshToken());
 
-        return ResponseEntity.ok()
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .headers(headers)
                 .build();
     }

@@ -16,7 +16,7 @@ import java.util.List;
 public interface UserService {
     
     // 회원 가입
-    Tokens createUser(String tempToken, MultipartFile multipartFile, SignUpRequest signUpRequest);
+    Tokens createUser(MultipartFile multipartFile, SignUpRequest signUpRequest);
 
     // 닉네임 중복 체크
     void checkNickname(String nickname);

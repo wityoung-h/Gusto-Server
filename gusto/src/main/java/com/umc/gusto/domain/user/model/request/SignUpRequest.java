@@ -6,6 +6,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class SignUpRequest {
+    String provider;
+    String providerId;
     String nickname;
     String age;
     String gender;

@@ -58,15 +58,12 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public Tokens createUser(String tempToken, MultipartFile multipartFile, SignUpRequest request) {
-        // temp token을 사용하여 social 정보 가져오기
-        UUID socialUID = UUID.fromString(tempToken);
-        Social socialInfo = socialRepository.findByTemporalToken(socialUID).orElseThrow(() -> new GeneralException(Code.INVALID_ACCESS_TOKEN));
+    public Tokens createUser(MultipartFile multipartFile, SignUpRequest request) {
+        // 이미 가입된 계정이 존재함
+        socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(request.getProvider()), request.getProviderId())
+                .ifPresent( info -> { throw new GeneralException(Code.USER_ALREADY_SIGNUP); });
 
-        if(socialInfo.getSocialStatus() == Social.SocialStatus.CONNECTED) {
-            throw new GeneralException(Code.USER_ALREADY_SIGNUP);
-        }
-
+        // redis에 임시 저장된 닉네임 정보를 삭제 및 닉네임 중복 검사
         redisService.deleteValues(request.getNickname());
         checkNickname(request.getNickname());
 
@@ -90,10 +87,14 @@ public class UserServiceImpl implements UserService{
                 .build();
 
         user = userRepository.save(user);
-        
-        // social entity 정보 갱신
-        socialInfo.updateUser(user);
-        socialInfo.updateSocialStatus(Social.SocialStatus.CONNECTED);
+
+        // 새로운 소셜 정보 생성
+        Social socialInfo = Social.builder()
+                .socialType(Social.SocialType.valueOf(request.getProvider()))
+                .providerId(request.getProviderId())
+                .user(user)
+                .build();
+
         socialRepository.save(socialInfo);
 
         // access-token 및 refresh-token 생성

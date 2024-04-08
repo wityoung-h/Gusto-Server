@@ -47,7 +47,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
             OAuthAttributes attributes = oAuth2User.getOAuthAttributes();
             String uri = UriComponentsBuilder.fromUriString(redirectUrl + "/new-user")
-                    .queryParam("temp-token", String.valueOf(socialInfo.getTemporalToken()))
+//                    .queryParam("temp-token", String.valueOf(socialInfo.getTemporalToken()))
                     .queryParam("nickname", attributes.getNickname())
                     .queryParam("profileImg", attributes.getProfileImg())
                     .queryParam("gender", attributes.getGender().name())

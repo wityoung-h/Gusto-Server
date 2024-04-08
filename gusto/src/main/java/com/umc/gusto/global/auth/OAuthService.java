@@ -46,7 +46,7 @@ public class OAuthService extends DefaultOAuth2UserService {
                      .socialType(provider)
                      .providerId(oAuthAttributes.getId())
                      .socialStatus(Social.SocialStatus.WAITING_SIGN_UP)
-                     .temporalToken(UUID.randomUUID())
+//                     .temporalToken(UUID.randomUUID())
                      .build());
 
              if(oAuthAttributes.getNickname() == null) {
