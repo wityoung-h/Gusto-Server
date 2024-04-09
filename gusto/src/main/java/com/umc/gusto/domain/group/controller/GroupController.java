@@ -73,7 +73,7 @@ public class GroupController {
     }
 
     /**
-     * 그룹리스트 추가
+     * 그룹리스트 추가 = 그룹에서 찜
      * [POST] /groups/{groupId}/groupList
      */
     @PostMapping("/{groupId}/groupList")
