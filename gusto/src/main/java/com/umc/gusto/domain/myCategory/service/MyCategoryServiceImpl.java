@@ -17,6 +17,8 @@ import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -33,9 +35,13 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
-    public List<MyCategoryResponse> getAllMyCategory(User user, String nickname, String townName) {
+    private static final int MY_CATEGORY_PAGE_SIZE = 7;
+    private static final int PIN_PAGE_SIZE = 5;
 
+    @Transactional(readOnly = true)
+    public List<MyCategoryResponse> getAllMyCategory(User user, String nickname, String townName, Long myCategoryId, Pageable pageable) {
+
+        int pageNumber = pageable.getPageNumber();
         List<MyCategory> myCategoryList;
         if (nickname != null) {
             if (nickname.equals(user.getNickname())) {
@@ -43,11 +49,22 @@ public class MyCategoryServiceImpl implements MyCategoryService {
             }
             user = userRepository.findByNickname(nickname)
                     .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
-            myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublic(user);
+            if (myCategoryId != null) {
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublicPaging(user, myCategoryId, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));
+            } else {
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublic(user, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));
+            }
         } else {
-            myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(user);   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
+            if (myCategoryId != null) {
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPaging(user, myCategoryId, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
+            } else {
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(user, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
+            }
+
         }
         User finalUser = user;
+
+
         return myCategoryList.stream()
                 .map(myCategory -> {
                     List<Pin> pinList;
@@ -70,8 +87,10 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     }
 
     @Transactional(readOnly = true)
-    public List<PinByMyCategoryResponse> getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName) {
+    public List<PinByMyCategoryResponse> getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName, Long pinId, Pageable pageable) {
         Optional<MyCategory> myCategory;
+
+        int pageNumber = pageable.getPageNumber();
         List<Pin> pinList;
         if (nickname != null) {
             if (nickname.equals(user.getNickname())) {
@@ -85,11 +104,21 @@ public class MyCategoryServiceImpl implements MyCategoryService {
         }
 
         if (townName != null) {
-            pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESC(category, townName))
-                    .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
+            if (pinId != null) {
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(category, townName, pinId, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
+                        .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
+            } else {
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCFirstPaging(category, townName, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
+                        .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
+            }
         } else {
-            pinList = myCategory.map(pinRepository::findPinsByMyCategoryAndPinIdDESC)
-                    .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
+            if (pinId != null) {
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndPinIdDESCPaging(category, pinId, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
+                        .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
+            } else {
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndPinIdDESCFirstPaging(category, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
+                        .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
+            }
         }
 
 
@@ -98,7 +127,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                 .map(pin -> {
                     Store store = pin.getStore();
                     Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(store);               // 가장 좋아요가 많은 review
-                    String reviewImg = topReviewOptional.map(Review::getImg1).orElse("");                               // 가장 좋아요가 많은 review 이미지
+                    String reviewImg = topReviewOptional.map(Review::getImg1).orElse("");                               // 가장 좋아요가 많은 review 이미지(TO DO: 3개 출력으로 변경)
                     Integer reviewCnt = reviewRepository.countByStoreAndUserNickname(store, finalUser.getNickname());                        // 내가 작성한 리뷰의 개수 == 방문 횟수
 
                     return  PinByMyCategoryResponse.builder()

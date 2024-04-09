@@ -19,6 +19,7 @@ import com.umc.gusto.global.common.PublishStatus;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,8 @@ public class RouteServiceImpl implements RouteService{
     private final RouteListService routeListService;
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
+
+    private static final int ROUTE_LIST_PAGE = 6;
 
 
     @Transactional
@@ -87,11 +90,16 @@ public class RouteServiceImpl implements RouteService{
     }
 
     @Override
-    public List<RouteResponse> getRoute(User user) {
+    public List<RouteResponse> getRoute(User user, Long routeId) {
         userRepository.findByNicknameAndMemberStatusIs(user.getNickname(), User.MemberStatus.ACTIVE)
                 .orElseThrow(()->new GeneralException(Code.USER_NOT_FOUND));
 
-        List<Route> routes = routeRepository.findRouteByUserAndStatus(user, BaseEntity.Status.ACTIVE);
+        List<Route> routes;
+        if(routeId == null) {
+            routes = routeRepository. findRouteByUserFirstId(user,BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
+        }else{
+            routes = routeRepository.findRouteByAfterIRouted(user,routeId, BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
+        }
 
         return routes.stream()
                 .map(route -> RouteResponse.builder()
@@ -103,13 +111,17 @@ public class RouteServiceImpl implements RouteService{
     }
 
     @Override
-    public List<RouteResponse> getGroupRoute(Long groupId) {
+    public List<RouteResponse> getGroupRoute(Long groupId, Long routeId) {
+        if(routeId == null) {
+            routeId = 0L;
+        }
+
         // 그룹 존재 여부 확인
         Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
                 .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
 
         //특정 그룹 내 루트 조회
-        List<Route> routes = routeRepository.findRoutesByGroupAndStatusOrderByCreatedAtDesc(group,BaseEntity.Status.ACTIVE);
+        List<Route> routes = routeRepository.findRoutesByGroup(group,routeId,BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
         return routes.stream().map(
                         Route -> RouteResponse.builder()
                                 .routeId(Route.getRouteId())
@@ -165,11 +177,16 @@ public class RouteServiceImpl implements RouteService{
     }
 
     @Override
-    public List<RouteResponse> getRoute(String nickname) {
+    public List<RouteResponse> getRoute(String nickname,Long routeId) {
         User user = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
                 .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
 
-        List<Route> routes = routeRepository.findRouteByUserAndStatus(user, BaseEntity.Status.ACTIVE);
+        List<Route> routes;
+        if(routeId == null) {
+            routes = routeRepository. findRouteByUserFirstId(user,BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
+        }else{
+            routes = routeRepository.findRouteByAfterIRouted(user,routeId, BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
+        }
 
         return routes.stream()
                 .map(route -> {

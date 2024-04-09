@@ -4,6 +4,7 @@ import com.umc.gusto.domain.group.entity.Group;
 import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,14 +25,18 @@ public interface RouteRepository extends JpaRepository<Route,Long> {
     @Query("SELECT r FROM Route r WHERE r.routeId = :routeId AND r.status = :status AND r.group.groupId IS NULL")
     Optional<Route> findRouteByRouteIdAndStatusAndGroup(@Param("routeId") Long routeId, @Param("status") BaseEntity.Status status);
 
-    // 유저의 루트 목록 조회 , 그룹X, ACTIVE
+    // 가장 첫 페이징
     @Query("select r from Route r where r.user = :user AND r.status = :status AND r.group.groupId IS NULL ORDER BY r.createdAt DESC")
-    List<Route> findRouteByUserAndStatus(@Param("user") User user, @Param("status") BaseEntity.Status status);
+    List<Route> findRouteByUserFirstId(@Param("user") User user , @Param("status") BaseEntity.Status status, Pageable pageable);
+
+    // 유저의 루트 목록 조회 , 그룹X, ACTIVE
+    @Query("select r from Route r where r.user = :user AND r.status = :status AND r.routeId <:routeId AND r.group.groupId IS NULL ORDER BY r.createdAt DESC")
+    List<Route> findRouteByAfterIRouted(@Param("user") User user, @Param("routeId") Long routeId , @Param("status") BaseEntity.Status status, Pageable pageable);
 
     // 그룹의 루트 개수 조회
     int countRoutesByGroupAndStatus(Group group, BaseEntity.Status status);
 
     // 그룹의 루트 목록 조회
-    List<Route> findRoutesByGroupAndStatusOrderByCreatedAtDesc(Group group, BaseEntity.Status status);
-
+    @Query("select r from Route r where r.group =:group AND r.status =:status AND r.routeId >:routeId ")
+    List<Route> findRoutesByGroup(@Param("group") Group group, @Param("routeId") Long routeId ,@Param("status") BaseEntity.Status status, Pageable pageable);
 }
