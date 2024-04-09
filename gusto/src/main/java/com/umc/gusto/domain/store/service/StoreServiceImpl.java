@@ -75,6 +75,7 @@ public class StoreServiceImpl implements StoreService{
     public GetStoreDetailResponse getStoreDetail(User user, Long storeId, LocalDate visitedAt, Long reviewId, Pageable pageable) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
+        // 가게별 기본 카테고리 값
 //        Category category = storeRepository.findCategoryByStoreId(storeId)
 //                .orElseThrow(() -> new GeneralException(Code.CATEGORY_NOT_FOUND));
         Long pinId = pinRepository.findByUserAndStoreStoreId(user, storeId);

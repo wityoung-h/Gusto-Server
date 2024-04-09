@@ -3,6 +3,8 @@ package com.umc.gusto.domain.myCategory.repository;
 import com.umc.gusto.domain.myCategory.entity.MyCategory;
 import com.umc.gusto.domain.myCategory.entity.Pin;
 import com.umc.gusto.domain.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,12 +18,38 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
             "WHERE p.myCategory = :myCategory " +
             "AND t.townName = :townName " +
             "ORDER BY p.pinId DESC")
+    List<Pin> findPinsByMyCategoryAndTownNameAndPinIdDESCFirstPaging(MyCategory myCategory, String townName, Pageable pageable);
+    @Query("SELECT p FROM Pin p " +
+            "JOIN p.store s " +
+            "JOIN s.town t " +
+            "WHERE p.myCategory = :myCategory " +
+            "AND t.townName = :townName " +
+            "ORDER BY p.pinId DESC")
     List<Pin> findPinsByMyCategoryAndTownNameAndPinIdDESC(MyCategory myCategory, String townName);
+    @Query("SELECT p FROM Pin p " +
+            "JOIN p.store s " +
+            "JOIN s.town t " +
+            "WHERE p.myCategory = :myCategory " +
+            "AND t.townName = :townName " +
+            "AND p.pinId < :pinId " +
+            "ORDER BY p.pinId DESC")
+    List<Pin> findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(MyCategory myCategory, String townName, Long pinId, Pageable pageable);
+    @Query("SELECT p FROM Pin p " +
+            "JOIN p.store s " +
+            "WHERE p.myCategory = :myCategory " +
+            "ORDER BY p.pinId DESC")
+    List<Pin> findPinsByMyCategoryAndPinIdDESCFirstPaging(MyCategory myCategory, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "JOIN p.store s " +
             "WHERE p.myCategory = :myCategory " +
             "ORDER BY p.pinId DESC")
     List<Pin> findPinsByMyCategoryAndPinIdDESC(MyCategory myCategory);
+    @Query("SELECT p FROM Pin p " +
+            "JOIN p.store s " +
+            "WHERE p.myCategory = :myCategory " +
+            "AND p.pinId < :pinId " +
+            "ORDER BY p.pinId DESC")
+    List<Pin> findPinsByMyCategoryAndPinIdDESCPaging(MyCategory myCategory, Long pinId, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "JOIN p.store s " +
             "JOIN s.town t " +

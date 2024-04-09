@@ -5,15 +5,16 @@ import com.umc.gusto.domain.myCategory.model.request.UpdateMyCategoryRequest;
 import com.umc.gusto.domain.myCategory.model.response.MyCategoryResponse;
 import com.umc.gusto.domain.myCategory.model.response.PinByMyCategoryResponse;
 import com.umc.gusto.domain.user.entity.User;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface MyCategoryService {
 
-    List<MyCategoryResponse> getAllMyCategory(User user, String nickname, String townName);
+    List<MyCategoryResponse> getAllMyCategory(User user, String nickname, String townName, Long myCategoryId, Pageable pageable);
 //    List<MyCategoryResponse> getAllMyCategoryWithLocation(User user, String townName);
 
-    List<PinByMyCategoryResponse> getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName);
+    List<PinByMyCategoryResponse> getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName, Long pinId, Pageable pageable);
 
 //    List<PinByMyCategoryResponse> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townName);
 
