@@ -293,12 +293,13 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public List<FollowResponse> getFollowList(User user, Long followId) {
-        if(followId == null) {
-            followId = 0L;
-        }
+        List<Follow> followList;
 
-        //follow 목록 조회
-        List<Follow> followList = followRepository.findFollowList(user, followId, Pageable.ofSize(FOLLOW_LIST_PAGE));
+        if(followId == null) {
+            followList = followRepository.findFollowList(user, Pageable.ofSize(FOLLOW_LIST_PAGE));
+        } else {
+            followList = followRepository.findFollowList(user, followId, Pageable.ofSize(FOLLOW_LIST_PAGE));
+        }
 
         // 반환할 목록이 없음 throw Exception
         if(followList.size() == 0) {
@@ -324,11 +325,13 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public List<FollowResponse> getFollwerList(User user, Long followId) {
-        if(followId == null) {
-            followId = 0L;
-        }
+        List<Follow> followList;
 
-        List<Follow> followList = followRepository.findFollwerList(user, followId, Pageable.ofSize(FOLLOW_LIST_PAGE));
+        if(followId == null) {
+            followList = followRepository.findFollwerList(user, Pageable.ofSize(FOLLOW_LIST_PAGE));
+        } else {
+            followList = followRepository.findFollwerList(user, followId, Pageable.ofSize(FOLLOW_LIST_PAGE));
+        }
 
         // 반환할 목록이 없음 throw Exception
         if(followList.size() == 0) {
