@@ -134,8 +134,8 @@ public class GroupController {
      * [GET] /groups/{groupId}/groupLists
      */
     @GetMapping("/{groupId}/groupLists")
-    public ResponseEntity<List<GroupListResponse>> getGroupList(@PathVariable Long groupId){
-        return ResponseEntity.ok().body(groupService.getAllGroupList(groupId));
+    public ResponseEntity<List<GroupListResponse>> getGroupList(@PathVariable Long groupId, @RequestParam(required = false, name = "groupListId") Long groupListId){
+        return ResponseEntity.ok().body(groupService.getAllGroupList(groupId, groupListId));
     }
 
       

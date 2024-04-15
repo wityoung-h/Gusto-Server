@@ -33,6 +33,7 @@ import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import com.umc.gusto.global.exception.customException.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -55,6 +56,8 @@ public class GroupServiceImpl implements GroupService{
     private static final int INVITE_CODE_LENGTH = 12;
     private final StoreRepository storeRepository;
     private final ReviewRepository reviewRepository;
+    private static final int GROUP_LIST_FIRST_PAGE = 8;
+    private static final int GROUP_LIST_PAGE = 6;
 
 
     public void createGroup(User owner, PostGroupRequest postGroupRequest){
@@ -287,12 +290,22 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Override
-    public List<GroupListResponse> getAllGroupList(Long groupId) {
+    public List<GroupListResponse> getAllGroupList(Long groupId, Long groupListId) {
+
         // 그룹 존재여부 확인
         Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
                 .orElseThrow(() -> new GeneralException(Code.FIND_FAIL_GROUP));
-        // 그룹 내 모든 찜한 상점 조회 = 그룹리스트 조회
-        List<GroupList> groupLists = groupListRepository.findGroupListByGroupOrderByCreatedAtDesc(group);
+
+        List<GroupList> groupLists;
+        if(groupListId == null){
+            // 그룹 내 모든 찜한 상점 조회 = 그룹리스트 조회
+            groupLists = groupListRepository.findFirstGroupListOrderByDesc(group, Pageable.ofSize(GROUP_LIST_FIRST_PAGE));
+        }else{
+            // 그룹 내 모든 찜한 상점 조회 = 그룹리스트 조회
+            groupLists = groupListRepository.findGroupListByGroupOrderByCreatedAtDesc(group,groupListId, Pageable.ofSize(GROUP_LIST_PAGE));
+
+        }
+
 
         // 그룹 리스트에 해당하는 각 상점 정보 조회
         return groupLists.stream().map(gl -> {
