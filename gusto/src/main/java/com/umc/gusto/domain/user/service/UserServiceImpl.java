@@ -5,12 +5,10 @@ import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.NicknameBucket;
 import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
+import com.umc.gusto.domain.user.model.request.SignInRequest;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
-import com.umc.gusto.domain.user.model.response.FeedProfileResponse;
-import com.umc.gusto.domain.user.model.response.ProfileResponse;
-import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
-import com.umc.gusto.domain.user.model.response.FollowResponse;
+import com.umc.gusto.domain.user.model.response.*;
 import com.umc.gusto.domain.user.repository.FollowRepository;
 import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.domain.user.repository.UserRepository;
@@ -58,15 +56,12 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public Tokens createUser(String tempToken, MultipartFile multipartFile, SignUpRequest request) {
-        // temp token을 사용하여 social 정보 가져오기
-        UUID socialUID = UUID.fromString(tempToken);
-        Social socialInfo = socialRepository.findByTemporalToken(socialUID).orElseThrow(() -> new GeneralException(Code.INVALID_ACCESS_TOKEN));
+    public Tokens createUser(MultipartFile multipartFile, SignUpRequest request) {
+        // 이미 가입된 계정이 존재함
+        socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(request.getProvider()), request.getProviderId())
+                .ifPresent( info -> { throw new GeneralException(Code.USER_ALREADY_SIGNUP); });
 
-        if(socialInfo.getSocialStatus() == Social.SocialStatus.CONNECTED) {
-            throw new GeneralException(Code.USER_ALREADY_SIGNUP);
-        }
-
+        // redis에 임시 저장된 닉네임 정보를 삭제 및 닉네임 중복 검사
         redisService.deleteValues(request.getNickname());
         checkNickname(request.getNickname());
 
@@ -90,10 +85,14 @@ public class UserServiceImpl implements UserService{
                 .build();
 
         user = userRepository.save(user);
-        
-        // social entity 정보 갱신
-        socialInfo.updateUser(user);
-        socialInfo.updateSocialStatus(Social.SocialStatus.CONNECTED);
+
+        // 새로운 소셜 정보 생성
+        Social socialInfo = Social.builder()
+                .socialType(Social.SocialType.valueOf(request.getProvider()))
+                .providerId(request.getProviderId())
+                .user(user)
+                .build();
+
         socialRepository.save(socialInfo);
 
         // access-token 및 refresh-token 생성
@@ -125,7 +124,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public String generateRandomNickname() {
+    public NicknameResponse generateRandomNickname() {
         String nickname;
 
         // 중복 없는 닉네임이 생성될 때까지 반복
@@ -146,7 +145,23 @@ public class UserServiceImpl implements UserService{
             break;
         }
 
-        return nickname;
+        return new NicknameResponse(nickname);
+    }
+
+    @Override
+    public Tokens signIn(SignInRequest signInRequest) {
+        // social 정보 확인
+        Social social = socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(signInRequest.getProvider()), signInRequest.getProviderId())
+                .orElseThrow(() -> new GeneralException(Code.USER_NOT_OUR_CLIENT));
+
+        // social 정보와 연결된 유저 정보 불러옴
+        User user = social.getUser();
+
+        // access-token 및 refresh-token 생성
+        Tokens tokens = jwtService.createToken(String.valueOf(user.getUserId()));
+        redisService.setValuesWithTimeout(tokens.getRefreshToken(), String.valueOf(user.getUserId()), JwtConfig.REFRESH_TOKEN_VALID_TIME);
+
+        return tokens;
     }
 
     @Override

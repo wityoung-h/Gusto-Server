@@ -25,14 +25,11 @@ public class Social extends BaseTime {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 15)
-    private SocialStatus socialStatus = SocialStatus.WAITING_SIGN_UP;
+    private SocialStatus socialStatus = SocialStatus.CONNECTED;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private User user;
-
-    @Column(columnDefinition = "BINARY(16)")
-    private UUID temporalToken;
 
     @Column
     private String providerId;

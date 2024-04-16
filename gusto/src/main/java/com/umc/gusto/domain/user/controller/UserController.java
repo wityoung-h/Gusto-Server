@@ -2,13 +2,11 @@ package com.umc.gusto.domain.user.controller;
 
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
+import com.umc.gusto.domain.user.model.request.SignInRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
-import com.umc.gusto.domain.user.model.response.ProfileResponse;
-import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
+import com.umc.gusto.domain.user.model.response.*;
 import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
-import com.umc.gusto.domain.user.model.response.FeedProfileResponse;
-import com.umc.gusto.domain.user.model.response.FollowResponse;
 import com.umc.gusto.global.auth.model.AuthUser;
 import com.umc.gusto.global.auth.model.Tokens;
 import lombok.RequiredArgsConstructor;
@@ -29,26 +27,37 @@ public class UserController {
 
     /**
      * 회원 가입 API
-     * [POST] /users/sing-up
-     * @param token
+     * [POST] /users/sign-up
      * @param multipartFile
      * @param signUpRequest
      * @return -
      */
     @PostMapping("/sign-up")
-    public ResponseEntity signUp(@RequestHeader("Temp-Token") String token,
-                         @RequestPart(name = "profileImg", required = false) MultipartFile multipartFile,
+    public ResponseEntity signUp(@RequestPart(name = "profileImg", required = false) MultipartFile multipartFile,
                          @RequestPart(name = "info") SignUpRequest signUpRequest) {
-        // 에러 핸들러 작업 예정으로 try-catch 작성하지 않음
-        Tokens tokens = userService.createUser(token, multipartFile, signUpRequest);
+        Tokens tokens = userService.createUser(multipartFile, signUpRequest);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Auth-Token", tokens.getAccessToken());
         headers.set("refresh-token", tokens.getRefreshToken());
 
-        return ResponseEntity.ok()
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .headers(headers)
                 .build();
+    }
+
+    /**
+     * 기본 닉네임 생성 API
+     * [GET] /users/random-nickname
+     * @param -
+     * @return String
+     */
+    @PostMapping("/random-nickname")
+    public ResponseEntity generateNickname() {
+        NicknameResponse nicknameResponse = userService.generateRandomNickname();
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(nicknameResponse);
     }
 
     /**
@@ -76,6 +85,25 @@ public class UserController {
         userService.confirmNickname(nickname);
 
         return ResponseEntity.ok()
+                .build();
+    }
+
+    /**
+     * 로그인 API
+     * [POST] /users/sign-in
+     * @param signInRequest
+     * @return -
+     */
+    @PostMapping("/sign-up")
+    public ResponseEntity signUp(@RequestBody SignInRequest signInRequest) {
+        Tokens tokens = userService.signIn(signInRequest);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Auth-Token", tokens.getAccessToken());
+        headers.set("refresh-token", tokens.getRefreshToken());
+
+        return ResponseEntity.ok()
+                .headers(headers)
                 .build();
     }
 
