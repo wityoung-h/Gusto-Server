@@ -33,6 +33,7 @@ import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import com.umc.gusto.global.exception.customException.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,8 +42,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -198,10 +198,11 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Transactional(readOnly = true)
-    public Page<GetGroupsResponse> getUserGroups(User user, Long lastGroupId, int size) {
+    public Map<String, Object> getUserGroups(User user, Long lastGroupId, int size) {
         Page<Group> groups = pagingGroup(user, lastGroupId, size);
+        boolean hasNext = groups.hasNext();
 
-        return groups.map(group -> {
+        List<GetGroupsResponse> responses = groups.map(group -> {
                     int numMembers = groupMemberRepository.countGroupMembersByGroup(group);
                     int numRestaurants = groupListRepository.countGroupListsByGroup(group);
                     int numRoutes = routeRepository.countRoutesByGroupAndStatus(group, BaseEntity.Status.ACTIVE);
@@ -214,7 +215,12 @@ public class GroupServiceImpl implements GroupService{
                             .numRestaurants(numRestaurants)
                             .numRoutes(numRoutes)
                             .build();
-                });
+                }).toList();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("groups", responses);
+        map.put("hasNext", hasNext);
+        return map;
     }
 
     private Page<Group> pagingGroup(User user, Long lastGroupId, int size){
@@ -230,14 +236,20 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Transactional(readOnly = true)
-    public Page<GetGroupMemberResponse> getGroupMembers(Long groupId, Long lastMemberId, int size){
+    public Map<String, Object> getGroupMembers(Long groupId, Long lastMemberId, int size){
         Page<GroupMember> groupMembers = pagingGroupMember(groupId, lastMemberId, size);
+        boolean hasNext = groupMembers.hasNext();
 
-        return groupMembers.map(groupMember -> GetGroupMemberResponse.builder()
+        List<GetGroupMemberResponse> responses = groupMembers.map(groupMember -> GetGroupMemberResponse.builder()
                         .groupMemberId(groupMember.getGroupMemberId())
                         .nickname(groupMember.getUser().getNickname())
                         .profileImg(groupMember.getUser().getProfileImage())
-                        .build());
+                        .build()).toList();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("groupMembers", responses);
+        map.put("hasNext", hasNext);
+        return map;
     }
 
     private Page<GroupMember> pagingGroupMember(Long groupId, Long lastMemberId, int size){
