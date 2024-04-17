@@ -4,7 +4,6 @@ import com.umc.gusto.domain.myCategory.entity.Pin;
 import com.umc.gusto.domain.myCategory.repository.PinRepository;
 import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
-import com.umc.gusto.domain.store.entity.Category;
 import com.umc.gusto.domain.store.entity.OpeningHours;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.model.response.*;
