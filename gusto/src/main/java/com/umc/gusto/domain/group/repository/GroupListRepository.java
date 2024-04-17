@@ -13,10 +13,10 @@ import java.util.Optional;
 
 public interface GroupListRepository extends JpaRepository<GroupList,Long> {
     Optional<GroupList> findGroupListByGroupListId(Long groupListId);
-    @Query("SELECT gl from GroupList gl where gl.group =: group ORDER BY gl.groupListId desc")
+    @Query("SELECT gl from GroupList gl where gl.group =:group ORDER BY gl.groupListId desc")
     List<GroupList> findFirstGroupListOrderByDesc(@Param("group") Group group , Pageable pageable);
 
-    @Query("SELECT gl from GroupList gl where gl.group =: group AND gl.groupListId <:grouteListId ORDER BY gl.groupListId desc")
+    @Query("SELECT gl from GroupList gl where gl.group =:group AND gl.groupListId <:groupListId ORDER BY gl.groupListId desc")
     List<GroupList> findGroupListByGroupOrderByCreatedAtDesc(@Param("group") Group group, @Param("groupListId") Long groupListId , Pageable pageable);
     int countGroupListsByGroup(Group group);
     Boolean existsGroupListByGroupAndStore(Group group, Store store);
