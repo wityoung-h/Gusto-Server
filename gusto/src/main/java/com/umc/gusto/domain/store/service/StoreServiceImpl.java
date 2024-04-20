@@ -14,6 +14,7 @@ import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -89,7 +90,7 @@ public class StoreServiceImpl implements StoreService{
         // reviews 페이징 처리 (3,6,6...)
         int pageSize;
         int pageNumber = pageable.getPageNumber();
-        List<Review> reviews;
+        Page<Review> reviews;
 
         if (reviewId != null && visitedAt != null) {
             pageSize = PAGE_SIZE;
@@ -127,7 +128,10 @@ public class StoreServiceImpl implements StoreService{
                 .address(store.getAddress())
                 .reviewImg4(reviewImg)
                 .pin(isPinned)
-                .reviews(getReviews)
+                .reviews(PagingResponse.builder()
+                    .hasNext(reviews.hasNext())
+                    .result(getReviews)
+                    .build())
                 .build();
     }
 
