@@ -18,7 +18,7 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
             "WHERE p.myCategory = :myCategory " +
             "AND t.townName = :townName " +
             "ORDER BY p.pinId DESC")
-    List<Pin> findPinsByMyCategoryAndTownNameAndPinIdDESCFirstPaging(MyCategory myCategory, String townName, Pageable pageable);
+    Page<Pin> findPinsByMyCategoryAndTownNameAndPinIdDESCFirstPaging(MyCategory myCategory, String townName, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "JOIN p.store s " +
             "JOIN s.town t " +
@@ -33,12 +33,12 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
             "AND t.townName = :townName " +
             "AND p.pinId < :pinId " +
             "ORDER BY p.pinId DESC")
-    List<Pin> findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(MyCategory myCategory, String townName, Long pinId, Pageable pageable);
+    Page<Pin> findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(MyCategory myCategory, String townName, Long pinId, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "JOIN p.store s " +
             "WHERE p.myCategory = :myCategory " +
             "ORDER BY p.pinId DESC")
-    List<Pin> findPinsByMyCategoryAndPinIdDESCFirstPaging(MyCategory myCategory, Pageable pageable);
+    Page<Pin> findPinsByMyCategoryAndPinIdDESCFirstPaging(MyCategory myCategory, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "JOIN p.store s " +
             "WHERE p.myCategory = :myCategory " +
@@ -49,7 +49,7 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
             "WHERE p.myCategory = :myCategory " +
             "AND p.pinId < :pinId " +
             "ORDER BY p.pinId DESC")
-    List<Pin> findPinsByMyCategoryAndPinIdDESCPaging(MyCategory myCategory, Long pinId, Pageable pageable);
+    Page<Pin> findPinsByMyCategoryAndPinIdDESCPaging(MyCategory myCategory, Long pinId, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "JOIN p.store s " +
             "JOIN s.town t " +
