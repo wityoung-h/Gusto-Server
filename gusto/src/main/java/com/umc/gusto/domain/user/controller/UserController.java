@@ -17,8 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -236,12 +234,12 @@ public class UserController {
      * @return List<>
      */
     @GetMapping("/following")
-    public ResponseEntity<List<FollowResponse>> followList(@AuthenticationPrincipal AuthUser authUser,
+    public ResponseEntity<PagingResponse> followList(@AuthenticationPrincipal AuthUser authUser,
                                                            @RequestParam(required = false, name = "followId") Long followId) {
-        List<FollowResponse> followResponses = userService.getFollowList(authUser.getUser(), followId);
+        PagingResponse pagingResponse = userService.getFollowList(authUser.getUser(), followId);
 
         return ResponseEntity.ok()
-                .body(followResponses);
+                .body(pagingResponse);
     }
 
     /**
@@ -251,11 +249,11 @@ public class UserController {
      * @return List<>
      */
     @GetMapping("/follower")
-    public ResponseEntity<List<FollowResponse>> followerList(@AuthenticationPrincipal AuthUser authUser,
+    public ResponseEntity<PagingResponse> followerList(@AuthenticationPrincipal AuthUser authUser,
                                                            @RequestParam(required = false, name = "followId") Long followId) {
-        List<FollowResponse> followResponses = userService.getFollwerList(authUser.getUser(), followId);
+        PagingResponse pagingResponse = userService.getFollwerList(authUser.getUser(), followId);
 
         return ResponseEntity.ok()
-                .body(followResponses);
+                .body(pagingResponse);
     }
 }
