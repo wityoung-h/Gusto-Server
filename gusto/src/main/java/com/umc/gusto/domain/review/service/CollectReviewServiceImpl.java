@@ -34,7 +34,11 @@ public class CollectReviewServiceImpl implements CollectReviewService{
         //다음에 조회될 리뷰가 있는지 확인하기
         boolean checkNext = reviews.hasNext();
         List<BasicViewResponse> basicViewResponse = reviews.map(BasicViewResponse::of).toList();
-        Long cursorId = basicViewResponse.get(basicViewResponse.size()-1).getReviewId();
+//        Long cursorId = basicViewResponse.get(basicViewResponse.size()-1).getReviewId();
+        Long cursorId = null;
+        if(!basicViewResponse.isEmpty()){
+            cursorId = basicViewResponse.get(basicViewResponse.size()-1).getReviewId();
+        }
         return CollectReviewsResponse.of(basicViewResponse, cursorId,checkNext);
     }
 
@@ -63,7 +67,11 @@ public class CollectReviewServiceImpl implements CollectReviewService{
                     return TimelineViewResponse.of(review, visitedCount);
                 }).toList();
 //        return CollectReviewsOfTimelineResponse.of(timelineViewResponses, checkNext);
-        Long cursorId = timelineViewResponses.get(timelineViewResponses.size()-1).getReviewId();
+//        Long cursorId = timelineViewResponses.get(timelineViewResponses.size()-1).getReviewId();
+        Long cursorId = null;
+        if(!timelineViewResponses.isEmpty()){
+            cursorId = timelineViewResponses.get(timelineViewResponses.size()-1).getReviewId();
+        }
         return CollectReviewsResponse.of(timelineViewResponses, cursorId,checkNext);
     }
   
@@ -90,13 +98,19 @@ public class CollectReviewServiceImpl implements CollectReviewService{
         Sort sort = Sort.by("visitedAt").descending().and(Sort.by("createdAt").descending());
         PageRequest pageRequest = PageRequest.of(0, size, sort);
 
+        Page<Review> reviews;
         //최초로 조회한 경우
         if(cursorId==null){
-            return reviewRepository.findAllByUserAndStatus(user, BaseEntity.Status.ACTIVE, pageRequest).orElseThrow(()-> new NotFoundException(Code.REVIEW_NOT_FOUND));
+            reviews = reviewRepository.findAllByUserAndStatus(user, BaseEntity.Status.ACTIVE, pageRequest).orElseThrow(()-> new NotFoundException(Code.REVIEW_NOT_FOUND));
         }else{ //최초가 아닌 경우
             //커서 id를 기반으로 그보다 낮은 ID의 리뷰를 가져온다 => 최신 날짜가 이전의 데이터가 나타난다.
             Review review = reviewRepository.findById(cursorId).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
-            return reviewRepository.findAllByUserAndStatusAndReviewIdLessThanAndVisitedAtLessThanEqual(user, BaseEntity.Status.ACTIVE, cursorId, review.getVisitedAt(),pageRequest).orElseThrow(()-> new NotFoundException(Code.REVIEW_NOT_FOUND));
+            reviews = reviewRepository.findAllByUserAndStatusAndReviewIdLessThanAndVisitedAtLessThanEqual(user, BaseEntity.Status.ACTIVE, cursorId, review.getVisitedAt(),pageRequest).orElseThrow(()-> new NotFoundException(Code.REVIEW_NOT_FOUND));
         }
+
+        if(reviews.isEmpty()){
+            throw new NotFoundException(Code.REVIEW_NOT_FOUND);
+        }
+        return reviews;
     }
 }
