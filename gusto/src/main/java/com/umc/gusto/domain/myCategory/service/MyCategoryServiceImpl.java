@@ -41,9 +41,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     private static final int PIN_PAGE_SIZE = 5;
 
     @Transactional(readOnly = true)
-    public PagingResponse getAllMyCategory(User user, String nickname, String townName, Long myCategoryId, Pageable pageable) {
-
-        int pageNumber = pageable.getPageNumber();
+    public PagingResponse getAllMyCategory(User user, String nickname, String townName, Long myCategoryId) {
         Page<MyCategory> myCategoryList;
         if (nickname != null) {
             if (nickname.equals(user.getNickname())) {
@@ -52,15 +50,15 @@ public class MyCategoryServiceImpl implements MyCategoryService {
             user = userRepository.findByNickname(nickname)
                     .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
             if (myCategoryId != null) {
-                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublicPaging(user, myCategoryId, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublicPaging(user, myCategoryId, Pageable.ofSize(MY_CATEGORY_PAGE_SIZE));
             } else {
-                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublic(user, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublic(user, Pageable.ofSize(MY_CATEGORY_PAGE_SIZE));
             }
         } else {
             if (myCategoryId != null) {
-                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPaging(user, myCategoryId, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPaging(user, myCategoryId, Pageable.ofSize(MY_CATEGORY_PAGE_SIZE));   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
             } else {
-                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(user, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(user, Pageable.ofSize(MY_CATEGORY_PAGE_SIZE));   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
             }
 
         }
@@ -94,10 +92,9 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     }
 
     @Transactional(readOnly = true)
-    public PagingResponse getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName, Long pinId, Pageable pageable) {
+    public PagingResponse getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName, Long pinId) {
         Optional<MyCategory> myCategory;
 
-        int pageNumber = pageable.getPageNumber();
         Page<Pin> pinList;
         if (nickname != null) {
             if (nickname.equals(user.getNickname())) {
@@ -112,18 +109,18 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
         if (townName != null) {
             if (pinId != null) {
-                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(category, townName, pinId, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(category, townName, pinId, Pageable.ofSize(PIN_PAGE_SIZE)))
                         .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             } else {
-                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCFirstPaging(category, townName, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCFirstPaging(category, townName, Pageable.ofSize(PIN_PAGE_SIZE)))
                         .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             }
         } else {
             if (pinId != null) {
-                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndPinIdDESCPaging(category, pinId, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndPinIdDESCPaging(category, pinId, Pageable.ofSize(PIN_PAGE_SIZE)))
                         .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             } else {
-                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndPinIdDESCFirstPaging(category, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndPinIdDESCFirstPaging(category, Pageable.ofSize(PIN_PAGE_SIZE)))
                         .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             }
         }

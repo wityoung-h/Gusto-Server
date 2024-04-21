@@ -73,7 +73,7 @@ public class StoreServiceImpl implements StoreService{
 
 
     @Transactional(readOnly = true)
-    public GetStoreDetailResponse getStoreDetail(User user, Long storeId, LocalDate visitedAt, Long reviewId, Pageable pageable) {
+    public GetStoreDetailResponse getStoreDetail(User user, Long storeId, LocalDate visitedAt, Long reviewId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
         // 가게별 기본 카테고리 값
@@ -89,15 +89,14 @@ public class StoreServiceImpl implements StoreService{
 
         // reviews 페이징 처리 (3,6,6...)
         int pageSize;
-        int pageNumber = pageable.getPageNumber();
         Page<Review> reviews;
 
         if (reviewId != null && visitedAt != null) {
             pageSize = PAGE_SIZE;
-            reviews = reviewRepository.findReviewsAfterIdByStore(store, visitedAt, reviewId, PageRequest.of(pageNumber, pageSize));
+            reviews = reviewRepository.findReviewsAfterIdByStore(store, visitedAt, reviewId, Pageable.ofSize(pageSize));
         } else {
             pageSize = PAGE_SIZE_FIRST;
-            reviews = reviewRepository.findFirstReviewsByStore(store, PageRequest.of(pageNumber, pageSize));
+            reviews = reviewRepository.findFirstReviewsByStore(store, Pageable.ofSize(pageSize));
         }
 
         List<GetReviewsResponse> getReviews = reviews.stream()

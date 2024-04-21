@@ -23,8 +23,6 @@ import java.util.List;
 public class MyCategoryController {
     private final MyCategoryService myCategoryService;
 
-    private static final int DEFAULT_PAGE_NUMBER = 0;
-
     /**
      * 카테고리 전체 조회
      * [GET] /myCategories?nickname={nickname}&townName={townName}&myCategoryId={myCategoryId}
@@ -36,8 +34,7 @@ public class MyCategoryController {
             @RequestParam(name = "townName", required = false) String townName,
             @RequestParam(name = "myCategoryId", required = false) Long myCategoryId) {     // paging 처리를 위해 마지막 리턴 myCategoryId 사용
         User user = authUser.getUser();
-        Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, 5);
-        PagingResponse pagingResponse = myCategoryService.getAllMyCategory(user, nickname, townName, myCategoryId, pageable);
+        PagingResponse pagingResponse = myCategoryService.getAllMyCategory(user, nickname, townName, myCategoryId);
 
         return ResponseEntity.status(HttpStatus.OK).body(pagingResponse);
     }
@@ -55,8 +52,7 @@ public class MyCategoryController {
             @RequestParam(name = "pinId", required = false) Long pinId                                // paging 처리를 위해 마지막 리턴 pinId 사용
             ) {
         User user = authUser.getUser();
-        Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, 7);
-        PagingResponse pagingResponse = myCategoryService.getAllPinByMyCategory(user, nickname, myCategoryId, townName, pinId, pageable);
+        PagingResponse pagingResponse = myCategoryService.getAllPinByMyCategory(user, nickname, myCategoryId, townName, pinId);
 
         return ResponseEntity.status(HttpStatus.OK).body(pagingResponse);
     }
