@@ -13,50 +13,38 @@ import java.util.Optional;
 
 public interface PinRepository extends JpaRepository<Pin, Long> {
     @Query("SELECT p FROM Pin p " +
-            "JOIN p.store s " +
-            "JOIN s.town t " +
             "WHERE p.myCategory = :myCategory " +
-            "AND t.townName = :townName " +
+            "AND p.store.town.townName = :townName " +
             "ORDER BY p.pinId DESC")
     Page<Pin> findPinsByMyCategoryAndTownNameAndPinIdDESCFirstPaging(MyCategory myCategory, String townName, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
-            "JOIN p.store s " +
-            "JOIN s.town t " +
             "WHERE p.myCategory = :myCategory " +
-            "AND t.townName = :townName " +
+            "AND p.store.town.townName = :townName " +
             "ORDER BY p.pinId DESC")
     List<Pin> findPinsByMyCategoryAndTownNameAndPinIdDESC(MyCategory myCategory, String townName);
     @Query("SELECT p FROM Pin p " +
-            "JOIN p.store s " +
-            "JOIN s.town t " +
             "WHERE p.myCategory = :myCategory " +
-            "AND t.townName = :townName " +
+            "AND p.store.town.townName = :townName " +
             "AND p.pinId < :pinId " +
             "ORDER BY p.pinId DESC")
     Page<Pin> findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(MyCategory myCategory, String townName, Long pinId, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
-            "JOIN p.store s " +
             "WHERE p.myCategory = :myCategory " +
             "ORDER BY p.pinId DESC")
     Page<Pin> findPinsByMyCategoryAndPinIdDESCFirstPaging(MyCategory myCategory, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
-            "JOIN p.store s " +
             "WHERE p.myCategory = :myCategory " +
             "ORDER BY p.pinId DESC")
     List<Pin> findPinsByMyCategoryAndPinIdDESC(MyCategory myCategory);
     @Query("SELECT p FROM Pin p " +
-            "JOIN p.store s " +
             "WHERE p.myCategory = :myCategory " +
             "AND p.pinId < :pinId " +
             "ORDER BY p.pinId DESC")
     Page<Pin> findPinsByMyCategoryAndPinIdDESCPaging(MyCategory myCategory, Long pinId, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
-            "JOIN p.store s " +
-            "JOIN s.town t " +
-            "JOIN p.user u " +
             "WHERE p.user = :user " +
             "AND p.myCategory.myCategoryId = :myCategoryId " +
-            "AND t.townName = :townName " +
+            "AND p.store.town.townName = :townName " +
             "ORDER BY p.pinId DESC")
     List<Pin> findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(User user, Long myCategoryId, String townName);
     Optional<Pin> findByUserAndPinId(User user, Long pinId);
