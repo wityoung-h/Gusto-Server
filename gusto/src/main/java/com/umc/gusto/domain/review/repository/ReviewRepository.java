@@ -32,20 +32,16 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Integer countByStoreAndUserNickname(Store store, String nickname);      // 방문횟수는 리뷰 공개여부과 상관 X
     @Query("SELECT count(r.reviewId) FROM Review r WHERE r.status = 'ACTIVE' AND r.store = :store AND r.user = :user")
     Integer countByStoreAndUser(Store store, User user);
-    @Query("SELECT r.img1 FROM Review r WHERE r.store.storeId = :storeId ORDER BY r.liked DESC")
-    List<String> findTopReviewImageByStoreId(Long storeId);
 
     Optional<Review> findByReviewIdAndStatus(Long reviewId, BaseEntity.Status status);
     Optional<Page<Review>> findAllByUserAndStatus(User user, BaseEntity.Status status, PageRequest pageRequest);
-    Optional<Page<Review>> findAllByUserAndStatusAndReviewIdLessThan(User user, BaseEntity.Status status, Long reviewId,PageRequest pageRequest);
+    Optional<Page<Review>> findAllByUserAndStatusAndReviewIdLessThanAndVisitedAtLessThanEqual(User user, BaseEntity.Status status, Long reviewId, LocalDate visitedAt,PageRequest pageRequest);
     List<Review> findByUserAndStatusAndVisitedAtBetween(User user, BaseEntity.Status status, LocalDate startDate, LocalDate lastDate);
 
-    boolean existsByUserAndReviewIdLessThan(User user, Long reviewId);
     @Query(value = "SELECT * FROM review r WHERE r.user_id <> :user AND r.status = 'ACTIVE' AND r.skip_check=false ORDER BY RAND() limit 33", nativeQuery = true)
     List<Review> findRandomFeedByUser(@Param("user") UUID user); //WHERE r.user_id <> :userZ
 
     boolean existsByStoreAndUserNickname(Store store, String nickname);
-    boolean existsByStore(Store store);
 
     //검색 기능
     @Query("SELECT r FROM Review r WHERE r.status = 'ACTIVE' AND r.skipCheck = false AND r.store.storeName like concat('%', :keyword, '%') OR r.comment like concat('%', :keyword, '%')")
