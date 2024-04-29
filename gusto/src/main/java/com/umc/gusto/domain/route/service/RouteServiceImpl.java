@@ -7,6 +7,7 @@ import com.umc.gusto.domain.route.entity.RouteList;
 import com.umc.gusto.domain.route.model.request.ModifyRoueListRequest;
 import com.umc.gusto.domain.route.model.request.ModifyRouteRequest;
 import com.umc.gusto.domain.route.model.request.RouteRequest;
+import com.umc.gusto.domain.route.model.response.RoutePagingResponse;
 import com.umc.gusto.domain.route.model.response.RouteResponse;
 import com.umc.gusto.domain.route.repository.RouteListRepository;
 import com.umc.gusto.domain.route.repository.RouteRepository;
@@ -19,6 +20,7 @@ import com.umc.gusto.global.common.PublishStatus;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,28 +92,32 @@ public class RouteServiceImpl implements RouteService{
     }
 
     @Override
-    public List<RouteResponse> getRoute(User user, Long routeId) {
+    public RoutePagingResponse getRoute(User user, Long routeId) {
         userRepository.findByNicknameAndMemberStatusIs(user.getNickname(), User.MemberStatus.ACTIVE)
                 .orElseThrow(()->new GeneralException(Code.USER_NOT_FOUND));
 
-        List<Route> routes;
+        Page<Route> routes;
         if(routeId == null) {
-            routes = routeRepository. findRouteByUserFirstId(user,BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
+            routes = routeRepository.findRouteByUserFirstId(user, BaseEntity.Status.ACTIVE, Pageable.ofSize(ROUTE_LIST_PAGE));
         }else{
             routes = routeRepository.findRouteByAfterIRouted(user,routeId, BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
         }
-
-        return routes.stream()
+        List<RouteResponse> list = routes.getContent().stream()
                 .map(route -> RouteResponse.builder()
-                            .routeId(route.getRouteId())
-                            .routeName(route.getRouteName())
-                            .numStore(routeListRepository.countRouteListByRoute(route))
-                            .build())
+                        .routeId(route.getRouteId())
+                        .routeName(route.getRouteName())
+                        .numStore(routeListRepository.countRouteListByRoute(route))
+                        .build())
                 .collect(Collectors.toList());
+        return RoutePagingResponse.builder()
+                .hasNest(routes.hasNext())
+                .result(list)
+                .build();
+
     }
 
     @Override
-    public List<RouteResponse> getGroupRoute(Long groupId, Long routeId) {
+    public  RoutePagingResponse getGroupRoute(Long groupId, Long routeId) {
         if(routeId == null) {
             routeId = 0L;
         }
@@ -121,8 +127,8 @@ public class RouteServiceImpl implements RouteService{
                 .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
 
         //특정 그룹 내 루트 조회
-        List<Route> routes = routeRepository.findRoutesByGroup(group,routeId,BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
-        return routes.stream().map(
+        Page<Route> routes = routeRepository.findRoutesByGroup(group,routeId,BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
+        List<RouteResponse> list = routes.stream().map(
                         Route -> RouteResponse.builder()
                                 .routeId(Route.getRouteId())
                                 .routeName(Route.getRouteName())
@@ -130,6 +136,10 @@ public class RouteServiceImpl implements RouteService{
                                 .groupId(Route.getRouteId())
                                 .build())
                 .collect(Collectors.toList());
+        return RoutePagingResponse.builder()
+                .hasNest(routes.hasNext())
+                .result(list)
+                .build();
     }
 
     @Transactional
@@ -177,18 +187,18 @@ public class RouteServiceImpl implements RouteService{
     }
 
     @Override
-    public List<RouteResponse> getRoute(String nickname,Long routeId) {
+    public RoutePagingResponse getRoute(String nickname,Long routeId) {
         User user = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
                 .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
 
-        List<Route> routes;
+        Page<Route> routes;
         if(routeId == null) {
             routes = routeRepository. findRouteByUserFirstId(user,BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
         }else{
             routes = routeRepository.findRouteByAfterIRouted(user,routeId, BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
         }
 
-        return routes.stream()
+        List<RouteResponse> list = routes.stream()
                 .map(route -> {
                     // 유저 활성화 설정 변경
                     if (!route.getUser().getPublishRoute().equals(PublishStatus.PUBLIC)) {
@@ -201,6 +211,10 @@ public class RouteServiceImpl implements RouteService{
                             .build();
                 })
                 .collect(Collectors.toList());
+        return RoutePagingResponse.builder()
+                .hasNest(routes.hasNext())
+                .result(list)
+                .build();
     }
 
 }

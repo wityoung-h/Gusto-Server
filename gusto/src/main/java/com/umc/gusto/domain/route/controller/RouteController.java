@@ -2,7 +2,7 @@ package com.umc.gusto.domain.route.controller;
 
 import com.umc.gusto.domain.route.model.request.ModifyRouteRequest;
 import com.umc.gusto.domain.route.model.request.RouteRequest;
-import com.umc.gusto.domain.route.model.response.RouteResponse;
+import com.umc.gusto.domain.route.model.response.RoutePagingResponse;
 import com.umc.gusto.domain.route.service.RouteService;
 import com.umc.gusto.global.auth.model.AuthUser;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("routes")
@@ -52,11 +50,11 @@ public class RouteController {
      * [GET] /routes
      */
     @GetMapping("")
-    public ResponseEntity<List<RouteResponse>> allMyRoute(
+    public ResponseEntity<RoutePagingResponse> allMyRoute(
             @AuthenticationPrincipal AuthUser authUSer,
             @RequestParam(required = false, name = "routeId") Long routeId
     ){
-        List<RouteResponse> route = routeService.getRoute(authUSer.getUser(),routeId);
+        RoutePagingResponse route = routeService.getRoute(authUSer.getUser(),routeId);
         return ResponseEntity.ok().body(route);
     }
 
@@ -65,9 +63,9 @@ public class RouteController {
      * [GET] /routes/groups{groupId}
      */
     @GetMapping("/groups/{groupId}")
-    public ResponseEntity<List<RouteResponse>> allMyRoute(
+    public ResponseEntity<RoutePagingResponse> allMyRoute(
             @PathVariable Long groupId, @RequestParam(required = false, name = "routeId") Long routeId){
-        List<RouteResponse> route = routeService.getGroupRoute(groupId, routeId);
+        RoutePagingResponse route = routeService.getGroupRoute(groupId, routeId);
         return ResponseEntity.ok().body(route);
     }
 
@@ -86,11 +84,11 @@ public class RouteController {
      * [GET] /routes/{nickname}
      */
     @GetMapping("/{nickname}")
-    public ResponseEntity<List<RouteResponse>> allUserRoute
+    public ResponseEntity<RoutePagingResponse> allUserRoute
     (@PathVariable String nickname,
      @RequestParam(required = false, name = "routeId") Long routeId
      ){
-        List<RouteResponse> route = routeService.getRoute(nickname,routeId);
+        RoutePagingResponse route = routeService.getRoute(nickname,routeId);
         return ResponseEntity.ok().body(route);
     }
 

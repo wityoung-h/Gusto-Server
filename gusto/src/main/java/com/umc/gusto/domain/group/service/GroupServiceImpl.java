@@ -9,13 +9,7 @@ import com.umc.gusto.domain.group.model.request.JoinGroupRequest;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.TransferOwnershipRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
-import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
-import com.umc.gusto.domain.group.model.response.GetGroupResponse;
-import com.umc.gusto.domain.group.model.response.GroupListResponse;
-import com.umc.gusto.domain.group.model.response.GetInvitationCodeResponse;
-import com.umc.gusto.domain.group.model.response.TransferOwnershipResponse;
-import com.umc.gusto.domain.group.model.response.GetGroupsResponse;
-import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
+import com.umc.gusto.domain.group.model.response.*;
 import com.umc.gusto.domain.group.repository.GroupListRepository;
 import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
@@ -329,13 +323,13 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Override
-    public List<GroupListResponse> getAllGroupList(Long groupId, Long groupListId) {
+    public PagingResponse getAllGroupList(Long groupId, Long groupListId) {
 
         // 그룹 존재여부 확인
         Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
                 .orElseThrow(() -> new GeneralException(Code.FIND_FAIL_GROUP));
 
-        List<GroupList> groupLists;
+        Page<GroupList> groupLists;
         if(groupListId == null){
             // 그룹 내 모든 찜한 상점 조회 = 그룹리스트 조회
             groupLists = groupListRepository.findFirstGroupListOrderByDesc(group, Pageable.ofSize(GROUP_LIST_FIRST_PAGE));
@@ -347,7 +341,7 @@ public class GroupServiceImpl implements GroupService{
 
 
         // 그룹 리스트에 해당하는 각 상점 정보 조회
-        return groupLists.stream().map(gl -> {
+        List<GroupListResponse> list = groupLists.stream().map(gl -> {
             Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(gl.getStore()); // 가장 좋아요가 많은 review
             String reviewImg = topReviewOptional.map(Review::getImg1).orElse("");
             return GroupListResponse.builder()
@@ -359,6 +353,11 @@ public class GroupServiceImpl implements GroupService{
                     .address(gl.getStore().getAddress())
                     .build();
         }).collect(Collectors.toList());
+
+        return PagingResponse.builder()
+                .result(list)
+                .hasNext(groupLists.hasNext())
+                .build();
 
 
     }
