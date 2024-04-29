@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -145,12 +146,12 @@ public class GroupController {
      * [GET] /groups?lastGroupId={lastGroupId}
      */
     @GetMapping
-    public ResponseEntity<Page<GetGroupsResponse>> getGroups(@AuthenticationPrincipal AuthUser authUser,
-                                                             @RequestParam(name = "lastGroupId", required = false) Long lastGroupId,
-                                                             @RequestParam(name = "size", defaultValue = "5") int size)
+    public ResponseEntity<Map<String, Object>> getGroups(@AuthenticationPrincipal AuthUser authUser,
+                                                         @RequestParam(name = "lastGroupId", required = false) Long lastGroupId,
+                                                         @RequestParam(name = "size", defaultValue = "5") int size)
     {
         User user = authUser.getUser();
-        Page<GetGroupsResponse> getGroups = groupService.getUserGroups(user, lastGroupId, size);
+        Map<String, Object> getGroups = groupService.getUserGroups(user, lastGroupId, size);
         return ResponseEntity.status(HttpStatus.OK).body(getGroups);
     }
 
@@ -159,10 +160,10 @@ public class GroupController {
      * [GET] /groups/{groupId}/members?lastMemberId={lastMemberId}
      */
     @GetMapping("/{groupId}/members")
-    public ResponseEntity<Page<GetGroupMemberResponse>> getGroupMembers (@PathVariable Long groupId,
+    public ResponseEntity<Map<String, Object>> getGroupMembers (@PathVariable Long groupId,
                                                                          @RequestParam(name = "lastMemberId", required = false) Long lastMemberId,
                                                                          @RequestParam(name = "size", defaultValue = "10") int size){
-        Page<GetGroupMemberResponse> getGroupMembers = groupService.getGroupMembers(groupId, lastMemberId, size);
+        Map<String, Object> getGroupMembers = groupService.getGroupMembers(groupId, lastMemberId, size);
         return ResponseEntity.status(HttpStatus.OK).body(getGroupMembers);
     }
 

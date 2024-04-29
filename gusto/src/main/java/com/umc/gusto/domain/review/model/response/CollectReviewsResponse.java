@@ -7,13 +7,15 @@ import java.util.List;
 
 @Builder
 @Getter
-public class CollectReviewsOfInstaResponse {
-    List<BasicViewResponse> reviews;
+public class CollectReviewsResponse {
+    List<?> reviews;
+    Long cursorId;
     boolean hasNext;
 
-    public static CollectReviewsOfInstaResponse of(List<BasicViewResponse> reviews, boolean hasNext){
-        return CollectReviewsOfInstaResponse.builder()
+    public static CollectReviewsResponse of(List<?> reviews, Long cursorId, boolean hasNext){
+        return CollectReviewsResponse.builder()
                 .reviews(reviews)
+                .cursorId(cursorId)
                 .hasNext(hasNext)
                 .build();
     }

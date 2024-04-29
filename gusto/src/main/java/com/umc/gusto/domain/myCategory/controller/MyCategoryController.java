@@ -3,6 +3,7 @@ package com.umc.gusto.domain.myCategory.controller;
 import com.umc.gusto.domain.myCategory.model.request.CreateMyCategoryRequest;
 import com.umc.gusto.domain.myCategory.model.request.UpdateMyCategoryRequest;
 import com.umc.gusto.domain.myCategory.model.response.MyCategoryResponse;
+import com.umc.gusto.domain.myCategory.model.response.PagingResponse;
 import com.umc.gusto.domain.myCategory.model.response.PinByMyCategoryResponse;
 import com.umc.gusto.domain.myCategory.service.MyCategoryService;
 import com.umc.gusto.domain.user.entity.User;
@@ -22,23 +23,20 @@ import java.util.List;
 public class MyCategoryController {
     private final MyCategoryService myCategoryService;
 
-    private static final int DEFAULT_PAGE_NUMBER = 0;
-
     /**
      * 카테고리 전체 조회
      * [GET] /myCategories?nickname={nickname}&townName={townName}&myCategoryId={myCategoryId}
      */
     @GetMapping
-    public ResponseEntity<List<MyCategoryResponse>> allMyCategory(
+    public ResponseEntity<PagingResponse> allMyCategory(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "nickname", required = false) String nickname,
             @RequestParam(name = "townName", required = false) String townName,
             @RequestParam(name = "myCategoryId", required = false) Long myCategoryId) {     // paging 처리를 위해 마지막 리턴 myCategoryId 사용
         User user = authUser.getUser();
-        Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, 5);
-        List<MyCategoryResponse> myCategoryList = myCategoryService.getAllMyCategory(user, nickname, townName, myCategoryId, pageable);
+        PagingResponse pagingResponse = myCategoryService.getAllMyCategory(user, nickname, townName, myCategoryId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(myCategoryList);
+        return ResponseEntity.status(HttpStatus.OK).body(pagingResponse);
     }
 
     /**
@@ -46,7 +44,7 @@ public class MyCategoryController {
      * [GET] /myCategories/pins?nickname={nickname}&myCategoryId={myCategoryId}&townName={townName}&pinId={pinId}
      */
     @GetMapping("/pins")             // 나의 찜을 조회 할 시 nickname 값을 받지 않고, nickname이 조회될 경우 townName을 받지 않음
-    public ResponseEntity<List<PinByMyCategoryResponse>> allPinByMyCategory(
+    public ResponseEntity<PagingResponse> allPinByMyCategory(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "nickname", required = false) String nickname,
             @RequestParam(name = "myCategoryId") Long myCategoryId,
@@ -54,10 +52,9 @@ public class MyCategoryController {
             @RequestParam(name = "pinId", required = false) Long pinId                                // paging 처리를 위해 마지막 리턴 pinId 사용
             ) {
         User user = authUser.getUser();
-        Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, 7);
-        List<PinByMyCategoryResponse> myStoreList = myCategoryService.getAllPinByMyCategory(user, nickname, myCategoryId, townName, pinId, pageable);
+        PagingResponse pagingResponse = myCategoryService.getAllPinByMyCategory(user, nickname, myCategoryId, townName, pinId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(myStoreList);
+        return ResponseEntity.status(HttpStatus.OK).body(pagingResponse);
     }
 
     /**

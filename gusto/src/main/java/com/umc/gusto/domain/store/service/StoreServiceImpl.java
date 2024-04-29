@@ -4,7 +4,6 @@ import com.umc.gusto.domain.myCategory.entity.Pin;
 import com.umc.gusto.domain.myCategory.repository.PinRepository;
 import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
-import com.umc.gusto.domain.store.entity.Category;
 import com.umc.gusto.domain.store.entity.OpeningHours;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.model.response.*;
@@ -14,6 +13,7 @@ import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -72,7 +72,7 @@ public class StoreServiceImpl implements StoreService{
 
 
     @Transactional(readOnly = true)
-    public GetStoreDetailResponse getStoreDetail(User user, Long storeId, LocalDate visitedAt, Long reviewId, Pageable pageable) {
+    public GetStoreDetailResponse getStoreDetail(User user, Long storeId, LocalDate visitedAt, Long reviewId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
         // 가게별 기본 카테고리 값
@@ -88,15 +88,14 @@ public class StoreServiceImpl implements StoreService{
 
         // reviews 페이징 처리 (3,6,6...)
         int pageSize;
-        int pageNumber = pageable.getPageNumber();
-        List<Review> reviews;
+        Page<Review> reviews;
 
         if (reviewId != null && visitedAt != null) {
             pageSize = PAGE_SIZE;
-            reviews = reviewRepository.findReviewsAfterIdByStore(store, visitedAt, reviewId, PageRequest.of(pageNumber, pageSize));
+            reviews = reviewRepository.findReviewsAfterIdByStore(store, visitedAt, reviewId, Pageable.ofSize(pageSize));
         } else {
             pageSize = PAGE_SIZE_FIRST;
-            reviews = reviewRepository.findFirstReviewsByStore(store, PageRequest.of(pageNumber, pageSize));
+            reviews = reviewRepository.findFirstReviewsByStore(store, Pageable.ofSize(pageSize));
         }
 
         List<GetReviewsResponse> getReviews = reviews.stream()
@@ -127,7 +126,10 @@ public class StoreServiceImpl implements StoreService{
                 .address(store.getAddress())
                 .reviewImg4(reviewImg)
                 .pin(isPinned)
-                .reviews(getReviews)
+                .reviews(PagingResponse.builder()
+                    .hasNext(reviews.hasNext())
+                    .result(getReviews)
+                    .build())
                 .build();
     }
 
@@ -198,13 +200,13 @@ public class StoreServiceImpl implements StoreService{
         // 방문하지 않은 가게 리스트
         UnvisitedStoresResponse unvisitedStoresResponse = UnvisitedStoresResponse.builder()
                 .numPinStores(unvisitedStoresInfo.size())
-                .unvisitedStores(unvisitedStoresInfo)
+                .unvisitedStores(unvisitedStoresInfo.size() > 10 ? unvisitedStoresInfo.subList(0, 10) : unvisitedStoresInfo)
                 .build();
 
         // 방문한 가게 리스트
         VisitedStoresResponse visitedStoresResponse = VisitedStoresResponse.builder()
                 .numPinStores(visitedStoresInfo.size())
-                .visitedStores(visitedStoresInfo)
+                .visitedStores(visitedStoresInfo.size() > 10 ? visitedStoresInfo.subList(0, 10) : visitedStoresInfo)
                 .build();
 
         GetPinStoreResponse pinStoreResponse = GetPinStoreResponse.builder()

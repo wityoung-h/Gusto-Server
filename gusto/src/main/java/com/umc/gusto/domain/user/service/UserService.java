@@ -9,8 +9,6 @@ import com.umc.gusto.domain.user.model.response.*;
 import com.umc.gusto.global.auth.model.Tokens;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 public interface UserService {
     
     // 회원 가입
@@ -52,8 +50,8 @@ public interface UserService {
     void unfollowUser(User user, String nickname);
 
     // 팔로우 목록
-    List<FollowResponse> getFollowList(User user, Long followId);
+    PagingResponse getFollowList(User user, Long followId);
 
     // 팔로워 목록
-    List<FollowResponse> getFollwerList(User user, Long followId);
+    PagingResponse getFollwerList(User user, Long followId);
 }

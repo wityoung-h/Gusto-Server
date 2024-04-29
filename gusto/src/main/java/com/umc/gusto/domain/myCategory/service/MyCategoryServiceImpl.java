@@ -5,6 +5,7 @@ import com.umc.gusto.domain.myCategory.entity.Pin;
 import com.umc.gusto.domain.myCategory.model.request.CreateMyCategoryRequest;
 import com.umc.gusto.domain.myCategory.model.request.UpdateMyCategoryRequest;
 import com.umc.gusto.domain.myCategory.model.response.MyCategoryResponse;
+import com.umc.gusto.domain.myCategory.model.response.PagingResponse;
 import com.umc.gusto.domain.myCategory.model.response.PinByMyCategoryResponse;
 import com.umc.gusto.domain.myCategory.repository.MyCategoryRepository;
 import com.umc.gusto.domain.myCategory.repository.PinRepository;
@@ -17,6 +18,7 @@ import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,10 +41,8 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     private static final int PIN_PAGE_SIZE = 5;
 
     @Transactional(readOnly = true)
-    public List<MyCategoryResponse> getAllMyCategory(User user, String nickname, String townName, Long myCategoryId, Pageable pageable) {
-
-        int pageNumber = pageable.getPageNumber();
-        List<MyCategory> myCategoryList;
+    public PagingResponse getAllMyCategory(User user, String nickname, String townName, Long myCategoryId) {
+        Page<MyCategory> myCategoryList;
         if (nickname != null) {
             if (nickname.equals(user.getNickname())) {
                 throw new GeneralException(Code.USER_NOT_FOUND_SELF);
@@ -50,22 +50,22 @@ public class MyCategoryServiceImpl implements MyCategoryService {
             user = userRepository.findByNickname(nickname)
                     .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
             if (myCategoryId != null) {
-                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublicPaging(user, myCategoryId, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublicPaging(user, myCategoryId, Pageable.ofSize(MY_CATEGORY_PAGE_SIZE));
             } else {
-                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublic(user, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublic(user, Pageable.ofSize(MY_CATEGORY_PAGE_SIZE));
             }
         } else {
             if (myCategoryId != null) {
-                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPaging(user, myCategoryId, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPaging(user, myCategoryId, Pageable.ofSize(MY_CATEGORY_PAGE_SIZE));   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
             } else {
-                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(user, PageRequest.of(pageNumber, MY_CATEGORY_PAGE_SIZE));   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
+                myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(user, Pageable.ofSize(MY_CATEGORY_PAGE_SIZE));   // 받아온 nickname과 User의 nickname 값이 다른 경우(쿼리문 사용)
             }
 
         }
         User finalUser = user;
 
 
-        return myCategoryList.stream()
+        List<MyCategoryResponse> result = myCategoryList.stream()
                 .map(myCategory -> {
                     List<Pin> pinList;
                     if (townName != null) {
@@ -84,14 +84,18 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                 })
                 .collect(Collectors.toList());
 
+        return PagingResponse.builder()
+                .hasNext(myCategoryList.hasNext())
+                .result(result)
+                .build();
+
     }
 
     @Transactional(readOnly = true)
-    public List<PinByMyCategoryResponse> getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName, Long pinId, Pageable pageable) {
+    public PagingResponse getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName, Long pinId) {
         Optional<MyCategory> myCategory;
 
-        int pageNumber = pageable.getPageNumber();
-        List<Pin> pinList;
+        Page<Pin> pinList;
         if (nickname != null) {
             if (nickname.equals(user.getNickname())) {
                 throw new GeneralException(Code.USER_NOT_FOUND_SELF);
@@ -105,25 +109,25 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
         if (townName != null) {
             if (pinId != null) {
-                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(category, townName, pinId, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(category, townName, pinId, Pageable.ofSize(PIN_PAGE_SIZE)))
                         .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             } else {
-                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCFirstPaging(category, townName, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCFirstPaging(category, townName, Pageable.ofSize(PIN_PAGE_SIZE)))
                         .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             }
         } else {
             if (pinId != null) {
-                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndPinIdDESCPaging(category, pinId, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndPinIdDESCPaging(category, pinId, Pageable.ofSize(PIN_PAGE_SIZE)))
                         .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             } else {
-                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndPinIdDESCFirstPaging(category, PageRequest.of(pageNumber, PIN_PAGE_SIZE)))
+                pinList = myCategory.map(category -> pinRepository.findPinsByMyCategoryAndPinIdDESCFirstPaging(category, Pageable.ofSize(PIN_PAGE_SIZE)))
                         .orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             }
         }
 
 
         User finalUser = user;
-        return pinList.stream()                                     // townName을 기준으로 보일 수 있는 store가 포함된 pin만 보이기
+        List<PinByMyCategoryResponse> result = pinList.stream()                                     // townName을 기준으로 보일 수 있는 store가 포함된 pin만 보이기
                 .map(pin -> {
                     Store store = pin.getStore();
                     Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(store);               // 가장 좋아요가 많은 review
@@ -140,6 +144,11 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                             .build();
                 })
                 .collect(Collectors.toList());
+
+        return PagingResponse.builder()
+                .hasNext(pinList.hasNext())
+                .result(result)
+                .build();
     }
 
     @Transactional
