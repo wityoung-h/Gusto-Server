@@ -4,7 +4,6 @@ import com.umc.gusto.domain.myCategory.entity.Pin;
 import com.umc.gusto.domain.myCategory.repository.PinRepository;
 import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
-import com.umc.gusto.domain.store.entity.Category;
 import com.umc.gusto.domain.store.entity.OpeningHours;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.model.response.*;
@@ -198,13 +197,13 @@ public class StoreServiceImpl implements StoreService{
         // 방문하지 않은 가게 리스트
         UnvisitedStoresResponse unvisitedStoresResponse = UnvisitedStoresResponse.builder()
                 .numPinStores(unvisitedStoresInfo.size())
-                .unvisitedStores(unvisitedStoresInfo)
+                .unvisitedStores(unvisitedStoresInfo.size() > 10 ? unvisitedStoresInfo.subList(0, 10) : unvisitedStoresInfo)
                 .build();
 
         // 방문한 가게 리스트
         VisitedStoresResponse visitedStoresResponse = VisitedStoresResponse.builder()
                 .numPinStores(visitedStoresInfo.size())
-                .visitedStores(visitedStoresInfo)
+                .visitedStores(visitedStoresInfo.size() > 10 ? visitedStoresInfo.subList(0, 10) : visitedStoresInfo)
                 .build();
 
         GetPinStoreResponse pinStoreResponse = GetPinStoreResponse.builder()

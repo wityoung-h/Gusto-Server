@@ -5,18 +5,15 @@ import com.umc.gusto.domain.group.model.request.JoinGroupRequest;
 import com.umc.gusto.domain.group.model.request.PostGroupRequest;
 import com.umc.gusto.domain.group.model.request.TransferOwnershipRequest;
 import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
-import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
 import com.umc.gusto.domain.group.model.response.GetGroupResponse;
 import com.umc.gusto.domain.group.model.response.GroupListResponse;
 import com.umc.gusto.domain.group.model.response.GetInvitationCodeResponse;
 import com.umc.gusto.domain.group.model.response.TransferOwnershipResponse;
-import com.umc.gusto.domain.group.model.response.GetGroupsResponse;
 import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
 import com.umc.gusto.domain.user.entity.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface GroupService {
     // 그룹 생성
@@ -53,10 +50,10 @@ public interface GroupService {
     void leaveGroup(User user, Long groupId);
 
     // 그룹 목록 조회
-    Page<GetGroupsResponse> getUserGroups(User user, Long lastGroupId, int size);
+    Map<String, Object> getUserGroups(User user, Long lastGroupId, int size);
 
     //그룹 구성원 조회
-    Page<GetGroupMemberResponse> getGroupMembers(Long groupId, Long lastMemberId, int size);
+    Map<String, Object> getGroupMembers(Long groupId, Long lastMemberId, int size);
 
     //그룹 루트 삭제
     void deleteRoute(Long routeId, User user, Long groupId);
