@@ -11,7 +11,7 @@ import java.util.List;
 public interface StoreService {
 
     GetStoreResponse getStore(User user, Long storeId);
-    GetStoreDetailResponse getStoreDetail(User user, Long storeId, LocalDate visitedAt, Long reviewId, Pageable pageable);
+    GetStoreDetailResponse getStoreDetail(User user, Long storeId, LocalDate visitedAt, Long reviewId);
     List<GetStoresInMapResponse> getStoresInMap(User user, String townName, Long myCategoryId, Boolean visited);
     List<GetPinStoreResponse> getPinStoresByCategoryAndLocation(User user, Long myCategoryId, String townName);
     List<GetStoreInfoResponse> searchStore(String keyword);
