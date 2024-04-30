@@ -50,10 +50,8 @@ public class StoreController {
             @RequestParam(name = "visitedAt", required = false) LocalDate visitedAt,
             @RequestParam(name = "reviewId", required = false) Long reviewId){
         User user = authUser.getUser();
-        Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
-
         // 상점 세부 정보 가져오기
-        GetStoreDetailResponse getStoreDetail = storeService.getStoreDetail(user, storeId, visitedAt, reviewId, pageable);
+        GetStoreDetailResponse getStoreDetail = storeService.getStoreDetail(user, storeId, visitedAt, reviewId);
         return ResponseEntity.status(HttpStatus.OK).body(getStoreDetail);
     }
 

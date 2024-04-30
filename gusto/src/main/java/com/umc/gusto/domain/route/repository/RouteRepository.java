@@ -4,12 +4,12 @@ import com.umc.gusto.domain.group.entity.Group;
 import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface RouteRepository extends JpaRepository<Route,Long> {
@@ -27,16 +27,16 @@ public interface RouteRepository extends JpaRepository<Route,Long> {
 
     // 가장 첫 페이징
     @Query("select r from Route r where r.user = :user AND r.status = :status AND r.group.groupId IS NULL ORDER BY r.createdAt DESC")
-    List<Route> findRouteByUserFirstId(@Param("user") User user , @Param("status") BaseEntity.Status status, Pageable pageable);
+    Page<Route> findRouteByUserFirstId(@Param("user") User user , @Param("status") BaseEntity.Status status, Pageable pageable);
 
     // 유저의 루트 목록 조회 , 그룹X, ACTIVE
     @Query("select r from Route r where r.user = :user AND r.status = :status AND r.routeId <:routeId AND r.group.groupId IS NULL ORDER BY r.createdAt DESC")
-    List<Route> findRouteByAfterIRouted(@Param("user") User user, @Param("routeId") Long routeId , @Param("status") BaseEntity.Status status, Pageable pageable);
+    Page<Route> findRouteByAfterIRouted(@Param("user") User user, @Param("routeId") Long routeId , @Param("status") BaseEntity.Status status, Pageable pageable);
 
     // 그룹의 루트 개수 조회
     int countRoutesByGroupAndStatus(Group group, BaseEntity.Status status);
 
     // 그룹의 루트 목록 조회
     @Query("select r from Route r where r.group =:group AND r.status =:status AND r.routeId >:routeId ORDER BY r.createdAt")
-    List<Route> findRoutesByGroup(@Param("group") Group group, @Param("routeId") Long routeId ,@Param("status") BaseEntity.Status status, Pageable pageable);
+    Page<Route> findRoutesByGroup(@Param("group") Group group, @Param("routeId") Long routeId ,@Param("status") BaseEntity.Status status, Pageable pageable);
 }

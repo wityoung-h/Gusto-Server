@@ -21,6 +21,6 @@ public class GetStoreDetailResponse{
     String address;
     Boolean pin;        // 찜 여부
     List<String> reviewImg4;
-    List<GetReviewsResponse> reviews;
+    PagingResponse reviews;
 
 }

@@ -24,6 +24,7 @@ import com.umc.gusto.global.util.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -307,8 +308,8 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public List<FollowResponse> getFollowList(User user, Long followId) {
-        List<Follow> followList;
+    public PagingResponse getFollowList(User user, Long followId) {
+        Page<Follow> followList;
 
         if(followId == null) {
             followList = followRepository.findFollowList(user, Pageable.ofSize(FOLLOW_LIST_PAGE));
@@ -316,13 +317,13 @@ public class UserServiceImpl implements UserService{
             followList = followRepository.findFollowList(user, followId, Pageable.ofSize(FOLLOW_LIST_PAGE));
         }
 
-        // 반환할 목록이 없음 throw Exception
-        if(followList.size() == 0) {
-            throw new NotFoundException(Code.USER_FOLLOW_NO_MORE_CONTENT);
+        // page가 존재하지 않으면 throw Exception
+        if(followList.isEmpty()) {
+            throw new NotFoundException(Code.USER_FOLLOW_NOT_EXIST);
         }
 
         // res mapping
-        List<FollowResponse> response = followList.stream()
+        List<FollowResponse> result = followList.stream()
                 .map(follow -> {
                     FollowResponse item = FollowResponse.builder()
                             .followId(follow.getFollowId())
@@ -334,13 +335,16 @@ public class UserServiceImpl implements UserService{
                 })
                 .collect(Collectors.toList());
 
-        return response;
+        return PagingResponse.builder()
+                .hasNext(followList.hasNext())
+                .result(result)
+                .build();
     }
 
     @Override
     @Transactional
-    public List<FollowResponse> getFollwerList(User user, Long followId) {
-        List<Follow> followList;
+    public PagingResponse getFollwerList(User user, Long followId) {
+        Page<Follow> followList;
 
         if(followId == null) {
             followList = followRepository.findFollwerList(user, Pageable.ofSize(FOLLOW_LIST_PAGE));
@@ -348,13 +352,13 @@ public class UserServiceImpl implements UserService{
             followList = followRepository.findFollwerList(user, followId, Pageable.ofSize(FOLLOW_LIST_PAGE));
         }
 
-        // 반환할 목록이 없음 throw Exception
-        if(followList.size() == 0) {
-            throw new NotFoundException(Code.USER_FOLLOW_NO_MORE_CONTENT);
+        // page가 존재하지 않으면 throw Exception
+        if(followList.isEmpty()) {
+            throw new NotFoundException(Code.USER_FOLLOWER_NOT_EXIST);
         }
 
         // res mapping
-        List<FollowResponse> response = followList.stream()
+        List<FollowResponse> result = followList.stream()
                 .map(follow -> {
                     FollowResponse item = FollowResponse.builder()
                             .followId(follow.getFollowId())
@@ -366,6 +370,9 @@ public class UserServiceImpl implements UserService{
                 })
                 .collect(Collectors.toList());
 
-        return response;
+        return PagingResponse.builder()
+                .hasNext(followList.hasNext())
+                .result(result)
+                .build();
     }
 }
