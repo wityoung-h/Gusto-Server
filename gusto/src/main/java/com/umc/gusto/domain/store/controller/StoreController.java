@@ -1,18 +1,18 @@
 package com.umc.gusto.domain.store.controller;
 
 
-import com.umc.gusto.domain.store.model.response.GetStoreDetailResponse;
-import com.umc.gusto.domain.store.model.response.GetStoreResponse;
+import com.umc.gusto.domain.store.model.response.*;
 import com.umc.gusto.domain.store.service.StoreService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,16 +21,16 @@ public class StoreController {
     private final StoreService storeService;
 
     /**
-     * 가게 1건 조회
-     * [GET] /stores/{storeId}
+     * 가게 조회
+     * [GET] /stores?storeId={storeId}&storeId={storeId}
      */
-    @GetMapping("/{storeId}")
-    public ResponseEntity<GetStoreResponse> getStore(
+    @GetMapping
+    public ResponseEntity<List<GetStoreResponse>> getStores(
             @AuthenticationPrincipal AuthUser authUser,
-            @PathVariable Long storeId) {
+            @RequestParam(name = "storeId") List<Long> storeIds) {
         User user = authUser.getUser();
-        GetStoreResponse getStore = storeService.getStore(user, storeId);
-        return ResponseEntity.status(HttpStatus.OK).body(getStore);
+        List<GetStoreResponse> getStores = storeService.getStores(user, storeIds);
+        return ResponseEntity.status(HttpStatus.OK).body(getStores);
     }
 
     /**
@@ -41,25 +41,50 @@ public class StoreController {
     public ResponseEntity<GetStoreDetailResponse> getStoreDetail(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long storeId,
+            @RequestParam(name = "visitedAt", required = false) LocalDate visitedAt,
             @RequestParam(name = "reviewId", required = false) Long reviewId){
         User user = authUser.getUser();
-        Pageable pageable = PageRequest.of(0, 3);
-
         // 상점 세부 정보 가져오기
-        GetStoreDetailResponse getStoreDetail = storeService.getStoreDetail(user, storeId, reviewId, pageable);
-        return  ResponseEntity.status(HttpStatus.OK).body(getStoreDetail);
+        GetStoreDetailResponse getStoreDetail = storeService.getStoreDetail(user, storeId, visitedAt, reviewId);
+        return ResponseEntity.status(HttpStatus.OK).body(getStoreDetail);
     }
 
     /**
-     * 리스트로 받은 가게 id 상세 조회
-     * [GET] /stores
+     * 현 지역의 카테고리 별 찜한 가게 목록 조회
+     * [GET] /stores/map?townName={townName}&myCategoryId={myCategoryId}&visited={visitStatus}
      */
-    @GetMapping
-    public ResponseEntity<GetStoreResponse> getStores(
-            @AuthenticationPrincipal AuthUser authUser) {
+    @GetMapping("/map")
+    public ResponseEntity<List<GetStoresInMapResponse>> getStoresInMap(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam(name = "townName") String townName,
+            @RequestParam(name = "myCategoryId", required = false) Long myCategoryId,
+            @RequestParam(name = "visited", required = false) Boolean visited
+            ) {
+
         User user = authUser.getUser();
-        GetStoreResponse getStore = storeService.getStore(user);
-        return ResponseEntity.status(HttpStatus.OK).body(getStore);
+        List<GetStoresInMapResponse> getStoresInMaps = storeService.getStoresInMap(user, townName, myCategoryId, visited);
+        return  ResponseEntity.status(HttpStatus.OK).body(getStoresInMaps);
     }
 
+    /**
+     * 현재 지역의 찜한 식당 방문 여부 조회
+     * [GET] /stores/pins?myCategoryId={categoryId}&townName={townName}
+     */
+    @GetMapping("/pins")
+    public ResponseEntity<List<GetPinStoreResponse>> getPinStoresByCategoryAndLocation(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam(name = "myCategoryId", required = false) Long myCategoryId,
+            @RequestParam(name = "townName") String townName){
+        User user = authUser.getUser();
+        List<GetPinStoreResponse> storeList = storeService.getPinStoresByCategoryAndLocation(user, myCategoryId, townName);
+        return ResponseEntity.status(HttpStatus.OK).body(storeList);
+    }
+
+    /**
+     * 맛집 검색 엔진
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<GetStoreInfoResponse>> searchStore(@RequestParam(name = "keyword") String keyword){
+        return ResponseEntity.status(HttpStatus.OK).body(storeService.searchStore(keyword));
+    }
 }

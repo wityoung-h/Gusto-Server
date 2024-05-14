@@ -3,20 +3,21 @@ package com.umc.gusto.domain.myCategory.service;
 import com.umc.gusto.domain.myCategory.model.request.CreateMyCategoryRequest;
 import com.umc.gusto.domain.myCategory.model.request.UpdateMyCategoryRequest;
 import com.umc.gusto.domain.myCategory.model.response.MyCategoryResponse;
+import com.umc.gusto.domain.myCategory.model.response.PagingResponse;
 import com.umc.gusto.domain.myCategory.model.response.PinByMyCategoryResponse;
 import com.umc.gusto.domain.user.entity.User;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface MyCategoryService {
 
-    List<MyCategoryResponse> getAllMyCategory(String nickname);
+    PagingResponse getAllMyCategory(User user, String nickname, String townName, Long myCategoryId);
+//    List<MyCategoryResponse> getAllMyCategoryWithLocation(User user, String townName);
 
-    List<MyCategoryResponse> getAllMyCategoryWithLocation(User user, String townName);
+    PagingResponse getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName, Long pinId);
 
-    List<PinByMyCategoryResponse> getAllPinByMyCategory(String nickname, Long myCategoryId);
-
-    List<PinByMyCategoryResponse> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townName);
+//    List<PinByMyCategoryResponse> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townName);
 
     void createMyCategory(User user, CreateMyCategoryRequest request);
 

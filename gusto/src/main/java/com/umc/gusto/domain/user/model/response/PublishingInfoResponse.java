@@ -10,4 +10,5 @@ import lombok.Getter;
 public class PublishingInfoResponse {
     private boolean publishReview;
     private boolean publishPin;
+    private boolean publishRoute;
 }

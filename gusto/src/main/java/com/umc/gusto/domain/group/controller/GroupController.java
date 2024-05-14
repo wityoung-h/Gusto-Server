@@ -1,27 +1,19 @@
 package com.umc.gusto.domain.group.controller;
 
-import com.umc.gusto.domain.group.model.request.GroupListRequest;
-import com.umc.gusto.domain.group.model.request.JoinGroupRequest;
-import com.umc.gusto.domain.group.model.request.PostGroupRequest;
-import com.umc.gusto.domain.group.model.request.TransferOwnershipRequest;
-import com.umc.gusto.domain.group.model.request.UpdateGroupRequest;
-import com.umc.gusto.domain.group.model.response.GetGroupMemberResponse;
-import com.umc.gusto.domain.group.model.response.GetGroupResponse;
-import com.umc.gusto.domain.group.model.response.GroupListResponse;
-import com.umc.gusto.domain.group.model.response.GetInvitationCodeResponse;
-import com.umc.gusto.domain.group.model.response.TransferOwnershipResponse;
-import com.umc.gusto.domain.group.model.response.GetGroupsResponse;
-import com.umc.gusto.domain.group.model.response.UpdateGroupResponse;
+import com.umc.gusto.domain.group.model.request.*;
+import com.umc.gusto.domain.group.model.response.*;
 import com.umc.gusto.domain.group.service.GroupService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -73,7 +65,7 @@ public class GroupController {
     }
 
     /**
-     * 그룹리스트 추가
+     * 그룹리스트 추가 = 그룹에서 찜
      * [POST] /groups/{groupId}/groupList
      */
     @PostMapping("/{groupId}/groupList")
@@ -107,12 +99,12 @@ public class GroupController {
 
     /**
      * 그룹 참여
-     * [POST] /groups/{groupId}/join
+     * [POST] /groups/join
      */
-    @PostMapping("/{groupId}/join")
-    public ResponseEntity<?> joinGroup(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long groupId, @RequestBody JoinGroupRequest joinGroupRequest){
+    @PostMapping("/join")
+    public ResponseEntity<?> joinGroup(@AuthenticationPrincipal AuthUser authUser, @RequestBody JoinGroupRequest joinGroupRequest){
         User user = authUser.getUser();
-        groupService.joinGroup(user, groupId, joinGroupRequest);
+        groupService.joinGroup(user, joinGroupRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -134,8 +126,8 @@ public class GroupController {
      * [GET] /groups/{groupId}/groupLists
      */
     @GetMapping("/{groupId}/groupLists")
-    public ResponseEntity<List<GroupListResponse>> getGroupList(@PathVariable Long groupId){
-        return ResponseEntity.ok().body(groupService.getAllGroupList(groupId));
+    public ResponseEntity<PagingResponse> getGroupList(@PathVariable Long groupId, @RequestParam(required = false, name = "groupListId") Long groupListId){
+        return ResponseEntity.ok().body(groupService.getAllGroupList(groupId, groupListId));
     }
 
       
@@ -151,22 +143,41 @@ public class GroupController {
   
     /**
      * 그룹 목록 조회
-     * [GET] /groups
+     * [GET] /groups?lastGroupId={lastGroupId}
      */
     @GetMapping
-    public ResponseEntity<List<GetGroupsResponse>> getGroups(@AuthenticationPrincipal AuthUser authUser){
+    public ResponseEntity<Map<String, Object>> getGroups(@AuthenticationPrincipal AuthUser authUser,
+                                                         @RequestParam(name = "lastGroupId", required = false) Long lastGroupId,
+                                                         @RequestParam(name = "size", defaultValue = "5") int size)
+    {
         User user = authUser.getUser();
-        List<GetGroupsResponse> getGroups = groupService.getUserGroups(user);
+        Map<String, Object> getGroups = groupService.getUserGroups(user, lastGroupId, size);
         return ResponseEntity.status(HttpStatus.OK).body(getGroups);
     }
 
     /**
      * 그룹 구성원 조회
-     * [GET] /groups/{groupId}/members
+     * [GET] /groups/{groupId}/members?lastMemberId={lastMemberId}
      */
     @GetMapping("/{groupId}/members")
-    public ResponseEntity<List<GetGroupMemberResponse>> getGroupMembers (@PathVariable Long groupId){
-        List<GetGroupMemberResponse> getGroupMembers = groupService.getGroupMembers(groupId);
+    public ResponseEntity<Map<String, Object>> getGroupMembers (@PathVariable Long groupId,
+                                                                         @RequestParam(name = "lastMemberId", required = false) Long lastMemberId,
+                                                                         @RequestParam(name = "size", defaultValue = "10") int size){
+        Map<String, Object> getGroupMembers = groupService.getGroupMembers(groupId, lastMemberId, size);
         return ResponseEntity.status(HttpStatus.OK).body(getGroupMembers);
+    }
+
+    /**
+     * 그룹 루트 삭제
+     * [DELETE] /groups/routes/{routeId}??groupId={groupId}
+     */
+    @DeleteMapping("/routes/{routeId}")
+    public ResponseEntity<?> getDeleteGroupRoute
+    (@PathVariable Long routeId,
+     @AuthenticationPrincipal AuthUser authUser,
+     @RequestParam Long groupId
+    ){
+        groupService.deleteRoute(routeId,authUser.getUser(),groupId);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 }

@@ -5,11 +5,10 @@ import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.NicknameBucket;
 import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
+import com.umc.gusto.domain.user.model.request.SignInRequest;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
-import com.umc.gusto.domain.user.model.response.ProfileResponse;
-import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
-import com.umc.gusto.domain.user.model.response.FollowResponse;
+import com.umc.gusto.domain.user.model.response.*;
 import com.umc.gusto.domain.user.repository.FollowRepository;
 import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.domain.user.repository.UserRepository;
@@ -25,6 +24,7 @@ import com.umc.gusto.global.util.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,20 +52,17 @@ public class UserServiceImpl implements UserService{
     private static final int FOLLOW_LIST_PAGE = 30;
 
 
-    @Value("${default.img.url.profile}")
+    @Value("${default.img.url}")
     private String DEFAULT_PROFILE_IMG;
 
     @Override
     @Transactional
-    public Tokens createUser(String tempToken, MultipartFile multipartFile, SignUpRequest request) {
-        // temp token을 사용하여 social 정보 가져오기
-        UUID socialUID = UUID.fromString(tempToken);
-        Social socialInfo = socialRepository.findByTemporalToken(socialUID).orElseThrow(() -> new GeneralException(Code.INVALID_ACCESS_TOKEN));
+    public Tokens createUser(MultipartFile multipartFile, SignUpRequest request) {
+        // 이미 가입된 계정이 존재함
+        socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(request.getProvider()), request.getProviderId())
+                .ifPresent( info -> { throw new GeneralException(Code.USER_ALREADY_SIGNUP); });
 
-        if(socialInfo.getSocialStatus() == Social.SocialStatus.CONNECTED) {
-            throw new GeneralException(Code.USER_ALREADY_SIGNUP);
-        }
-
+        // redis에 임시 저장된 닉네임 정보를 삭제 및 닉네임 중복 검사
         redisService.deleteValues(request.getNickname());
         checkNickname(request.getNickname());
 
@@ -89,10 +86,14 @@ public class UserServiceImpl implements UserService{
                 .build();
 
         user = userRepository.save(user);
-        
-        // social entity 정보 갱신
-        socialInfo.updateUser(user);
-        socialInfo.updateSocialStatus(Social.SocialStatus.CONNECTED);
+
+        // 새로운 소셜 정보 생성
+        Social socialInfo = Social.builder()
+                .socialType(Social.SocialType.valueOf(request.getProvider()))
+                .providerId(request.getProviderId())
+                .user(user)
+                .build();
+
         socialRepository.save(socialInfo);
 
         // access-token 및 refresh-token 생성
@@ -124,7 +125,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public String generateRandomNickname() {
+    public NicknameResponse generateRandomNickname() {
         String nickname;
 
         // 중복 없는 닉네임이 생성될 때까지 반복
@@ -145,13 +146,35 @@ public class UserServiceImpl implements UserService{
             break;
         }
 
-        return nickname;
+        return new NicknameResponse(nickname);
     }
 
     @Override
-    public ProfileResponse getProfile(User user, String nickname) {
-        User target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
-                .orElseThrow(() -> new GeneralException(Code.DONT_EXIST_USER));
+    public Tokens signIn(SignInRequest signInRequest) {
+        // social 정보 확인
+        Social social = socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(signInRequest.getProvider()), signInRequest.getProviderId())
+                .orElseThrow(() -> new GeneralException(Code.USER_NOT_OUR_CLIENT));
+
+        // social 정보와 연결된 유저 정보 불러옴
+        User user = social.getUser();
+
+        // access-token 및 refresh-token 생성
+        Tokens tokens = jwtService.createToken(String.valueOf(user.getUserId()));
+        redisService.setValuesWithTimeout(tokens.getRefreshToken(), String.valueOf(user.getUserId()), JwtConfig.REFRESH_TOKEN_VALID_TIME);
+
+        return tokens;
+    }
+
+    @Override
+    public FeedProfileResponse getProfile(User user, String nickname) {
+        User target;
+
+        if(nickname.equals("my")) {
+            target = user;
+        } else {
+            target = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
+                    .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
+        }
 
         AtomicBoolean followed = new AtomicBoolean(false);
 
@@ -159,10 +182,11 @@ public class UserServiceImpl implements UserService{
             followRepository.findByFollowerAndFollowing(user, target).ifPresent(a -> followed.set(true));
         }
 
-        return ProfileResponse.builder()
+        return FeedProfileResponse.builder()
                 .nickname(target.getNickname())
+                .profileImg(target.getProfileImage())
                 .review(target.getReviewCnt())
-                .pin(target.getPinCnt())
+                .following(target.getFollowing())
                 .follower(target.getFollower())
                 .followed(followed.get())
                 .build();
@@ -180,6 +204,17 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public ProfileResponse getProfile(User user) {
+        return ProfileResponse.builder()
+                .profileImg(user.getProfileImage())
+                .nickname(user.getNickname())
+                .age(user.getAge().toString())
+                .gender(user.getGender().toString())
+                .build();
+    }
+
+    @Override
+    @Transactional
     public void updateProfile(User user, MultipartFile profileImg, UpdateProfileRequest request) {
         if(profileImg != null) {
             s3Service.deleteImageFromUrl(user.getProfileImage());
@@ -196,6 +231,10 @@ public class UserServiceImpl implements UserService{
             if(request.getGender() != null) {
                 user.updateGender(User.Gender.valueOf(request.getGender()));
             }
+
+            if(request.getNickname() != null) {
+                updateNickname(user, request.getNickname());
+            }
         }
 
         userRepository.save(user);
@@ -206,6 +245,7 @@ public class UserServiceImpl implements UserService{
         return PublishingInfoResponse.builder()
                 .publishReview(user.getPublishReview() == PublishStatus.PUBLIC)
                 .publishPin(user.getPublishCategory() == PublishStatus.PUBLIC)
+                .publishRoute(user.getPublishRoute() == PublishStatus.PUBLIC)
                 .build();
     }
 
@@ -213,9 +253,11 @@ public class UserServiceImpl implements UserService{
     public void updatePublishingInfo(User user, PublishingInfoRequest request) {
         PublishStatus reviewStatus = (request.getPublishReview()) ?PublishStatus.PUBLIC : PublishStatus.PRIVATE;
         PublishStatus pinStatus = (request.getPublishPin()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
+        PublishStatus routeStatus = (request.getPublishRoute()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
 
         user.updatePublishReview(reviewStatus);
         user.updatePublishPin(pinStatus);
+        user.updatePublishRoute(routeStatus);
 
         userRepository.save(user);
     }
@@ -246,7 +288,9 @@ public class UserServiceImpl implements UserService{
 
         // target의 팔로워 수 1 증가
         target.updateFollower(target.getFollower() + 1);
+        user.updateFollowing(user.getFollowing() + 1);
         userRepository.save(target);
+        userRepository.save(user);
     }
 
     @Override
@@ -262,26 +306,29 @@ public class UserServiceImpl implements UserService{
 
         // target의 팔로워 수 1 감소
         target.updateFollower(target.getFollower() - 1);
+        user.updateFollowing(user.getFollowing() - 1);
         userRepository.save(target);
+        userRepository.save(user);
     }
 
     @Override
     @Transactional
-    public List<FollowResponse> getFollowList(User user, Long followId) {
+    public PagingResponse getFollowList(User user, Long followId) {
+        Page<Follow> followList;
+
         if(followId == null) {
-            followId = 0L;
+            followList = followRepository.findFollowList(user, Pageable.ofSize(FOLLOW_LIST_PAGE));
+        } else {
+            followList = followRepository.findFollowList(user, followId, Pageable.ofSize(FOLLOW_LIST_PAGE));
         }
 
-        //follow 목록 조회
-        List<Follow> followList = followRepository.findFollowList(user, followId, Pageable.ofSize(FOLLOW_LIST_PAGE));
-
-        // 반환할 목록이 없음 throw Exception
-        if(followList.size() == 0) {
-            throw new NotFoundException(Code.USER_FOLLOW_NO_MORE_CONTENT);
+        // page가 존재하지 않으면 throw Exception
+        if(followList.isEmpty()) {
+            throw new NotFoundException(Code.USER_FOLLOW_NOT_EXIST);
         }
 
         // res mapping
-        List<FollowResponse> response = followList.stream()
+        List<FollowResponse> result = followList.stream()
                 .map(follow -> {
                     FollowResponse item = FollowResponse.builder()
                             .followId(follow.getFollowId())
@@ -293,36 +340,44 @@ public class UserServiceImpl implements UserService{
                 })
                 .collect(Collectors.toList());
 
-        return response;
+        return PagingResponse.builder()
+                .hasNext(followList.hasNext())
+                .result(result)
+                .build();
     }
 
     @Override
     @Transactional
-    public List<FollowResponse> getFollwerList(User user, Long followId) {
+    public PagingResponse getFollwerList(User user, Long followId) {
+        Page<Follow> followList;
+
         if(followId == null) {
-            followId = 0L;
+            followList = followRepository.findFollwerList(user, Pageable.ofSize(FOLLOW_LIST_PAGE));
+        } else {
+            followList = followRepository.findFollwerList(user, followId, Pageable.ofSize(FOLLOW_LIST_PAGE));
         }
 
-        List<Follow> followList = followRepository.findFollwerList(user, followId, Pageable.ofSize(FOLLOW_LIST_PAGE));
-
-        // 반환할 목록이 없음 throw Exception
-        if(followList.size() == 0) {
-            throw new NotFoundException(Code.USER_FOLLOW_NO_MORE_CONTENT);
+        // page가 존재하지 않으면 throw Exception
+        if(followList.isEmpty()) {
+            throw new NotFoundException(Code.USER_FOLLOWER_NOT_EXIST);
         }
 
         // res mapping
-        List<FollowResponse> response = followList.stream()
+        List<FollowResponse> result = followList.stream()
                 .map(follow -> {
                     FollowResponse item = FollowResponse.builder()
                             .followId(follow.getFollowId())
-                            .nickname(follow.getFollowing().getNickname())
-                            .profileImg(follow.getFollowing().getProfileImage())
+                            .nickname(follow.getFollower().getNickname())
+                            .profileImg(follow.getFollower().getProfileImage())
                             .build();
 
                     return item;
                 })
                 .collect(Collectors.toList());
 
-        return response;
+        return PagingResponse.builder()
+                .hasNext(followList.hasNext())
+                .result(result)
+                .build();
     }
 }

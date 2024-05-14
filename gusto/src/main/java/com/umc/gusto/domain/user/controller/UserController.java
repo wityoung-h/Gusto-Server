@@ -2,12 +2,11 @@ package com.umc.gusto.domain.user.controller;
 
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
+import com.umc.gusto.domain.user.model.request.SignInRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
-import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
+import com.umc.gusto.domain.user.model.response.*;
 import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
-import com.umc.gusto.domain.user.model.response.ProfileResponse;
-import com.umc.gusto.domain.user.model.response.FollowResponse;
 import com.umc.gusto.global.auth.model.AuthUser;
 import com.umc.gusto.global.auth.model.Tokens;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -28,26 +25,37 @@ public class UserController {
 
     /**
      * 회원 가입 API
-     * [POST] /users/sing-up
-     * @param token
+     * [POST] /users/sign-up
      * @param multipartFile
      * @param signUpRequest
      * @return -
      */
     @PostMapping("/sign-up")
-    public ResponseEntity signUp(@RequestHeader("Temp-Token") String token,
-                         @RequestPart(name = "profileImg", required = false) MultipartFile multipartFile,
+    public ResponseEntity signUp(@RequestPart(name = "profileImg", required = false) MultipartFile multipartFile,
                          @RequestPart(name = "info") SignUpRequest signUpRequest) {
-        // 에러 핸들러 작업 예정으로 try-catch 작성하지 않음
-        Tokens tokens = userService.createUser(token, multipartFile, signUpRequest);
+        Tokens tokens = userService.createUser(multipartFile, signUpRequest);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Auth-Token", tokens.getAccessToken());
         headers.set("refresh-token", tokens.getRefreshToken());
 
-        return ResponseEntity.ok()
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .headers(headers)
                 .build();
+    }
+
+    /**
+     * 기본 닉네임 생성 API
+     * [GET] /users/random-nickname
+     * @param -
+     * @return String
+     */
+    @PostMapping("/random-nickname")
+    public ResponseEntity generateNickname() {
+        NicknameResponse nicknameResponse = userService.generateRandomNickname();
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(nicknameResponse);
     }
 
     /**
@@ -79,21 +87,40 @@ public class UserController {
     }
 
     /**
+     * 로그인 API
+     * [POST] /users/sign-in
+     * @param signInRequest
+     * @return -
+     */
+    @PostMapping("/sign-in")
+    public ResponseEntity signIn(@RequestBody SignInRequest signInRequest) {
+        Tokens tokens = userService.signIn(signInRequest);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Auth-Token", tokens.getAccessToken());
+        headers.set("refresh-token", tokens.getRefreshToken());
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .build();
+    }
+
+    /**
      * 먹스또 프로필 조회
      * [GET] /users/{nickname}/profile
      * @param nickname
      * @return ProfileRes
      */
     @GetMapping("/{nickname}/profile")
-    public ResponseEntity<ProfileResponse> retrieveProfile(@AuthenticationPrincipal AuthUser authUser,
-                                                           @PathVariable("nickname") String nickname) {
+    public ResponseEntity<FeedProfileResponse> retrieveProfile(@AuthenticationPrincipal AuthUser authUser,
+                                                               @PathVariable("nickname") String nickname) {
         User user = null;
 
         if(authUser != null) {
             user = authUser.getUser();
         }
 
-        ProfileResponse profileRes = userService.getProfile(user, nickname);
+        FeedProfileResponse profileRes = userService.getProfile(user, nickname);
 
         return ResponseEntity.ok()
                 .body(profileRes);
@@ -111,6 +138,20 @@ public class UserController {
 
         return ResponseEntity.ok()
                 .build();
+    }
+
+    /**
+     * 프로필 정보 조회
+     * [GET] /users/my-info
+     * @param -
+     * @return -
+     */
+    @GetMapping("/my-info")
+    public ResponseEntity getProfile(@AuthenticationPrincipal AuthUser authUser) {
+        ProfileResponse profileResponse = userService.getProfile(authUser.getUser());
+
+        return ResponseEntity.ok()
+                .body(profileResponse);
     }
 
     /**
@@ -193,12 +234,12 @@ public class UserController {
      * @return List<>
      */
     @GetMapping("/following")
-    public ResponseEntity<List<FollowResponse>> followList(@AuthenticationPrincipal AuthUser authUser,
+    public ResponseEntity<PagingResponse> followList(@AuthenticationPrincipal AuthUser authUser,
                                                            @RequestParam(required = false, name = "followId") Long followId) {
-        List<FollowResponse> followResponses = userService.getFollowList(authUser.getUser(), followId);
+        PagingResponse pagingResponse = userService.getFollowList(authUser.getUser(), followId);
 
         return ResponseEntity.ok()
-                .body(followResponses);
+                .body(pagingResponse);
     }
 
     /**
@@ -208,11 +249,11 @@ public class UserController {
      * @return List<>
      */
     @GetMapping("/follower")
-    public ResponseEntity<List<FollowResponse>> followerList(@AuthenticationPrincipal AuthUser authUser,
+    public ResponseEntity<PagingResponse> followerList(@AuthenticationPrincipal AuthUser authUser,
                                                            @RequestParam(required = false, name = "followId") Long followId) {
-        List<FollowResponse> followResponses = userService.getFollwerList(authUser.getUser(), followId);
+        PagingResponse pagingResponse = userService.getFollwerList(authUser.getUser(), followId);
 
         return ResponseEntity.ok()
-                .body(followResponses);
+                .body(pagingResponse);
     }
 }

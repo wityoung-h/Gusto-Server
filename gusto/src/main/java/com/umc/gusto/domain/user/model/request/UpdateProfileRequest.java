@@ -8,6 +8,7 @@ import lombok.Getter;
 @Builder
 @Getter
 public class UpdateProfileRequest {
+    String nickname;
     String age;
     String gender;
 }

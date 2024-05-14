@@ -2,21 +2,17 @@ package com.umc.gusto.domain.user.service;
 
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.model.request.PublishingInfoRequest;
+import com.umc.gusto.domain.user.model.request.SignInRequest;
 import com.umc.gusto.domain.user.model.request.SignUpRequest;
 import com.umc.gusto.domain.user.model.request.UpdateProfileRequest;
-import com.umc.gusto.domain.user.model.response.ProfileResponse;
-import com.umc.gusto.domain.user.model.response.PublishingInfoResponse;
-import com.umc.gusto.domain.user.model.request.SignUpRequest;
-import com.umc.gusto.domain.user.model.response.FollowResponse;
+import com.umc.gusto.domain.user.model.response.*;
 import com.umc.gusto.global.auth.model.Tokens;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 public interface UserService {
     
     // 회원 가입
-    Tokens createUser(String tempToken, MultipartFile multipartFile, SignUpRequest signUpRequest);
+    Tokens createUser(MultipartFile multipartFile, SignUpRequest signUpRequest);
 
     // 닉네임 중복 체크
     void checkNickname(String nickname);
@@ -25,13 +21,18 @@ public interface UserService {
     void confirmNickname(String nickname);
 
     // 닉네임 랜덤 생성
-    String generateRandomNickname();
+    NicknameResponse generateRandomNickname();
+
+    Tokens signIn(SignInRequest signInRequest);
 
     // 먹스또 프로필 조회
-    ProfileResponse getProfile(User user, String nickname);
+    FeedProfileResponse getProfile(User user, String nickname);
 
     // 닉네임 갱신
     void updateNickname(User user, String nickname);
+
+    // 프로필 정보 리턴
+    ProfileResponse getProfile(User user);
 
     // 프로필 정보 갱신
     void updateProfile(User user, MultipartFile profileImg, UpdateProfileRequest request);
@@ -49,8 +50,8 @@ public interface UserService {
     void unfollowUser(User user, String nickname);
 
     // 팔로우 목록
-    List<FollowResponse> getFollowList(User user, Long followId);
+    PagingResponse getFollowList(User user, Long followId);
 
     // 팔로워 목록
-    List<FollowResponse> getFollwerList(User user, Long followId);
+    PagingResponse getFollwerList(User user, Long followId);
 }

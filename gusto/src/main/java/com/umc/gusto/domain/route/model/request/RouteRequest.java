@@ -5,18 +5,10 @@ import lombok.Getter;
 
 import java.util.List;
 
+@Getter
 public class RouteRequest {
-
-    @Getter
-    public static class createRouteDto{
-
-        @NotBlank(message = "루트 명은 필수 입력값입니다.")
-        private String routeName;
-        private Long groupId;
-
-        private List<RouteListRequest.createRouteListDto> routeList;
-
-    }
-
-
+    @NotBlank(message = "루트 명은 필수 입력값입니다.")
+    private String routeName;
+    private Long groupId;
+    private List<RouteListRequest> routeList;
 }
