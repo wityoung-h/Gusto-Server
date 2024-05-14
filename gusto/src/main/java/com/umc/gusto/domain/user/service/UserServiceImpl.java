@@ -214,6 +214,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void updateProfile(User user, MultipartFile profileImg, UpdateProfileRequest request) {
         if(profileImg != null) {
             s3Service.deleteImageFromUrl(user.getProfileImage());
@@ -229,6 +230,10 @@ public class UserServiceImpl implements UserService{
 
             if(request.getGender() != null) {
                 user.updateGender(User.Gender.valueOf(request.getGender()));
+            }
+
+            if(request.getNickname() != null) {
+                updateNickname(user, request.getNickname());
             }
         }
 
