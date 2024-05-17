@@ -3,7 +3,6 @@ package com.umc.gusto.domain.group.service;
 import com.umc.gusto.domain.group.model.request.*;
 import com.umc.gusto.domain.group.model.response.*;
 import com.umc.gusto.domain.user.entity.User;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Map;
