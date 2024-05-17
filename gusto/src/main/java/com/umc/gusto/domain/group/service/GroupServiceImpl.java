@@ -282,6 +282,24 @@ public class GroupServiceImpl implements GroupService{
                 .build();
     }
 
+    @Transactional(readOnly = true)
+    public GetPreJoinGroupInfoResponse getPreJoinGroupInfo(JoinGroupRequest joinGroupRequest){
+        Group group = groupRepository.findGroupByCodeAndStatus(joinGroupRequest.getCode(), BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+
+        int numMembers = groupMemberRepository.countGroupMembersByGroup(group);
+
+        List<String> groupMembersNickname = groupMemberRepository.findGroupMembersByGroup(group).stream()
+                .map(groupMember -> groupMember.getUser().getNickname())
+                .collect(Collectors.toList());
+
+        return GetPreJoinGroupInfoResponse.builder()
+                .groupName(group.getGroupName())
+                .groupMembers(groupMembersNickname)
+                .numMembers(numMembers)
+                .build();
+    }
+
     @Override
     public void createGroupList(Long groupId,GroupListRequest request,User user) {
         // 그룹 존재 여부 확인

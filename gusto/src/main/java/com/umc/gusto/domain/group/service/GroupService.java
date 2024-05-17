@@ -48,6 +48,9 @@ public interface GroupService {
     //그룹 구성원 조회
     Map<String, Object> getGroupMembers(Long groupId, Long lastMemberId, int size);
 
+    // 초대 코드로 그룹 정보 조회
+    GetPreJoinGroupInfoResponse getPreJoinGroupInfo(JoinGroupRequest joinGroupRequest);
+
     //그룹 루트 삭제
     void deleteRoute(Long routeId, User user, Long groupId);
 
