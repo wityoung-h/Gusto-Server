@@ -50,21 +50,21 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
             "AND p.store.town.townName = :townName " +
-            "AND p.pinId < :pinId " +
+            "AND p.pinId > :pinId " +
             "ORDER BY p.pinId ASC")
     Page<Pin> findPinsByMyCategoryAndTownNameAndPinIdASCPaging(MyCategory myCategory, String townName, Long pinId, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
             "AND p.store.town.townName = :townName " +
-            "AND p.pinId < :pinId " +
+            "AND p.store.storeName < :storeName " +
             "ORDER BY p.store.storeName DESC")
-    Page<Pin> findPinsByMyCategoryAndTownNameAndStoreNameDESCPaging(MyCategory myCategory, String townName, Long pinId, Pageable pageable);
+    Page<Pin> findPinsByMyCategoryAndTownNameAndStoreNameDESCPaging(MyCategory myCategory, String townName, String storeName, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
             "AND p.store.town.townName = :townName " +
-            "AND p.pinId < :pinId " +
+            "AND p.store.storeName > :storeName " +
             "ORDER BY p.store.storeName ASC")
-    Page<Pin> findPinsByMyCategoryAndTownNameAndStoreNameASCPaging(MyCategory myCategory, String townName, Long pinId, Pageable pageable);
+    Page<Pin> findPinsByMyCategoryAndTownNameAndStoreNameASCPaging(MyCategory myCategory, String townName, String storeName, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
             "ORDER BY p.pinId DESC")
@@ -92,19 +92,19 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
     Page<Pin> findPinsByMyCategoryAndPinIdDESCPaging(MyCategory myCategory, Long pinId, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
-            "AND p.pinId < :pinId " +
+            "AND p.pinId > :pinId " +
             "ORDER BY p.pinId ASC")
     Page<Pin> findPinsByMyCategoryAndPinIdASCPaging(MyCategory myCategory, Long pinId, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
-            "AND p.pinId < :pinId " +
+            "AND p.store.storeName < :storeName " +
             "ORDER BY p.store.storeName DESC")
-    Page<Pin> findPinsByMyCategoryAndStoreNameDESCPaging(MyCategory myCategory, Long pinId, Pageable pageable);
+    Page<Pin> findPinsByMyCategoryAndStoreNameDESCPaging(MyCategory myCategory, String storeName, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
-            "AND p.pinId < :pinId " +
-            "ORDER BY p.pinId DESC")
-    Page<Pin> findPinsByMyCategoryAndStoreNameASCPaging(MyCategory myCategory, Long pinId, Pageable pageable);
+            "AND p.store.storeName > :storeName " +
+            "ORDER BY p.store.storeName ASC")
+    Page<Pin> findPinsByMyCategoryAndStoreNameASCPaging(MyCategory myCategory, String storeName, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "WHERE p.user = :user " +
             "AND p.myCategory.myCategoryId = :myCategoryId " +

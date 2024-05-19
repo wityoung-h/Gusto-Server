@@ -15,7 +15,7 @@ public interface MyCategoryService {
     PagingResponse getAllMyCategory(User user, String nickname, String townName, Long myCategoryId);
 //    List<MyCategoryResponse> getAllMyCategoryWithLocation(User user, String townName);
 
-    PagingResponse getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName, Long pinId, String sort);
+    PagingResponse getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName, Long pinId, String storeName, String sort);
 
 //    List<PinByMyCategoryResponse> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townName);
 

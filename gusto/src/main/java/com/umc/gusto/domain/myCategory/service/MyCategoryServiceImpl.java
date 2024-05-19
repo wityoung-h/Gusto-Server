@@ -19,7 +19,6 @@ import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
@@ -92,8 +91,10 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     }
 
     @Transactional(readOnly = true)
-    public PagingResponse getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName, Long pinId, String sort) {
+    public PagingResponse getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName, Long pinId, String storeName, String sort) {
         Optional<MyCategory> myCategory;
+
+        final String finalSort = (sort == null) ? "default" : sort;
 
         Page<Pin> pinList;
         if (nickname != null) {
@@ -108,59 +109,51 @@ public class MyCategoryServiceImpl implements MyCategoryService {
         }
 
         if (townName != null) {
-            if (pinId != null) {
-                pinList = myCategory.map(category -> {
-                    return switch (sort) {
-                        case "oldest" ->
-                                pinRepository.findPinsByMyCategoryAndTownNameAndPinIdASCPaging(category, townName, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
-                        case "name_ascend" ->
-                                pinRepository.findPinsByMyCategoryAndTownNameAndStoreNameASCPaging(category, townName, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
-                        case "name_descend" ->
-                                pinRepository.findPinsByMyCategoryAndTownNameAndStoreNameDESCPaging(category, townName, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
-                        default ->
-                                pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(category, townName, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
-                    };
+            if (pinId != null || storeName != null) {
+                pinList = myCategory.map(category -> switch (finalSort) {
+                    case "oldest" ->
+                            pinRepository.findPinsByMyCategoryAndTownNameAndPinIdASCPaging(category, townName, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
+                    case "storeName_asc" ->
+                            pinRepository.findPinsByMyCategoryAndTownNameAndStoreNameASCPaging(category, townName, storeName, Pageable.ofSize(PIN_PAGE_SIZE));
+                    case "storeName_desc" ->
+                            pinRepository.findPinsByMyCategoryAndTownNameAndStoreNameDESCPaging(category, townName, storeName, Pageable.ofSize(PIN_PAGE_SIZE));
+                    default ->
+                            pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(category, townName, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
                 }).orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             } else {
-                pinList = myCategory.map(category -> {
-                    return switch (sort) {
-                        case "oldest" ->
-                                pinRepository.findPinsByMyCategoryAndTownNameAndPinIdASCFirstPaging(category, townName, Pageable.ofSize(PIN_PAGE_SIZE));
-                        case "name_ascend" ->
-                                pinRepository.findPinsByMyCategoryAndTownNameAndStoreNameASCFirstPaging(category, townName, Pageable.ofSize(PIN_PAGE_SIZE));
-                        case "name_descend" ->
-                                pinRepository.findPinsByMyCategoryAndTownNameAndStoreNameDESCFirstPaging(category, townName, Pageable.ofSize(PIN_PAGE_SIZE));
-                        default ->
-                                pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCFirstPaging(category, townName, Pageable.ofSize(PIN_PAGE_SIZE));
-                    };
+                pinList = myCategory.map(category -> switch (finalSort) {
+                    case "oldest" ->
+                            pinRepository.findPinsByMyCategoryAndTownNameAndPinIdASCFirstPaging(category, townName, Pageable.ofSize(PIN_PAGE_SIZE));
+                    case "storeName_asc" ->
+                            pinRepository.findPinsByMyCategoryAndTownNameAndStoreNameASCFirstPaging(category, townName, Pageable.ofSize(PIN_PAGE_SIZE));
+                    case "storeName_desc" ->
+                            pinRepository.findPinsByMyCategoryAndTownNameAndStoreNameDESCFirstPaging(category, townName, Pageable.ofSize(PIN_PAGE_SIZE));
+                    default ->
+                            pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCFirstPaging(category, townName, Pageable.ofSize(PIN_PAGE_SIZE));
                 }).orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             }
         } else {
-            if (pinId != null) {
-                pinList = myCategory.map(category -> {
-                    return switch (sort) {
-                        case "oldest" ->
-                                pinRepository.findPinsByMyCategoryAndPinIdASCPaging(category, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
-                        case "name_ascend" ->
-                                pinRepository.findPinsByMyCategoryAndStoreNameASCPaging(category, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
-                        case "name_descend" ->
-                                pinRepository.findPinsByMyCategoryAndStoreNameDESCPaging(category, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
-                        default ->
-                                pinRepository.findPinsByMyCategoryAndPinIdDESCPaging(category, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
-                    };
+            if (pinId != null || storeName != null) {
+                pinList = myCategory.map(category -> switch (finalSort) {
+                    case "oldest" ->
+                            pinRepository.findPinsByMyCategoryAndPinIdASCPaging(category, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
+                    case "storeName_asc" ->
+                            pinRepository.findPinsByMyCategoryAndStoreNameASCPaging(category, storeName, Pageable.ofSize(PIN_PAGE_SIZE));
+                    case "storeName_desc" ->
+                            pinRepository.findPinsByMyCategoryAndStoreNameDESCPaging(category, storeName, Pageable.ofSize(PIN_PAGE_SIZE));
+                    default ->
+                            pinRepository.findPinsByMyCategoryAndPinIdDESCPaging(category, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
                 }).orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             } else {
-                pinList = myCategory.map(category -> {
-                    return switch (sort) {
-                        case "oldest" ->
-                                pinRepository.findPinsByMyCategoryAndPinIdASCFirstPaging(category, Pageable.ofSize(PIN_PAGE_SIZE));
-                        case "name_ascend" ->
-                                pinRepository.findPinsByMyCategoryAndStoreNameASCFirstPaging(category, Pageable.ofSize(PIN_PAGE_SIZE));
-                        case "name_descend" ->
-                                pinRepository.findPinsByMyCategoryAndStoreNameDESCFirstPaging(category, Pageable.ofSize(PIN_PAGE_SIZE));
-                        default ->
-                                pinRepository.findPinsByMyCategoryAndPinIdDESCFirstPaging(category, Pageable.ofSize(PIN_PAGE_SIZE));
-                    };
+                pinList = myCategory.map(category -> switch (finalSort) {
+                    case "oldest" ->
+                            pinRepository.findPinsByMyCategoryAndPinIdASCFirstPaging(category, Pageable.ofSize(PIN_PAGE_SIZE));
+                    case "storeName_asc" ->
+                            pinRepository.findPinsByMyCategoryAndStoreNameASCFirstPaging(category, Pageable.ofSize(PIN_PAGE_SIZE));
+                    case "storeName_desc" ->
+                            pinRepository.findPinsByMyCategoryAndStoreNameDESCFirstPaging(category, Pageable.ofSize(PIN_PAGE_SIZE));
+                    default ->
+                            pinRepository.findPinsByMyCategoryAndPinIdDESCFirstPaging(category, Pageable.ofSize(PIN_PAGE_SIZE));
                 }).orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
             }
         }

@@ -50,10 +50,11 @@ public class MyCategoryController {
             @RequestParam(name = "myCategoryId") Long myCategoryId,
             @RequestParam(name = "townName", required = false) String townName,
             @RequestParam(name = "pinId", required = false) Long pinId,
+            @RequestParam(name = "storeName", required = false) String storeName,
             @RequestParam(name = "sort", required = false) String sort// paging 처리를 위해 마지막 리턴 pinId 사용
             ) {
         User user = authUser.getUser();
-        PagingResponse pagingResponse = myCategoryService.getAllPinByMyCategory(user, nickname, myCategoryId, townName, pinId, sort);
+        PagingResponse pagingResponse = myCategoryService.getAllPinByMyCategory(user, nickname, myCategoryId, townName, pinId, storeName, sort);
 
         return ResponseEntity.status(HttpStatus.OK).body(pagingResponse);
     }
