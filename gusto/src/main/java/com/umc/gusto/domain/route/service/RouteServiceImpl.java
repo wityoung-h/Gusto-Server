@@ -110,7 +110,7 @@ public class RouteServiceImpl implements RouteService{
                         .build())
                 .collect(Collectors.toList());
         return RoutePagingResponse.builder()
-                .hasNest(routes.hasNext())
+                .hasNext(routes.hasNext())
                 .result(list)
                 .build();
 
@@ -137,7 +137,7 @@ public class RouteServiceImpl implements RouteService{
                                 .build())
                 .collect(Collectors.toList());
         return RoutePagingResponse.builder()
-                .hasNest(routes.hasNext())
+                .hasNext(routes.hasNext())
                 .result(list)
                 .build();
     }
@@ -212,7 +212,7 @@ public class RouteServiceImpl implements RouteService{
                 })
                 .collect(Collectors.toList());
         return RoutePagingResponse.builder()
-                .hasNest(routes.hasNext())
+                .hasNext(routes.hasNext())
                 .result(list)
                 .build();
     }
