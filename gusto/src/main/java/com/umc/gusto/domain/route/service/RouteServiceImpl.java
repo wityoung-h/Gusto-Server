@@ -121,38 +121,30 @@ public class RouteServiceImpl implements RouteService{
         Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
                 .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
 
+        Page<Route> routes;
         if(routeId == null) {
-            Page<Route> routes = routeRepository.findFirstRoutesByGroup(group, BaseEntity.Status.ACTIVE, Pageable.ofSize(ROUTE_LIST_PAGE));
-            List<RouteResponse> list = routes.stream().map(
-                            Route -> RouteResponse.builder()
-                                    .routeId(Route.getRouteId())
-                                    .routeName(Route.getRouteName())
-                                    .numStore(routeListRepository.countRouteListByRoute(Route))
-                                    .groupId(Route.getRouteId())
-                                    .build())
-                    .collect(Collectors.toList());
-            return RoutePagingResponse.builder()
-                    .hasNext(routes.hasNext())
-                    .result(list)
-                    .build();
+            routes = routeRepository.findFirstRoutesByGroup(group, BaseEntity.Status.ACTIVE, Pageable.ofSize(ROUTE_LIST_PAGE));
         }else{
             //특정 그룹 내 루트 조회
-            Page<Route> routes = routeRepository.findRoutesByGroup(group,routeId,BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
-            List<RouteResponse> list = routes.stream().map(
-                            Route -> RouteResponse.builder()
-                                    .routeId(Route.getRouteId())
-                                    .routeName(Route.getRouteName())
-                                    .numStore(routeListRepository.countRouteListByRoute(Route))
-                                    .groupId(Route.getRouteId())
-                                    .build())
-                    .collect(Collectors.toList());
-            return RoutePagingResponse.builder()
-                    .hasNext(routes.hasNext())
-                    .result(list)
-                    .build();
+            routes = routeRepository.findRoutesByGroup(group, routeId, BaseEntity.Status.ACTIVE, Pageable.ofSize(ROUTE_LIST_PAGE));
         }
+        return getRoutePagingResponse(routes);
 
+    }
 
+    private RoutePagingResponse getRoutePagingResponse(Page<Route> routes) {
+        List<RouteResponse> list = routes.stream().map(
+                        Route -> RouteResponse.builder()
+                                .routeId(Route.getRouteId())
+                                .routeName(Route.getRouteName())
+                                .numStore(routeListRepository.countRouteListByRoute(Route))
+                                .groupId(Route.getGroup().getGroupId())
+                                .build())
+                .collect(Collectors.toList());
+        return RoutePagingResponse.builder()
+                .hasNext(routes.hasNext())
+                .result(list)
+                .build();
     }
 
     @Transactional
