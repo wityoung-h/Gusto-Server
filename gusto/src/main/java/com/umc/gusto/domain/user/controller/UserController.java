@@ -106,6 +106,19 @@ public class UserController {
     }
 
     /**
+     * 로그아웃 API
+     * [POST] /users/sign-out
+     * @param -
+     * @return -
+     */
+    @PostMapping("/sign-out")
+    public ResponseEntity signOut(@AuthenticationPrincipal AuthUser authUser,
+                                  @RequestHeader("refresh-Token") String refreshToken) {
+        return ResponseEntity.status(HttpStatus.RESET_CONTENT)
+                .build();
+    }
+
+    /**
      * 먹스또 프로필 조회
      * [GET] /users/{nickname}/profile
      * @param nickname

@@ -166,6 +166,11 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public void signOut(User user, String refreshToken) {
+
+    }
+
+    @Override
     public FeedProfileResponse getProfile(User user, String nickname) {
         User target;
 
