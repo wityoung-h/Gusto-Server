@@ -114,6 +114,8 @@ public class UserController {
     @PostMapping("/sign-out")
     public ResponseEntity signOut(@AuthenticationPrincipal AuthUser authUser,
                                   @RequestHeader("refresh-Token") String refreshToken) {
+        userService.signOut(authUser.getUser(), refreshToken);
+
         return ResponseEntity.status(HttpStatus.RESET_CONTENT)
                 .build();
     }

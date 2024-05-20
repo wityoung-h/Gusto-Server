@@ -167,7 +167,8 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void signOut(User user, String refreshToken) {
-
+        jwtService.matchCheckTokens(user.getUserId(), refreshToken);
+        redisService.deleteValues(refreshToken);
     }
 
     @Override
