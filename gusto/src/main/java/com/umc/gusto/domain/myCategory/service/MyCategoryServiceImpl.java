@@ -109,14 +109,14 @@ public class MyCategoryServiceImpl implements MyCategoryService {
         }
 
         if (townName != null) {
-            if (pinId != null || storeName != null) {
+            if (pinId != null || storeName != null)  {
                 pinList = myCategory.map(category -> switch (finalSort) {
                     case "oldest" ->
                             pinRepository.findPinsByMyCategoryAndTownNameAndPinIdASCPaging(category, townName, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
                     case "storeName_asc" ->
-                            pinRepository.findPinsByMyCategoryAndTownNameAndStoreNameASCPaging(category, townName, storeName, Pageable.ofSize(PIN_PAGE_SIZE));
+                            pinRepository.findPinsByMyCategoryAndTownNameAndStoreNameASCPaging(category, townName, pinId, storeName, Pageable.ofSize(PIN_PAGE_SIZE));
                     case "storeName_desc" ->
-                            pinRepository.findPinsByMyCategoryAndTownNameAndStoreNameDESCPaging(category, townName, storeName, Pageable.ofSize(PIN_PAGE_SIZE));
+                            pinRepository.findPinsByMyCategoryAndTownNameAndStoreNameDESCPaging(category, townName, pinId, storeName, Pageable.ofSize(PIN_PAGE_SIZE));
                     default ->
                             pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(category, townName, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
                 }).orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));
@@ -138,9 +138,9 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                     case "oldest" ->
                             pinRepository.findPinsByMyCategoryAndPinIdASCPaging(category, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
                     case "storeName_asc" ->
-                            pinRepository.findPinsByMyCategoryAndStoreNameASCPaging(category, storeName, Pageable.ofSize(PIN_PAGE_SIZE));
+                            pinRepository.findPinsByMyCategoryAndStoreNameASCPaging(category, pinId, storeName, Pageable.ofSize(PIN_PAGE_SIZE));
                     case "storeName_desc" ->
-                            pinRepository.findPinsByMyCategoryAndStoreNameDESCPaging(category, storeName, Pageable.ofSize(PIN_PAGE_SIZE));
+                            pinRepository.findPinsByMyCategoryAndStoreNameDESCPaging(category, pinId, storeName, Pageable.ofSize(PIN_PAGE_SIZE));
                     default ->
                             pinRepository.findPinsByMyCategoryAndPinIdDESCPaging(category, pinId, Pageable.ofSize(PIN_PAGE_SIZE));
                 }).orElseThrow(() -> new GeneralException(Code.MY_CATEGORY_NOT_FOUND));

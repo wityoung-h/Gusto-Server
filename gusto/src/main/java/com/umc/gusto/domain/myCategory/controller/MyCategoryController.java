@@ -41,7 +41,7 @@ public class MyCategoryController {
 
     /**
      * 카테고리 별 가게 목록 조회
-     * [GET] /myCategories/pins?nickname={nickname}&myCategoryId={myCategoryId}&townName={townName}&pinId={pinId}&sort={sort}
+     * [GET] /myCategories/pins?nickname={nickname}&myCategoryId={myCategoryId}&townName={townName}&pinId={pinId}&storeName={storeName}&sort={sort}
      */
     @GetMapping("/pins")             // 나의 찜을 조회 할 시 nickname 값을 받지 않고, nickname이 조회될 경우 townName을 받지 않음
     public ResponseEntity<PagingResponse> allPinByMyCategory(
