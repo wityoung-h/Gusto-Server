@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface StoreService {
 
-    GetStoreResponse getStore(User user, Long storeId);
+    List<GetStoreResponse> getStores(User user, List<Long> storeIds);
     GetStoreDetailResponse getStoreDetail(User user, Long storeId, LocalDate visitedAt, Long reviewId);
     List<GetStoresInMapResponse> getStoresInMap(User user, String townName, Long myCategoryId, Boolean visited);
     List<GetPinStoreResponse> getPinStoresByCategoryAndLocation(User user, Long myCategoryId, String townName);

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="84e07f26-bf5a-404f-a135-26db939435e5" name="Gnar">
+        <fileTransfer accessType="SFTP" host="52.78.124.27" port="22" sshConfigId="6806b413-f8a9-423b-a543-4e2f8b436be6" sshConfig="ubuntu@52.78.124.27:22 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
