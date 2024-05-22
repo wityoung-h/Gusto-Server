@@ -6,9 +6,6 @@ import com.umc.gusto.domain.store.service.StoreService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,20 +20,17 @@ import java.util.List;
 public class StoreController {
     private final StoreService storeService;
 
-    private static final int DEFAULT_PAGE_NUMBER = 0;
-    private static final int DEFAULT_PAGE_SIZE = 3;
-
     /**
-     * 가게 1건 조회
-     * [GET] /stores/{storeId}
+     * 가게 조회
+     * [GET] /stores?storeId={storeId}&storeId={storeId}
      */
-    @GetMapping("/{storeId}")
-    public ResponseEntity<GetStoreResponse> getStore(
+    @GetMapping
+    public ResponseEntity<List<GetStoreResponse>> getStores(
             @AuthenticationPrincipal AuthUser authUser,
-            @PathVariable Long storeId) {
+            @RequestParam(name = "storeId") List<Long> storeIds) {
         User user = authUser.getUser();
-        GetStoreResponse getStore = storeService.getStore(user, storeId);
-        return ResponseEntity.status(HttpStatus.OK).body(getStore);
+        List<GetStoreResponse> getStores = storeService.getStores(user, storeIds);
+        return ResponseEntity.status(HttpStatus.OK).body(getStores);
     }
 
     /**

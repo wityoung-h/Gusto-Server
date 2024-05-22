@@ -6,7 +6,6 @@ import com.umc.gusto.domain.group.service.GroupService;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.auth.model.AuthUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -165,6 +164,16 @@ public class GroupController {
                                                                          @RequestParam(name = "size", defaultValue = "10") int size){
         Map<String, Object> getGroupMembers = groupService.getGroupMembers(groupId, lastMemberId, size);
         return ResponseEntity.status(HttpStatus.OK).body(getGroupMembers);
+    }
+
+    /**
+     * 초대 코드로 그룹 정보 조회
+     * [GET] /groups/pre-join
+     */
+    @GetMapping("/pre-join")
+    public ResponseEntity<GetPreJoinGroupInfoResponse> getPreJoinGroupInfo(@RequestBody JoinGroupRequest joinGroupRequest){
+        GetPreJoinGroupInfoResponse getPreJoinGroupInfo = groupService.getPreJoinGroupInfo(joinGroupRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(getPreJoinGroupInfo);
     }
 
     /**

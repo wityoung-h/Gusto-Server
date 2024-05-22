@@ -9,6 +9,6 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class RoutePagingResponse {
-    private Boolean hasNest;
+    private Boolean hasNext;
     private List<?> result;
 }

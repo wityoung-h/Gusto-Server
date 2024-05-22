@@ -34,40 +34,45 @@ public class StoreServiceImpl implements StoreService{
     private static final int PAGE_SIZE = 6;
 
     @Transactional(readOnly = true)
-    public GetStoreResponse getStore(User user, Long storeId) {
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
-        Long pinId = pinRepository.findByUserAndStoreStoreId(user, storeId);
-        List<OpeningHours> openingHoursList = openingHoursRepository.findByStoreStoreId(storeId);
+    public List<GetStoreResponse> getStores(User user, List<Long> storeIds) {
+        List<GetStoreResponse> responses = new ArrayList<>();
+        for (Long storeId : storeIds) {
+            Store store = storeRepository.findById(storeId)
+                    .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
+            Long pinId = pinRepository.findByUserAndStoreStoreId(user, storeId);
+            List<OpeningHours> openingHoursList = openingHoursRepository.findByStoreStoreId(storeId);
 
-        Map<OpeningHours.BusinessDay, GetStoreResponse.Timing> businessDays = new LinkedHashMap<>();
-        for (OpeningHours openingHours : openingHoursList) {
-            GetStoreResponse.Timing timing = new GetStoreResponse.Timing(
-                    openingHours.getOpenedAt(),
-                    openingHours.getClosedAt()
-            );
-            businessDays.put(openingHours.getBusinessDay(), timing);
+            Map<OpeningHours.BusinessDay, GetStoreResponse.Timing> businessDays = new LinkedHashMap<>();
+            for (OpeningHours openingHours : openingHoursList) {
+                GetStoreResponse.Timing timing = new GetStoreResponse.Timing(
+                        openingHours.getOpenedAt(),
+                        openingHours.getClosedAt()
+                );
+                businessDays.put(openingHours.getBusinessDay(), timing);
+            }
+
+            List<Review> top3Reviews = reviewRepository.findFirst3ByStoreOrderByLikedDesc(store);
+
+            List<String> reviewImg = top3Reviews.stream()
+                    .map(review -> Optional.ofNullable(review.getImg1()).orElse(""))
+                    .collect(Collectors.toList());
+            boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
+
+
+            responses.add(GetStoreResponse.builder()
+                    .pinId(pinId)
+                    .storeId(storeId)
+                    .storeName(store.getStoreName())
+                    .address(store.getAddress())
+                    .longitude(store.getLongitude())
+                    .latitude(store.getLatitude())
+                    .businessDay(businessDays)
+                    .reviewImg3(reviewImg)
+                    .pin(isPinned)
+                    .build());
         }
 
-        List<Review> top3Reviews = reviewRepository.findFirst3ByStoreOrderByLikedDesc(store);
-
-        List<String> reviewImg = top3Reviews.stream()
-                .map(review -> Optional.ofNullable(review.getImg1()).orElse(""))
-                .collect(Collectors.toList());
-        boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
-
-
-        return GetStoreResponse.builder()
-                .pinId(pinId)
-                .storeId(storeId)
-                .storeName(store.getStoreName())
-                .address(store.getAddress())
-                .longitude(store.getLongitude())
-                .latitude(store.getLatitude())
-                .businessDay(businessDays)
-                .reviewImg3(reviewImg)
-                .pin(isPinned)
-                .build();
+        return responses;
     }
 
 

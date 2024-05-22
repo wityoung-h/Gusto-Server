@@ -41,7 +41,7 @@ public class MyCategoryController {
 
     /**
      * 카테고리 별 가게 목록 조회
-     * [GET] /myCategories/pins?nickname={nickname}&myCategoryId={myCategoryId}&townName={townName}&pinId={pinId}
+     * [GET] /myCategories/pins?nickname={nickname}&myCategoryId={myCategoryId}&townName={townName}&pinId={pinId}&storeName={storeName}&sort={sort}
      */
     @GetMapping("/pins")             // 나의 찜을 조회 할 시 nickname 값을 받지 않고, nickname이 조회될 경우 townName을 받지 않음
     public ResponseEntity<PagingResponse> allPinByMyCategory(
@@ -49,10 +49,12 @@ public class MyCategoryController {
             @RequestParam(name = "nickname", required = false) String nickname,
             @RequestParam(name = "myCategoryId") Long myCategoryId,
             @RequestParam(name = "townName", required = false) String townName,
-            @RequestParam(name = "pinId", required = false) Long pinId                                // paging 처리를 위해 마지막 리턴 pinId 사용
+            @RequestParam(name = "pinId", required = false) Long pinId,
+            @RequestParam(name = "storeName", required = false) String storeName,
+            @RequestParam(name = "sort", required = false) String sort// paging 처리를 위해 마지막 리턴 pinId 사용
             ) {
         User user = authUser.getUser();
-        PagingResponse pagingResponse = myCategoryService.getAllPinByMyCategory(user, nickname, myCategoryId, townName, pinId);
+        PagingResponse pagingResponse = myCategoryService.getAllPinByMyCategory(user, nickname, myCategoryId, townName, pinId, storeName, sort);
 
         return ResponseEntity.status(HttpStatus.OK).body(pagingResponse);
     }
