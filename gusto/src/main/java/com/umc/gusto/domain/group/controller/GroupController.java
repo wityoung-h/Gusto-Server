@@ -168,9 +168,9 @@ public class GroupController {
 
     /**
      * 초대 코드로 그룹 정보 조회
-     * [GET] /groups/pre-join
+     * [POST] /groups/check-invitation
      */
-    @GetMapping("/pre-join")
+    @PostMapping("/check-invitation")
     public ResponseEntity<GetPreJoinGroupInfoResponse> getPreJoinGroupInfo(@RequestBody JoinGroupRequest joinGroupRequest){
         GetPreJoinGroupInfoResponse getPreJoinGroupInfo = groupService.getPreJoinGroupInfo(joinGroupRequest);
         return ResponseEntity.status(HttpStatus.OK).body(getPreJoinGroupInfo);
