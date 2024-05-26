@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -85,12 +86,14 @@ public class StoreController {
      * [GET] /stores/pins/visited?myCategoryId={categoryId}&townName={townName}
      */
     @GetMapping("/pins/visited")
-    public ResponseEntity<List<GetPinStoreInfoResponse>> getVisitedPinStoresByCategoryAndLocation(
+    public ResponseEntity<Map<String, Object>> getVisitedPinStoresByCategoryAndLocation(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "myCategoryId", required = false) Long myCategoryId,
-            @RequestParam(name = "townName") String townName){
+            @RequestParam(name = "townName") String townName,
+            @RequestParam(name = "lastStoreId", required = false) Long lastStoreId,
+            @RequestParam(name = "size", defaultValue = "5") int size){
         User user = authUser.getUser();
-        List<GetPinStoreInfoResponse> visitedStoreList = storeService.getVisitedPinStores(user, myCategoryId, townName);
+        Map<String, Object> visitedStoreList = storeService.getVisitedPinStores(user, myCategoryId, townName, lastStoreId, size);
         return ResponseEntity.status(HttpStatus.OK).body(visitedStoreList);
     }
 
@@ -99,12 +102,14 @@ public class StoreController {
      * [GET] /stores/pins/unvisited?myCategoryId={categoryId}&townName={townName}
      */
     @GetMapping("/pins/unvisited")
-    public ResponseEntity<List<GetPinStoreInfoResponse>> getUnvisitedPinStoresByCategoryAndLocation(
+    public ResponseEntity<Map<String, Object>> getUnvisitedPinStoresByCategoryAndLocation(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "myCategoryId", required = false) Long myCategoryId,
-            @RequestParam(name = "townName") String townName) {
+            @RequestParam(name = "townName") String townName,
+            @RequestParam(name = "lastStoreId", required = false) Long lastStoreId,
+            @RequestParam(name = "size", defaultValue = "5") int size) {
         User user = authUser.getUser();
-        List<GetPinStoreInfoResponse> unvisitedStoreList = storeService.getUnvisitedPinStores(user, myCategoryId, townName);
+        Map<String, Object> unvisitedStoreList = storeService.getUnvisitedPinStores(user, myCategoryId, townName, lastStoreId, size);
         return ResponseEntity.status(HttpStatus.OK).body(unvisitedStoreList);
     }
 

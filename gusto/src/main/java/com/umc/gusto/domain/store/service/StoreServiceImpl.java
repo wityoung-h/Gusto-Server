@@ -224,14 +224,19 @@ public class StoreServiceImpl implements StoreService{
     }
 
     @Transactional(readOnly = true)
-    public List<GetPinStoreInfoResponse> getPinStoresInfo(User user, Long myCategoryId, String townName, boolean visited) {
+    public Map<String, Object> getPinStoresInfo(User user, Long myCategoryId, String townName, boolean visited, Long lastStoreId, int size) {
         List<Pin> pins = pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName);
         if(myCategoryId == null){
             pins = pinRepository.findPinsByUserAndTownNameAndPinIdDESC(user, townName);
         }
 
         List<GetPinStoreInfoResponse> pinStoresInfo = new ArrayList<>();
+        boolean hasNext = false;
         for (Pin pin : pins) {
+            if (lastStoreId != null && pin.getStore().getStoreId() >= lastStoreId) {
+                continue;
+            }
+
             Store store = pin.getStore();
             boolean hasVisited = reviewRepository.existsByStoreAndUserNickname(store, user.getNickname());
 
@@ -250,17 +255,25 @@ public class StoreServiceImpl implements StoreService{
                 pinStoresInfo.add(pinStoreInfoResponse);
             }
         }
-        return pinStoresInfo;
+        if (pinStoresInfo.size() > size) {
+            pinStoresInfo = pinStoresInfo.subList(0, size);
+            hasNext = true;
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("pinStores", pinStoresInfo);
+        map.put("hasNext", hasNext);
+        return map;
     }
 
     @Transactional(readOnly = true)
-    public List<GetPinStoreInfoResponse> getVisitedPinStores(User user, Long myCategoryId, String townName) {
-        return getPinStoresInfo(user, myCategoryId, townName, true);
+    public Map<String, Object> getVisitedPinStores(User user, Long myCategoryId, String townName, Long lastStoreId, int size) {
+        return getPinStoresInfo(user, myCategoryId, townName, true, lastStoreId, size);
     }
 
     @Transactional(readOnly = true)
-    public List<GetPinStoreInfoResponse> getUnvisitedPinStores(User user, Long myCategoryId, String townName) {
-        return getPinStoresInfo(user, myCategoryId, townName, false);
+    public Map<String, Object> getUnvisitedPinStores(User user, Long myCategoryId, String townName,  Long lastStoreId, int size) {
+        return getPinStoresInfo(user, myCategoryId, townName, false, lastStoreId, size);
     }
 
     @Override
