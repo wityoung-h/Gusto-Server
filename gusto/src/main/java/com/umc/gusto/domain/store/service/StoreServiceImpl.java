@@ -224,6 +224,41 @@ public class StoreServiceImpl implements StoreService{
         return Collections.singletonList(pinStoreResponse);
     }
 
+    @Transactional(readOnly = true)
+    public List<GetPinStoreInfoResponse> getPinStoresInfo(User user, Long myCategoryId, String townName, boolean visited) {
+        List<Pin> pins = pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName);
+        if(myCategoryId == null){
+            pins = pinRepository.findPinsByUserAndTownNameAndPinIdDESC(user, townName);
+        }
+
+        List<GetPinStoreInfoResponse> pinStoresInfo = new ArrayList<>();
+        for (Pin pin : pins) {
+            Store store = pin.getStore();
+            boolean hasVisited = reviewRepository.existsByStoreAndUserNickname(store, user.getNickname());
+
+            if (hasVisited == visited) {
+                List<Review> top3Reviews = reviewRepository.findFirst3ByStoreOrderByLikedDesc(store);
+                List<String> reviewImg = top3Reviews.stream()
+                        .map(review -> Optional.ofNullable(review.getImg1()).orElse(""))
+                        .collect(Collectors.toList());
+
+                GetPinStoreInfoResponse pinStoreInfoResponse = GetPinStoreInfoResponse.builder()
+                        .storeName(store.getStoreName())
+                        .category(store.getCategoryString())
+                        .address(store.getAddress())
+                        .reviewImg3(reviewImg)
+                        .build();
+                pinStoresInfo.add(pinStoreInfoResponse);
+            }
+        }
+        return pinStoresInfo;
+    }
+
+    @Transactional(readOnly = true)
+    public List<GetPinStoreInfoResponse> getVisitedPinStores(User user, Long myCategoryId, String townName) {
+        return getPinStoresInfo(user, myCategoryId, townName, true);
+    }
+
     @Override
     public List<GetStoreInfoResponse> searchStore(String keyword) {
         List<Store> searchResult = storeRepository.findTop5ByStoreNameContains(keyword);

@@ -81,6 +81,20 @@ public class StoreController {
     }
 
     /**
+     * 현재 지역의 찜한 방문 식당 조회
+     * [GET] /stores/pins/visited?myCategoryId={categoryId}&townName={townName}
+     */
+    @GetMapping("/pins/visited")
+    public ResponseEntity<List<GetPinStoreInfoResponse>> getVisitedPinStoresByCategoryAndLocation(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam(name = "myCategoryId", required = false) Long myCategoryId,
+            @RequestParam(name = "townName") String townName){
+        User user = authUser.getUser();
+        List<GetPinStoreInfoResponse> visitedStoreList = storeService.getVisitedPinStores(user, myCategoryId, townName);
+        return ResponseEntity.status(HttpStatus.OK).body(visitedStoreList);
+    }
+
+    /**
      * 맛집 검색 엔진
      */
     @GetMapping("/search")
