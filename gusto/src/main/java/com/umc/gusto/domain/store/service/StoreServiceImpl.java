@@ -258,6 +258,11 @@ public class StoreServiceImpl implements StoreService{
         return getPinStoresInfo(user, myCategoryId, townName, true);
     }
 
+    @Transactional(readOnly = true)
+    public List<GetPinStoreInfoResponse> getUnvisitedPinStores(User user, Long myCategoryId, String townName) {
+        return getPinStoresInfo(user, myCategoryId, townName, false);
+    }
+
     @Override
     public List<GetStoreInfoResponse> searchStore(String keyword) {
         List<Store> searchResult = storeRepository.findTop5ByStoreNameContains(keyword);

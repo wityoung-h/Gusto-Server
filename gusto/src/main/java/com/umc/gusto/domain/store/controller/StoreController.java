@@ -95,6 +95,20 @@ public class StoreController {
     }
 
     /**
+     * 현재 지역의 찜한 미방문 식당 조회
+     * [GET] /stores/pins/unvisited?myCategoryId={categoryId}&townName={townName}
+     */
+    @GetMapping("/pins/unvisited")
+    public ResponseEntity<List<GetPinStoreInfoResponse>> getUnvisitedPinStoresByCategoryAndLocation(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam(name = "myCategoryId", required = false) Long myCategoryId,
+            @RequestParam(name = "townName") String townName) {
+        User user = authUser.getUser();
+        List<GetPinStoreInfoResponse> unvisitedStoreList = storeService.getUnvisitedPinStores(user, myCategoryId, townName);
+        return ResponseEntity.status(HttpStatus.OK).body(unvisitedStoreList);
+    }
+
+    /**
      * 맛집 검색 엔진
      */
     @GetMapping("/search")
