@@ -2,7 +2,6 @@ package com.umc.gusto.domain.store.service;
 
 import com.umc.gusto.domain.store.model.response.*;
 import com.umc.gusto.domain.user.entity.User;
-import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
