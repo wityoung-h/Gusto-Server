@@ -61,15 +61,14 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                         if (townName != null) {
                             pinList = pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESC(myCategory, townName);     // 먼저 카테고리로 구분
                         } else {
-                            pinList = pinRepository.findPinsByMyCategoryAndPinIdDESC(myCategory);     // 먼저 카테고리로 구분
+                            pinList = pinRepository.findPinsByMyCategoryAndPinIdDESC(myCategory);                          // 먼저 카테고리로 구분
                         }
                         return MyCategoryResponse.builder()
                                 .myCategoryId(myCategory.getMyCategoryId())
                                 .myCategoryName(myCategory.getMyCategoryName())
                                 .myCategoryScript(myCategory.getMyCategoryScript())
                                 .myCategoryIcon(myCategory.getMyCategoryIcon())
-                                .publishCategory(myCategory.getPublishCategory())
-                                .pinCnt(pinList.size())            // pin 개수 받아오기로 변경
+                                .pinCnt(pinList.size())                                                                    // 타인의 카테고리의 경우 publish값을 볼 필요 X
                                 .build();
                     })
                     .collect(Collectors.toList());
@@ -215,7 +214,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
         userRepository.save(user);
         List<MyCategory> myCategoryList = myCategoryRepository.findByUser(user);
 
-        if (publishCategory == PublishStatus.PUBLIC) {
+        if (publishCategory.equals(PublishStatus.PUBLIC)) {
             for (MyCategory myCategory: myCategoryList) {
                 myCategory.updatePublishCategory(PublishStatus.PUBLIC);
             }
