@@ -36,10 +36,13 @@ public class MyCategory extends BaseEntity{
     @Column(length = 20)
     private String myCategoryScript;
 
-//    @Builder.Default
-//    @Enumerated(EnumType.STRING)
-//    @Column(name = "publishCategory",nullable = false, length = 10)
-//    private PublishStatus publishCategory = PublishStatus.PUBLIC;
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(name = "publishCategory",nullable = false, length = 10)
+    private PublishStatus publishCategory = PublishStatus.PUBLIC;
+
+    @Enumerated(EnumType.STRING)
+    private PublishStatus previousPublishCategory = PublishStatus.PUBLIC;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
@@ -61,9 +64,10 @@ public class MyCategory extends BaseEntity{
     }
 
     // 데모데이 이후 진행
-//    public void updatePublishCategory(PublishStatus publishCategory) {
-//        this.publishCategory = publishCategory;
-//    }
-
+    public void updatePublishCategory(PublishStatus publishCategory) {
+        this.publishCategory = publishCategory;
+        this.previousPublishCategory = publishCategory;     // 이전 값 저장
+    }
     public void updateStatus(BaseEntity.Status status) {this.status = status;}
+
 }

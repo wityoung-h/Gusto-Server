@@ -262,7 +262,7 @@ public class UserServiceImpl implements UserService{
         PublishStatus routeStatus = (request.getPublishRoute()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
 
         user.updatePublishReview(reviewStatus);
-        user.updatePublishPin(pinStatus);
+        user.updatePublishCategory(pinStatus);
         user.updatePublishRoute(routeStatus);
 
         userRepository.save(user);
