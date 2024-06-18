@@ -210,7 +210,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     }
 
     @Transactional
-    public void setUserPublishCategory(User user, PublishStatus publishCategory) {
+    public void savePublishCategory(User user, PublishStatus publishCategory) {
         user.updatePublishCategory(publishCategory);
         userRepository.save(user);
         List<MyCategory> myCategoryList = myCategoryRepository.findByUser(user);
@@ -274,7 +274,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
             existingMyCategory.updateMyCategoryScript(updateMyCategory.getMyCategoryScript());
         }
 
-        if (updateMyCategory.getPublishCategory() != null) {
+        if (updateMyCategory.getPublishCategory() != null && user.getPublishCategory().equals(PublishStatus.PUBLIC)) {          // USER의 publishCategory가 PUBLIC이여야만 변경 가능
             existingMyCategory.updatePublishCategory(updateMyCategory.getPublishCategory());
         }
 
