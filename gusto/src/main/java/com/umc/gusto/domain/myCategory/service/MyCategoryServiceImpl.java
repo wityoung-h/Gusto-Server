@@ -47,6 +47,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
             if (nickname.equals(user.getNickname())) {
                 throw new GeneralException(Code.USER_NOT_FOUND_SELF);
             }
+
             user = userRepository.findByNickname(nickname)      // 타 닉네임 조회
                     .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
             if (myCategoryId != null) {
@@ -54,31 +55,6 @@ public class MyCategoryServiceImpl implements MyCategoryService {
             } else {
                 myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPublic(user, Pageable.ofSize(MY_CATEGORY_PAGE_SIZE));
             }
-
-            List<MyCategoryResponse> result = myCategoryList.stream()
-                    .map(myCategory -> {
-                        List<Pin> pinList;
-                        if (townName != null) {
-                            pinList = pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESC(myCategory, townName);     // 먼저 카테고리로 구분
-                        } else {
-                            pinList = pinRepository.findPinsByMyCategoryAndPinIdDESC(myCategory);                          // 먼저 카테고리로 구분
-                        }
-                        return MyCategoryResponse.builder()
-                                .myCategoryId(myCategory.getMyCategoryId())
-                                .myCategoryName(myCategory.getMyCategoryName())
-                                .myCategoryScript(myCategory.getMyCategoryScript())
-                                .myCategoryIcon(myCategory.getMyCategoryIcon())
-                                .publishCategory(myCategory.getPublishCategory())
-                                .pinCnt(pinList.size())                                                                    // 타인의 카테고리의 경우 publish값을 볼 필요 X
-                                .build();
-                    })
-                    .collect(Collectors.toList());
-
-            return PagingResponse.builder()
-                    .hasNext(myCategoryList.hasNext())
-                    .result(result)
-                    .build();
-
         } else {    // 내 카테고리 조회
             if (myCategoryId != null) {
                 myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategoryPaging(user, myCategoryId, Pageable.ofSize(MY_CATEGORY_PAGE_SIZE));
@@ -86,33 +62,33 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                 myCategoryList = myCategoryRepository.findByUserNicknameAndPublishCategory(user, Pageable.ofSize(MY_CATEGORY_PAGE_SIZE));
             }
 
-            User finalUser = user;
-            List<MyCategoryResponse> result = myCategoryList.stream()
-                    .map(myCategory -> {
-                        List<Pin> pinList;
-                        if (townName != null) {
-                            pinList = pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESC(myCategory, townName);     // 먼저 카테고리로 구분
-                        } else {
-                            pinList = pinRepository.findPinsByMyCategoryAndPinIdDESC(myCategory);     // 먼저 카테고리로 구분
-                        }
-                        return MyCategoryResponse.builder()
-                                .myCategoryId(myCategory.getMyCategoryId())
-                                .myCategoryName(myCategory.getMyCategoryName())
-                                .myCategoryScript(myCategory.getMyCategoryScript())
-                                .myCategoryIcon(myCategory.getMyCategoryIcon())
-                                .userPublishCategory(finalUser.getPublishCategory())        // user의 publishCategory는 본인만 볼 수 있게
-                                .publishCategory(myCategory.getPublishCategory())
-                                .pinCnt(pinList.size())
-                                .build();
-                    })
-                    .collect(Collectors.toList());
-
-            return PagingResponse.builder()
-                    .hasNext(myCategoryList.hasNext())
-                    .result(result)
-                    .build();
-
         }
+
+        User finalUser = user;
+        List<MyCategoryResponse> result = myCategoryList.stream()
+                .map(myCategory -> {
+                    List<Pin> pinList;
+                    if (townName != null) {
+                        pinList = pinRepository.findPinsByMyCategoryAndTownNameAndPinIdDESC(myCategory, townName);     // 먼저 카테고리로 구분
+                    } else {
+                        pinList = pinRepository.findPinsByMyCategoryAndPinIdDESC(myCategory);     // 먼저 카테고리로 구분
+                    }
+                    return MyCategoryResponse.builder()
+                            .myCategoryId(myCategory.getMyCategoryId())
+                            .myCategoryName(myCategory.getMyCategoryName())
+                            .myCategoryScript(myCategory.getMyCategoryScript())
+                            .myCategoryIcon(myCategory.getMyCategoryIcon())
+                            .userPublishCategory(nickname == null ? finalUser.getPublishCategory() : null)        // user의 publishCategory는 본인만 볼 수 있게
+                            .publishCategory(myCategory.getPublishCategory())
+                            .pinCnt(pinList.size())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return PagingResponse.builder()
+                .hasNext(myCategoryList.hasNext())
+                .result(result)
+                .build();
     }
 
     @Transactional(readOnly = true)
