@@ -68,6 +68,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                                 .myCategoryName(myCategory.getMyCategoryName())
                                 .myCategoryScript(myCategory.getMyCategoryScript())
                                 .myCategoryIcon(myCategory.getMyCategoryIcon())
+                                .publishCategory(myCategory.getPublishCategory())
                                 .pinCnt(pinList.size())                                                                    // 타인의 카테고리의 경우 publish값을 볼 필요 X
                                 .build();
                     })
@@ -210,13 +211,12 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
     @Transactional
     public void savePublishCategory(User user, PublishStatus publishCategory) {
-        user.updatePublishCategory(publishCategory);
-        userRepository.save(user);
         List<MyCategory> myCategoryList = myCategoryRepository.findByUser(user);
 
-        if (publishCategory.equals(PublishStatus.PUBLIC)) {
+        if (publishCategory.equals(PublishStatus.PRIVATE)) {
             for (MyCategory myCategory: myCategoryList) {
-                myCategory.updatePublishCategory(PublishStatus.PUBLIC);
+                myCategory.updatePreviousPublishCategory(myCategory.getPublishCategory());
+                myCategory.updatePublishCategory(PublishStatus.PRIVATE);
             }
             myCategoryRepository.saveAll(myCategoryList);
         } else {
@@ -225,6 +225,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
             }
             myCategoryRepository.saveAll(myCategoryList);
         }
+        userRepository.save(user);
     }
 
     @Transactional
@@ -273,8 +274,12 @@ public class MyCategoryServiceImpl implements MyCategoryService {
             existingMyCategory.updateMyCategoryScript(updateMyCategory.getMyCategoryScript());
         }
 
-        if (updateMyCategory.getPublishCategory() != null && user.getPublishCategory().equals(PublishStatus.PUBLIC)) {          // USER의 publishCategory가 PUBLIC이여야만 변경 가능
-            existingMyCategory.updatePublishCategory(updateMyCategory.getPublishCategory());
+        if (updateMyCategory.getPublishCategory() != null) {          // USER의 publishCategory가 PUBLIC이여야만 변경 가능
+            if (user.getPublishCategory().equals(PublishStatus.PUBLIC)) {
+                existingMyCategory.updatePublishCategory(updateMyCategory.getPublishCategory());
+            } else {
+                throw new GeneralException(Code.USER_PUBLISH_CATEGORY_PRIVATE);
+            }
         }
 
         myCategoryRepository.save(existingMyCategory);

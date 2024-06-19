@@ -1,5 +1,7 @@
 package com.umc.gusto.domain.user.service;
 
+import com.umc.gusto.domain.myCategory.repository.MyCategoryRepository;
+import com.umc.gusto.domain.myCategory.service.MyCategoryService;
 import com.umc.gusto.domain.user.entity.Follow;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
@@ -45,6 +47,7 @@ public class UserServiceImpl implements UserService{
     private final RedisService redisService;
     private final FollowRepository followRepository;
     private final S3Service s3Service;
+    private final MyCategoryService myCategoryService;
 
     private static final long NICKNAME_EXPIRED_TIME = 1000L * 60 * 15;
     private static final int MAX_NICKNAME_NUMBER = 999;
@@ -258,14 +261,17 @@ public class UserServiceImpl implements UserService{
     @Override
     public void updatePublishingInfo(User user, PublishingInfoRequest request) {
         PublishStatus reviewStatus = (request.getPublishReview()) ?PublishStatus.PUBLIC : PublishStatus.PRIVATE;
-        PublishStatus pinStatus = (request.getPublishPin()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
+        PublishStatus categoryStatus = (request.getPublishCategory()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
         PublishStatus routeStatus = (request.getPublishRoute()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
 
         user.updatePublishReview(reviewStatus);
-        user.updatePublishCategory(pinStatus);
+        user.updatePublishCategory(categoryStatus);
         user.updatePublishRoute(routeStatus);
 
         userRepository.save(user);
+
+        PublishStatus newPublishCategory =  categoryStatus == PublishStatus.PUBLIC? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
+        myCategoryService.savePublishCategory(user, newPublishCategory);
     }
 
     @Override
