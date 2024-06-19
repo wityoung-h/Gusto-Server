@@ -41,9 +41,8 @@ public class MyCategory extends BaseEntity{
     @Column(name = "publishCategory",nullable = false, length = 10)
     private PublishStatus publishCategory = PublishStatus.PUBLIC;
 
-    @Builder.Default
     @Enumerated(EnumType.STRING)
-    private PublishStatus previousPublishCategory = PublishStatus.PUBLIC;
+    private PublishStatus previousPublishCategory;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
