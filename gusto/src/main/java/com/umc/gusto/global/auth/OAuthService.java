@@ -71,4 +71,14 @@ public class OAuthService extends DefaultOAuth2UserService {
                 .socialInfo(info)
                 .build();
     }
+
+    public void loadUserInfo(String provider, String providerId, String accessToken) {
+        // TODO: ACCESS TOKEN 복호화
+
+        // TODO: Naver 유저 정보 확인
+
+        // TODO: KAKAO 유저 정보 확인
+
+        // TODO: Google 유저 정보 확인
+    }
 }
