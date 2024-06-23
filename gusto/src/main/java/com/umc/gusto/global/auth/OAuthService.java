@@ -98,9 +98,21 @@ public class OAuthService extends DefaultOAuth2UserService {
             Map<String, String> response = new HashMap<>((LinkedHashMap) result.get("response"));
             id = response.get("id");
         } else if(provider.equals("GOOGLE")) {
-            // TODO: KAKAO 유저 정보 확인
+            Map result = restClient.get()
+                    .uri("https://www.googleapis.com/oauth2/v2/userinfo")
+                    .header("Authorization", header)
+                    .retrieve()
+                    .body(Map.class);
+
+            id = String.valueOf(result.get("id"));
         } else {
-            // TODO: Google 유저 정보 확인
+            Map result = restClient.get()
+                    .uri("https://kapi.kakao.com/v2/user/me")
+                    .header("Authorization", header)
+                    .retrieve()
+                    .body(Map.class);
+
+            id = String.valueOf(result.get("id"));
         }
 
         if(!providerId.equals(id)) {
