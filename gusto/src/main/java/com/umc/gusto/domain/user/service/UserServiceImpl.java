@@ -13,6 +13,7 @@ import com.umc.gusto.domain.user.repository.FollowRepository;
 import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.auth.JwtService;
+import com.umc.gusto.global.auth.OAuthService;
 import com.umc.gusto.global.auth.model.Tokens;
 import com.umc.gusto.global.common.PublishStatus;
 import com.umc.gusto.global.config.secret.JwtConfig;
@@ -45,6 +46,7 @@ public class UserServiceImpl implements UserService{
     private final RedisService redisService;
     private final FollowRepository followRepository;
     private final S3Service s3Service;
+    private final OAuthService oAuthService;
 
     private static final long NICKNAME_EXPIRED_TIME = 1000L * 60 * 15;
     private static final int MAX_NICKNAME_NUMBER = 999;
@@ -58,7 +60,7 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public Tokens createUser(MultipartFile multipartFile, SignUpRequest request) {
-        // TODO: providerId - Access Token 일치 검사
+        oAuthService.loadUserInfo(request.getProvider(), request.getProviderId(), request.getAccessToken());
 
         // 이미 가입된 계정이 존재함
         socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(request.getProvider()), request.getProviderId())
@@ -153,7 +155,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public Tokens signIn(SignInRequest signInRequest) {
-        // TODO: providerId - Access Token 일치 검사
+        oAuthService.loadUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
 
         // social 정보 확인
         Social social = socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(signInRequest.getProvider()), signInRequest.getProviderId())
