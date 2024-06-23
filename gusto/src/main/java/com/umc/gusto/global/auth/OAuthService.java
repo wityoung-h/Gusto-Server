@@ -5,6 +5,8 @@ import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.global.auth.model.CustomOAuth2User;
 import com.umc.gusto.global.auth.model.OAuthAttributes;
+import com.umc.gusto.global.exception.Code;
+import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -12,22 +14,30 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class OAuthService extends DefaultOAuth2UserService {
     private final SocialRepository socialRepository;
     private final UserService userService;
+    private final RestClient restClient = RestClient.create();
     @Value("${default.img.url}")
-    private String DEFAULT_PROFILE_IMG;
+    private static String DEFAULT_PROFILE_IMG;
+    private static final String AUTH_TYPE = "Bearer ";
 
     // 유저 불러오기 - 해당 유저의 security context가 저장됨
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
+        System.out.println("***********************");
+        System.out.println(userRequest.getAccessToken().getTokenValue());
+        System.out.println("***********************");
 
         // provider - string to enum으로 변환
         Social.SocialType provider = Social.SocialType.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase());
@@ -75,10 +85,26 @@ public class OAuthService extends DefaultOAuth2UserService {
     public void loadUserInfo(String provider, String providerId, String accessToken) {
         // TODO: ACCESS TOKEN 복호화
 
-        // TODO: Naver 유저 정보 확인
+        String header = AUTH_TYPE + accessToken;
+        String id = "";
 
-        // TODO: KAKAO 유저 정보 확인
+        if(provider.equals("NAVER")) {
+            Map result = restClient.get()
+                    .uri("https://openapi.naver.com/v1/nid/me")
+                    .header("Authorization", header)
+                    .retrieve()
+                    .body(Map.class);
 
-        // TODO: Google 유저 정보 확인
+            Map<String, String> response = new HashMap<>((LinkedHashMap) result.get("response"));
+            id = response.get("id");
+        } else if(provider.equals("GOOGLE")) {
+            // TODO: KAKAO 유저 정보 확인
+        } else {
+            // TODO: Google 유저 정보 확인
+        }
+
+        if(!providerId.equals(id)) {
+            throw new GeneralException(Code.UNMATCHED_AUTH_INFO);
+        }
     }
 }
