@@ -1,9 +1,11 @@
 package com.umc.gusto.domain.route.entity;
 
 import com.umc.gusto.domain.store.entity.Store;
-import com.umc.gusto.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -21,7 +23,7 @@ public class RouteList {
     @Column(nullable = false, updatable = false)
     private Long routeListId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "routeId", nullable = false)
     private Route route;
 

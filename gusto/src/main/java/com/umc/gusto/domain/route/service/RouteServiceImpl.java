@@ -15,7 +15,6 @@ import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.store.repository.StoreRepository;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.repository.UserRepository;
-import com.umc.gusto.global.DeleteSchedulingConfig;
 import com.umc.gusto.global.common.BaseEntity;
 import com.umc.gusto.global.common.PublishStatus;
 import com.umc.gusto.global.exception.Code;
@@ -41,8 +40,6 @@ public class RouteServiceImpl implements RouteService{
     private final RouteListService routeListService;
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
-
-    private final DeleteSchedulingConfig schedulingConfig;
 
     private static final int ROUTE_LIST_PAGE = 6;
 
@@ -90,7 +87,7 @@ public class RouteServiceImpl implements RouteService{
 
         //루트 삭제 : soft delete // TODO:DB 최종 삭제 주기 체크
         route.updateStatus(BaseEntity.Status.INACTIVE);
-        //route.updateStatus(schedulingConfig.fixedRateScheduler());
+
 
 
     }

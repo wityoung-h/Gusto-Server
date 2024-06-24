@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,7 +46,6 @@ public interface RouteRepository extends JpaRepository<Route,Long> {
     @Query("select r from Route r where r.group =:group AND r.status =:status ORDER BY r.createdAt DESC ")
     Page<Route> findFirstRoutesByGroup(@Param("group") Group group,@Param("status") BaseEntity.Status status, Pageable pageable);
 
-
     // 삭제요소 파악
-    List<Route> findRouteByStatus(BaseEntity.Status status);
+    List<Route> findRouteByStatusAndUpdatedAtBefore(BaseEntity.Status status, LocalDateTime dateTime);
 }
