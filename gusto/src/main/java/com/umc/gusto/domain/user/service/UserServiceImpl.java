@@ -31,8 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -52,7 +51,7 @@ public class UserServiceImpl implements UserService{
     private static final int MAX_NICKNAME_NUMBER = 999;
     private static final int MIN_NICKNAME_NUMBER = 1;
     private static final int FOLLOW_LIST_PAGE = 30;
-
+    private static final Social.SocialType[] AUTH_SERVERS = Social.SocialType.values();
 
     @Value("${default.img.url}")
     private String DEFAULT_PROFILE_IMG;
@@ -419,5 +418,26 @@ public class UserServiceImpl implements UserService{
                 .build();
 
         socialRepository.save(social);
+    }
+
+    @Override
+    public Map<String, Boolean> getAccountList(User user) {
+        List<Social> socials = socialRepository.findByUser(user);
+
+        Set<String> servers = socials.stream()
+                .map(social -> String.valueOf(social.getSocialType()))
+                .collect(Collectors.toSet());
+
+        Map<String, Boolean> result = new HashMap<>();
+
+        for(int i = 0; i < AUTH_SERVERS.length; i++) {
+            if(servers.contains(AUTH_SERVERS[i].name())) {
+                result.put(AUTH_SERVERS[i].name(), true);
+            } else {
+                result.put(AUTH_SERVERS[i].name(), false);
+            }
+        }
+
+        return result;
     }
 }

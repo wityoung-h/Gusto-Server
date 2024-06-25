@@ -17,6 +17,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -285,5 +287,19 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .build();
+    }
+
+    /**
+     * 연결된 소셜 계정 목록
+     * [POST] /users/social-accounts
+     * @param -
+     * @return -
+     */
+    @GetMapping("/social-accounts")
+    public ResponseEntity<Map> socialAccountList(@AuthenticationPrincipal AuthUser authUser) {
+        Map<String, Boolean> accountList = userService.getAccountList(authUser.getUser());
+
+        return ResponseEntity.ok()
+                .body(accountList);
     }
 }

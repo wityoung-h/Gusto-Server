@@ -9,6 +9,8 @@ import com.umc.gusto.domain.user.model.response.*;
 import com.umc.gusto.global.auth.model.Tokens;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 public interface UserService {
     
     // 회원 가입
@@ -60,4 +62,7 @@ public interface UserService {
 
     // 소셜 연동 추가
     void connectSocialAccount(User user, SignInRequest signInRequest);
+
+    // 연결된 소셜 목록
+    Map<String, Boolean> getAccountList(User user);
 }
