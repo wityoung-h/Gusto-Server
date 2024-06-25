@@ -145,23 +145,31 @@ public class StoreServiceImpl implements StoreService{
             pins = pinRepository.findPinsByUserAndTownNameAndPinIdDESC(user, townName);
         }
 
-        List<Store> visitedStatus = new ArrayList<>();
-        for (Pin pin : pins) {
-            Store store = pin.getStore();
-            boolean hasVisited = reviewRepository.existsByStoreAndUserNickname(store, user.getNickname());
-            if (visited) {
-                if (hasVisited) {
-                    visitedStatus.add(store);
-                }
-            } else {
-                if (!hasVisited) {
-                    visitedStatus.add(store);
-                }
-            }
+        List<Store> pinStores = new ArrayList<>();
 
+        if (visited == null) {
+            pinStores = pins.stream()
+                    .map(Pin::getStore)
+                    .collect(Collectors.toList());
+
+        } else {
+            for (Pin pin : pins) {
+                Store store = pin.getStore();
+                boolean hasVisited = reviewRepository.existsByStoreAndUserNickname(store, user.getNickname());
+                if (visited) {
+                    if (hasVisited) {
+                        pinStores.add(store);
+                    }
+                } else {
+                    if (!hasVisited) {
+                        pinStores.add(store);
+                    }
+                }
+
+            }
         }
 
-        return visitedStatus.stream()
+        return pinStores.stream()
                 .map(store -> GetStoresInMapResponse.builder()
                         .storeId(store.getStoreId())
                         .storeName(store.getStoreName())
