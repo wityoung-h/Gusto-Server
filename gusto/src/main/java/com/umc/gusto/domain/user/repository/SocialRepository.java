@@ -10,4 +10,6 @@ public interface SocialRepository extends JpaRepository<Social, Long> {
     Optional<Social> findBySocialTypeAndProviderId(Social.SocialType socialType, String providerId);
 
     Integer countSocialsByUser(User user);
+
+    Boolean existsByUserAndSocialType(User user, Social.SocialType socialType);
 }

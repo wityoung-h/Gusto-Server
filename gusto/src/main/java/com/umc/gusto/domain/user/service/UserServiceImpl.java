@@ -406,10 +406,18 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void connectSocialAccount(User user, SignInRequest signInRequest) {
-        // TODO: providerId 와 AccessToken 값 비교
+        socialService.loadUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
 
-        // TODO: 해당 Provider에 이미 연결된 계정이 있는지 확인
+        if(socialRepository.existsByUserAndSocialType(user, Social.SocialType.valueOf(signInRequest.getProvider()))) {
+            throw new GeneralException(Code.ALREADY_EXIST_SOCIAL_CONNECT);
+        }
 
-        // TODO: social 정보 추가
+        Social social = Social.builder()
+                .user(user)
+                .socialType(Social.SocialType.valueOf(signInRequest.getProvider()))
+                .providerId(signInRequest.getProviderId())
+                .build();
+
+        socialRepository.save(social);
     }
 }
