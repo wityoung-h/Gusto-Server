@@ -139,10 +139,14 @@ public class StoreServiceImpl implements StoreService{
     }
 
     @Transactional(readOnly = true)
-    public List<GetStoresInMapResponse> getStoresInMap(User user, String townName, Long myCategoryId, Boolean visited) {
-        List<Pin> pins = pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName);
-        if (myCategoryId == null) {
+    public List<GetStoresInMapResponse> getStoresInMap(User user, String townName, List<Long> myCategoryIds, Boolean visited) {
+        List<Pin> pins = new ArrayList<>();
+        if (myCategoryIds == null || myCategoryIds.isEmpty()) {
             pins = pinRepository.findPinsByUserAndTownNameAndPinIdDESC(user, townName);
+        } else {
+            for (Long myCategoryId : myCategoryIds) {
+                pins.addAll(pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName));
+            }
         }
 
         List<Store> pinStores = new ArrayList<>();
