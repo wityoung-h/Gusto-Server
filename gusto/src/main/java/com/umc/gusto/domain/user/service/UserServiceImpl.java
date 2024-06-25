@@ -403,4 +403,13 @@ public class UserServiceImpl implements UserService{
         socialService.disconnectAccount(signInRequest.getProvider(), signInRequest.getAccessToken());
         socialRepository.delete(social);
     }
+
+    @Override
+    public void connectSocialAccount(User user, SignInRequest signInRequest) {
+        // TODO: providerId 와 AccessToken 값 비교
+
+        // TODO: 해당 Provider에 이미 연결된 계정이 있는지 확인
+
+        // TODO: social 정보 추가
+    }
 }

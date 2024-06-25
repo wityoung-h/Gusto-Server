@@ -271,4 +271,19 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
     }
+
+    /**
+     * 소셜 연동 추가
+     * [POST] /users/auth/connect-social-account
+     * @param -
+     * @return -
+     */
+    @PostMapping("/auth/connect-social-account")
+    public ResponseEntity connectSocialAccount(@AuthenticationPrincipal AuthUser authUser,
+                                                  @RequestBody SignInRequest signInRequest) {
+        userService.connectSocialAccount(authUser.getUser(), signInRequest);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .build();
+    }
 }

@@ -57,4 +57,7 @@ public interface UserService {
 
     // 소셜 연동 해제
     void disconnectSocialAccount(User user, SignInRequest signInRequest);
+
+    // 소셜 연동 추가
+    void connectSocialAccount(User user, SignInRequest signInRequest);
 }
