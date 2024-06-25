@@ -9,6 +9,7 @@ import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -93,6 +94,12 @@ public class OAuthService extends DefaultOAuth2UserService {
                     .uri("https://openapi.naver.com/v1/nid/me")
                     .header("Authorization", header)
                     .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                    }))
+                    .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
+                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                    }))
                     .body(Map.class);
 
             Map<String, String> response = new HashMap<>((LinkedHashMap) result.get("response"));
@@ -102,6 +109,12 @@ public class OAuthService extends DefaultOAuth2UserService {
                     .uri("https://www.googleapis.com/oauth2/v2/userinfo")
                     .header("Authorization", header)
                     .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                    }))
+                    .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
+                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                    }))
                     .body(Map.class);
 
             id = String.valueOf(result.get("id"));
@@ -110,6 +123,12 @@ public class OAuthService extends DefaultOAuth2UserService {
                     .uri("https://kapi.kakao.com/v2/user/me")
                     .header("Authorization", header)
                     .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                    }))
+                    .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
+                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                    }))
                     .body(Map.class);
 
             id = String.valueOf(result.get("id"));
