@@ -1,4 +1,4 @@
-package com.umc.gusto.global.auth;
+package com.umc.gusto.global.auth.service;
 
 import com.umc.gusto.global.auth.model.Tokens;
 import com.umc.gusto.global.config.secret.JwtConfig;

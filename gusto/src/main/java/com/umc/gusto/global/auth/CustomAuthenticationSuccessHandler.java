@@ -4,6 +4,8 @@ import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.global.auth.model.CustomOAuth2User;
 import com.umc.gusto.global.auth.model.OAuthAttributes;
 import com.umc.gusto.global.auth.model.Tokens;
+import com.umc.gusto.global.auth.service.JwtService;
+import com.umc.gusto.global.auth.service.OAuthService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
