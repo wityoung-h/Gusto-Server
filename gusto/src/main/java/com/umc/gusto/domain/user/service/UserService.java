@@ -54,4 +54,7 @@ public interface UserService {
 
     // 팔로워 목록
     PagingResponse getFollwerList(User user, Long followId);
+
+    // 소셜 연동 해제
+    void disconnectSocialAccount(User user, SignInRequest signInRequest);
 }

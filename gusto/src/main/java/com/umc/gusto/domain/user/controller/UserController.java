@@ -256,4 +256,19 @@ public class UserController {
         return ResponseEntity.ok()
                 .body(pagingResponse);
     }
+
+    /**
+     * 소셜 연동 해제
+     * [DELETE] /users/auth/disconnect-social-account
+     * @param -
+     * @return -
+     */
+    @DeleteMapping("/auth/disconnect-social-account")
+    public ResponseEntity disconnectSocialAccount(@AuthenticationPrincipal AuthUser authUser,
+                                                  @RequestBody SignInRequest signInRequest) {
+
+        userService.disconnectSocialAccount(authUser.getUser(), signInRequest);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .build();
+    }
 }

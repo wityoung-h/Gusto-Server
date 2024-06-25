@@ -75,6 +75,8 @@ public enum Code {
 
     // AUTH 관련 에러 +7
     UNMATCHED_AUTH_INFO(HttpStatus.FORBIDDEN, 403701, "AccessToken과 providerId가 일치하지 않습니다."),
+    NEED_LEAST_ONE_SOCIAL_ACCOUNT(HttpStatus.FORBIDDEN, 403702, "최소 1개의 소셜 계정이 연동되어야 합니다."),
+    SOCIAL_ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, 404701, "해당 소셜 계정이 연결되어 있지 않습니다."),
     OAUTH_FIND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 500701, "소셜 인증 서버에서 에러가 발생했습니다."),
 
     FOR_TEST_ERROR(HttpStatus.BAD_REQUEST,49999, "테스트용 에러")

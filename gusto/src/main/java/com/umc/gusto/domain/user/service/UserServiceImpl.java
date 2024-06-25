@@ -386,4 +386,21 @@ public class UserServiceImpl implements UserService{
                 .result(result)
                 .build();
     }
+
+    @Override
+    @Transactional
+    public void disconnectSocialAccount(User user, SignInRequest signInRequest) {
+        socialService.loadUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
+
+        Social social = socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(signInRequest.getProvider()), signInRequest.getProviderId())
+                .orElseThrow(() -> new GeneralException(Code.SOCIAL_ACCOUNT_NOT_FOUND));
+
+        Integer num = socialRepository.countSocialsByUser(user);
+        if(num == 1) {
+            throw new GeneralException(Code.NEED_LEAST_ONE_SOCIAL_ACCOUNT);
+        }
+
+        socialService.disconnectAccount(signInRequest.getProvider(), signInRequest.getAccessToken());
+        socialRepository.delete(social);
+    }
 }
