@@ -128,4 +128,8 @@ public class User extends BaseTime {
         if(plus) this.reviewCnt++;
         else this.reviewCnt--;
     }
+
+    public void updateMemberStatus(MemberStatus memberStatus) {
+        this.memberStatus = memberStatus;
+    }
 }

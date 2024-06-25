@@ -302,4 +302,18 @@ public class UserController {
         return ResponseEntity.ok()
                 .body(accountList);
     }
+
+    /**
+     * 회원 탈퇴
+     * [DELETE] /users/my
+     * @param -
+     * @return -
+     */
+    @DeleteMapping("/my")
+    public ResponseEntity disconnectSocialAccount(@AuthenticationPrincipal AuthUser authUser) {
+        userService.withdrawalUser(authUser.getUser());
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .build();
+    }
 }

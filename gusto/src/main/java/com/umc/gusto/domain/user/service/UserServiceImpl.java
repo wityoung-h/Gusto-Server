@@ -404,6 +404,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void connectSocialAccount(User user, SignInRequest signInRequest) {
         socialService.checkUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
 
@@ -421,6 +422,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Map<String, Boolean> getAccountList(User user) {
         List<Social> socials = socialRepository.findByUser(user);
 
@@ -439,5 +441,19 @@ public class UserServiceImpl implements UserService{
         }
 
         return result;
+    }
+
+    @Override
+    @Transactional
+    public void withdrawalUser(User user) {
+        user.updateMemberStatus(User.MemberStatus.INACTIVE);
+
+        List<Social> socials = socialRepository.findByUser(user);
+
+        for(Social social : socials) {
+            socialRepository.delete(social);
+        }
+
+        userRepository.save(user);
     }
 }

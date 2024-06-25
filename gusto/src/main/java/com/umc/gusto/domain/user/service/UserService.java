@@ -65,4 +65,7 @@ public interface UserService {
 
     // 연결된 소셜 목록
     Map<String, Boolean> getAccountList(User user);
+
+    // 회원 탈퇴
+    void withdrawalUser(User user);
 }
