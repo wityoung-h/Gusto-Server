@@ -261,11 +261,11 @@ public class UserController {
 
     /**
      * 소셜 연동 해제
-     * [DELETE] /users/auth/disconnect-social-account
+     * [DELETE] /users/auth/social-account
      * @param -
      * @return -
      */
-    @DeleteMapping("/auth/disconnect-social-account")
+    @DeleteMapping("/auth/social-account")
     public ResponseEntity disconnectSocialAccount(@AuthenticationPrincipal AuthUser authUser,
                                                   @RequestBody SignInRequest signInRequest) {
 
@@ -276,11 +276,11 @@ public class UserController {
 
     /**
      * 소셜 연동 추가
-     * [POST] /users/auth/connect-social-account
+     * [POST] /users/auth/social-account
      * @param -
      * @return -
      */
-    @PostMapping("/auth/connect-social-account")
+    @PostMapping("/auth/social-account")
     public ResponseEntity connectSocialAccount(@AuthenticationPrincipal AuthUser authUser,
                                                   @RequestBody SignInRequest signInRequest) {
         userService.connectSocialAccount(authUser.getUser(), signInRequest);
