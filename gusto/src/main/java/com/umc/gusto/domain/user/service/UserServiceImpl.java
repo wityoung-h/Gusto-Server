@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public Tokens createUser(MultipartFile multipartFile, SignUpRequest request) {
-        socialService.loadUserInfo(request.getProvider(), request.getProviderId(), request.getAccessToken());
+        socialService.checkUserInfo(request.getProvider(), request.getProviderId(), request.getAccessToken());
 
         // 이미 가입된 계정이 존재함
         socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(request.getProvider()), request.getProviderId())
@@ -155,7 +155,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public Tokens signIn(SignInRequest signInRequest) {
-        socialService.loadUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
+        socialService.checkUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
 
         // social 정보 확인
         Social social = socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(signInRequest.getProvider()), signInRequest.getProviderId())
@@ -390,7 +390,7 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public void disconnectSocialAccount(User user, SignInRequest signInRequest) {
-        socialService.loadUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
+        socialService.checkUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
 
         Social social = socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(signInRequest.getProvider()), signInRequest.getProviderId())
                 .orElseThrow(() -> new GeneralException(Code.SOCIAL_ACCOUNT_NOT_FOUND));
@@ -406,7 +406,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void connectSocialAccount(User user, SignInRequest signInRequest) {
-        socialService.loadUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
+        socialService.checkUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
 
         if(socialRepository.existsByUserAndSocialType(user, Social.SocialType.valueOf(signInRequest.getProvider()))) {
             throw new GeneralException(Code.ALREADY_EXIST_SOCIAL_CONNECT);

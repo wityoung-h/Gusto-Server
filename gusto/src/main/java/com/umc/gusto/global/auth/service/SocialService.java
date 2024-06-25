@@ -25,7 +25,7 @@ public class SocialService {
     @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
     private static String NAVER_CLIENT_SECRET;
 
-    public void loadUserInfo(String provider, String providerId, String accessToken) {
+    public void checkUserInfo(String provider, String providerId, String accessToken) {
         // TODO: ACCESS TOKEN 복호화
 
         String header = AUTH_TYPE + accessToken;
