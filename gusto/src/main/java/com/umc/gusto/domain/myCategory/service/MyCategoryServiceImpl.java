@@ -186,25 +186,6 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     }
 
     @Transactional
-    public void savePublishCategory(User user, PublishStatus publishCategory) {
-        List<MyCategory> myCategoryList = myCategoryRepository.findByUser(user);
-
-        if (publishCategory.equals(PublishStatus.PRIVATE)) {
-            for (MyCategory myCategory: myCategoryList) {
-                myCategory.updatePreviousPublishCategory(myCategory.getPublishCategory());
-                myCategory.updatePublishCategory(PublishStatus.PRIVATE);
-            }
-            myCategoryRepository.saveAll(myCategoryList);
-        } else {
-            for (MyCategory myCategory: myCategoryList) {
-                myCategory.updatePublishCategory(myCategory.getPreviousPublishCategory());
-            }
-            myCategoryRepository.saveAll(myCategoryList);
-        }
-        userRepository.save(user);
-    }
-
-    @Transactional
     public void createMyCategory(User user, CreateMyCategoryRequest createMyCategory) {
         // 중복 이름 체크
         myCategoryRepository.findByMyCategoryNameAndUser(createMyCategory.getMyCategoryName(), user)

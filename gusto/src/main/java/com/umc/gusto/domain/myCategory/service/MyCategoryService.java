@@ -20,8 +20,6 @@ public interface MyCategoryService {
 
 //    List<PinByMyCategoryResponse> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townName);
 
-    void savePublishCategory(User user, PublishStatus publicCategory);
-
     void createMyCategory(User user, CreateMyCategoryRequest request);
 
     void modifyMyCategory(User user,Long myCategoryId, UpdateMyCategoryRequest request);
