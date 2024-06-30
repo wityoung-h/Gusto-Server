@@ -12,7 +12,6 @@ public class MyCategoryResponse{
     String myCategoryName;
     String myCategoryScript;
     Integer myCategoryIcon;
-    PublishStatus userPublishCategory;
     PublishStatus publishCategory;
     Integer pinCnt;
 }

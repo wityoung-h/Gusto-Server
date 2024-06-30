@@ -64,7 +64,6 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
         }
 
-        User finalUser = user;
         List<MyCategoryResponse> result = myCategoryList.stream()
                 .map(myCategory -> {
                     List<Pin> pinList;
@@ -78,7 +77,6 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                             .myCategoryName(myCategory.getMyCategoryName())
                             .myCategoryScript(myCategory.getMyCategoryScript())
                             .myCategoryIcon(myCategory.getMyCategoryIcon())
-                            .userPublishCategory(nickname == null ? finalUser.getPublishCategory() : null)        // user의 publishCategory는 본인만 볼 수 있게
                             .publishCategory(myCategory.getPublishCategory())
                             .pinCnt(pinList.size())
                             .build();

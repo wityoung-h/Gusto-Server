@@ -269,9 +269,6 @@ public class UserServiceImpl implements UserService{
         user.updatePublishRoute(routeStatus);
 
         userRepository.save(user);
-
-        PublishStatus newPublishCategory =  categoryStatus == PublishStatus.PUBLIC? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
-        myCategoryService.savePublishCategory(user, newPublishCategory);
     }
 
     @Override
