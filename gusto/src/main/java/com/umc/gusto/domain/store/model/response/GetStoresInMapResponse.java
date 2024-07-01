@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GetStoresInMapResponse{
     Long storeId;
-    Long myCategoryId;
     String storeName;
     Double longitude;
     Double latitude;
