@@ -1,0 +1,76 @@
+package com.umc.gusto.global.auth.service;
+
+
+import com.umc.gusto.global.exception.Code;
+import com.umc.gusto.global.exception.GeneralException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@Service
+@RequiredArgsConstructor
+public class SocialService {
+    private final RestClient restClient = RestClient.create();
+    private static final String AUTH_TYPE = "Bearer ";
+    public void loadUserInfo(String provider, String providerId, String accessToken) {
+        // TODO: ACCESS TOKEN 복호화
+
+        String header = AUTH_TYPE + accessToken;
+        String id = "";
+
+        if(provider.equals("NAVER")) {
+            Map result = restClient.get()
+                    .uri("https://openapi.naver.com/v1/nid/me")
+                    .header("Authorization", header)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                    }))
+                    .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
+                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                    }))
+                    .body(Map.class);
+
+            Map<String, String> response = new HashMap<>((LinkedHashMap) result.get("response"));
+            id = response.get("id");
+        } else if(provider.equals("GOOGLE")) {
+            Map result = restClient.get()
+                    .uri("https://www.googleapis.com/oauth2/v2/userinfo")
+                    .header("Authorization", header)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                    }))
+                    .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
+                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                    }))
+                    .body(Map.class);
+
+            id = String.valueOf(result.get("id"));
+        } else {
+            Map result = restClient.get()
+                    .uri("https://kapi.kakao.com/v2/user/me")
+                    .header("Authorization", header)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                    }))
+                    .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
+                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                    }))
+                    .body(Map.class);
+
+            id = String.valueOf(result.get("id"));
+        }
+
+        if(!providerId.equals(id)) {
+            throw new GeneralException(Code.UNMATCHED_AUTH_INFO);
+        }
+    }
+}

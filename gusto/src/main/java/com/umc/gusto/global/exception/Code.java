@@ -74,6 +74,10 @@ public enum Code {
     EXPIRED_ACCESS_TOKEN(HttpStatus.FORBIDDEN, 403601, "X-AUTH-TOKEN이 만료되었습니다. 토큰 재발급을 실행해주세요."),
     EXPIRED_REFRESH_TOKEN(HttpStatus.FORBIDDEN, 403602, "refresh-token이 만료되었습니다. 재로그인이 필요합니다."),
 
+    // AUTH 관련 에러 +7
+    UNMATCHED_AUTH_INFO(HttpStatus.FORBIDDEN, 403701, "AccessToken과 providerId가 일치하지 않습니다."),
+    OAUTH_FIND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 500701, "소셜 인증 서버에서 에러가 발생했습니다."),
+
     FOR_TEST_ERROR(HttpStatus.BAD_REQUEST,49999, "테스트용 에러")
 
 

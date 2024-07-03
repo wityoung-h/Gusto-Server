@@ -8,6 +8,7 @@ import lombok.Getter;
 public class SignUpRequest {
     String provider;
     String providerId;
+    String accessToken;
     String nickname;
     String age;
     String gender;
