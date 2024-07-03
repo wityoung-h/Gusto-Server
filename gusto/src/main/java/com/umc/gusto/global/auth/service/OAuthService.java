@@ -6,17 +6,18 @@ import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.global.auth.model.CustomOAuth2User;
 import com.umc.gusto.global.auth.model.OAuthAttributes;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class OAuthService extends DefaultOAuth2UserService {
     private final SocialRepository socialRepository;
@@ -28,9 +29,9 @@ public class OAuthService extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
-        System.out.println("***********************");
-        System.out.println(userRequest.getAccessToken().getTokenValue());
-        System.out.println("***********************");
+        log.info("***********************");
+        log.info(userRequest.getAccessToken().getTokenValue());
+        log.info("***********************");
 
         // provider - string to enum으로 변환
         Social.SocialType provider = Social.SocialType.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase());
@@ -39,6 +40,8 @@ public class OAuthService extends DefaultOAuth2UserService {
                 .getUserNameAttributeName();
 
         OAuthAttributes oAuthAttributes = OAuthAttributes.of(provider, userNameAttribute, oAuth2User.getAttributes());
+        log.info(oAuthAttributes.getId());
+        log.info("***********************");
 
         Optional<Social> socialInfo = socialRepository.findBySocialTypeAndProviderId(provider, oAuthAttributes.getId());
 
