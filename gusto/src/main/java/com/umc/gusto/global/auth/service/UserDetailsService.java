@@ -1,4 +1,4 @@
-package com.umc.gusto.global.auth;
+package com.umc.gusto.global.auth.service;
 
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.repository.UserRepository;
