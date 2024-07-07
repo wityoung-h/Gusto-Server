@@ -106,5 +106,18 @@ public class RouteController {
         return ResponseEntity.ok().body(route);
     }
 
+    /**
+     * 루트별 공개/비공개 설정
+     * [PATCH] /routes/{routeId}/publishing/{publishStatus}
+     */
+    @PatchMapping("/{routeId}/publishing/{publishStatus}")
+    public ResponseEntity modifyPublishingRoute(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long routeId,
+            @PathVariable boolean publishStatus)
+    {
+        routeService.modifyPublishingInfo(authUser.getUser(),routeId,publishStatus);
+        return ResponseEntity.ok().build();
+    }
 
 }

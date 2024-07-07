@@ -145,7 +145,7 @@ public class RouteServiceImpl implements RouteService{
                 .map(route -> RouteResponse.builder()
                         .routeId(route.getRouteId())
                         .routeName(route.getRouteName())
-                        .publishRoute(route.getPublishRoute() == PublishStatus.PUBLIC) // public => , private =>
+                        .publishRoute(route.getPublishRoute() == PublishStatus.PUBLIC)
                         .numStore(routeListRepository.countRouteListByRoute(route))
                         .build())
                 .collect(Collectors.toList());
@@ -256,6 +256,18 @@ public class RouteServiceImpl implements RouteService{
                 .hasNext(routes.hasNext())
                 .result(list)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void modifyPublishingInfo(User user, Long routeId, boolean publishStatus) {
+        Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.ROUTE_NOT_FOUND));
+        // 루트를 생성한 유저만 변경 가능
+        if(!route.getUser().getNickname().equals(user.getNickname())){
+            throw new GeneralException(Code.USER_NO_PERMISSION_FOR_ROUTE);
+        }
+        route.updatePublishRoute(publishStatus? PublishStatus.PUBLIC: PublishStatus.PRIVATE);
     }
 
 }

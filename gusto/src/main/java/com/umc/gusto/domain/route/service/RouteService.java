@@ -24,4 +24,7 @@ public interface RouteService {
 
     // 타인의 루트 조회
     RoutePagingResponse getOtherRoute(String nickname, Long routeId);
+
+    // 루트 공개/비공개 수정
+    void  modifyPublishingInfo(User user, Long routeId,boolean publishStatus);
 }

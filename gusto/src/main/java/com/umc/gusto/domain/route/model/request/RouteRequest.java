@@ -11,7 +11,7 @@ public class RouteRequest {
     @NotBlank(message = "루트 명은 필수 입력값입니다.")
     private String routeName;
     private Long groupId;
-    private boolean publishRoute;
+    private boolean publishRoute; // public =>true , private => false
     private List<RouteListRequest> routeList;
 
     //isPublishRoute 대신 직접 지정
