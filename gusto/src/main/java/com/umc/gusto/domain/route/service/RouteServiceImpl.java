@@ -1,6 +1,7 @@
 package com.umc.gusto.domain.route.service;
 
 import com.umc.gusto.domain.group.entity.Group;
+import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.route.entity.RouteList;
@@ -41,6 +42,8 @@ public class RouteServiceImpl implements RouteService{
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
 
+    private final GroupMemberRepository groupMemberRepository;
+
     private static final int ROUTE_LIST_PAGE = 6;
 
     @Transactional
@@ -59,11 +62,46 @@ public class RouteServiceImpl implements RouteService{
         Route route = Route.builder()
                 .routeName(request.getRouteName())
                 .user(user)
-                .group(groupRepository.findGroupByGroupIdAndStatus(request.getGroupId(), BaseEntity.Status.ACTIVE).orElse(null))
+                .publishRoute(request.getPublishRoute())
                 .build();
         Route savedRoute = routeRepository.save(route);
 
       
+        if(request.getRouteList() != null){
+            // 루트리스트 생성 비지니스 로직 호출
+            routeListService.createRouteList(savedRoute, request.getRouteList());
+        }else if(request.getGroupId() == null ){
+            // 내 루트 생성시에는 최소 1개 이상의 경로가 포함되어야 함
+            throw new GeneralException(Code.ROUTE_MYROUTE_BAD_REQUEST);
+        }
+    }
+
+    @Transactional
+    @Override
+    public void createRouteGroup(Long groupId, RouteRequest request,User user) {
+        // 루트명은 내 루트명 중에서 중복 불가능
+        if (routeRepository.existsByRouteName(request.getRouteName(),BaseEntity.Status.ACTIVE,user)) {
+            throw new GeneralException(Code.ROUTE_DUPLICATE_ROUTENAME);
+        }
+        // 루트 리스트 갯수 6개 제한 확인
+        if(request.getRouteList().size()>=7){
+            throw new GeneralException(Code.ROUTELIST_TO_MANY_REQUEST);
+        }
+
+        // 그룹,그룹 멤버 존재 확인
+        if(groupMemberRepository.existsByGroupIdAndUserId(groupId,user)<1){
+            throw new GeneralException(Code.FIND_FAIL_GROUP);
+        }
+
+        // 루트 생성
+        Route route = Route.builder()
+                .routeName(request.getRouteName())
+                .user(user)
+                .group(groupRepository.findGroupByGroupIdAndStatus(groupId,BaseEntity.Status.ACTIVE).get())
+                .build();
+        Route savedRoute = routeRepository.save(route);
+
+
         if(request.getRouteList() != null){
             // 루트리스트 생성 비지니스 로직 호출
             routeListService.createRouteList(savedRoute, request.getRouteList());

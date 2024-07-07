@@ -1,7 +1,6 @@
 package com.umc.gusto.domain.group.repository;
 
 import com.umc.gusto.domain.group.entity.Group;
-import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +13,6 @@ import java.util.Optional;
 
 public interface GroupRepository extends JpaRepository<Group, Long> {
     Optional<Group> findGroupByGroupIdAndStatus(Long groupId, BaseEntity.Status status);
-
     @Query("SELECT ic.group FROM InvitationCode ic WHERE ic.code = :code AND ic.group.status = :status")
     Optional<Group> findGroupByCodeAndStatus(@Param("code") String code, @Param("status") BaseEntity.Status status);
     @Query("SELECT g FROM Group g WHERE g.groupId IN :groupIds AND g.status = :status ORDER BY g.groupId DESC")

@@ -32,6 +32,21 @@ public class RouteController {
     }
 
     /**
+     * 그룹 내 루트 추가
+     * [POST] /routes/{groupId}
+     */
+    // 루트 생성
+    @PostMapping("{groupId}")
+    public ResponseEntity<?> createRoute(
+            @PathVariable Long groupId,
+            @RequestBody RouteRequest request,
+            @AuthenticationPrincipal AuthUser authUSer)
+    {
+        routeService.createRouteGroup(groupId,request,authUSer.getUser());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /**
      * 내 루트 삭제
      * [DELETE] /routes/{routeId}
      */
