@@ -28,28 +28,28 @@ public interface RouteRepository extends JpaRepository<Route,Long> {
 
     // 유저=본인
     // 가장 첫 페이징 유저의 루트 목록 조회, 그룹X
-    @Query("select r from Route r where r.user = :user AND r.status = :status AND r.group.groupId IS NULL ORDER BY r.createdAt DESC")
-    Page<Route> findRouteByUserFirstId(@Param("user") User user , @Param("status") BaseEntity.Status status, Pageable pageable);
-    // 유저의 루트 목록 조회 , 그룹X, ACTIVE
-    @Query("select r from Route r where r.user = :user AND r.status = :status AND r.routeId <:routeId AND r.group.groupId IS NULL ORDER BY r.createdAt DESC")
-    Page<Route> findRouteByAfterRouted(@Param("user") User user, @Param("routeId") Long routeId , @Param("status") BaseEntity.Status status, Pageable pageable);
+    @Query("select r from Route r where r.user = :user AND r.status = 'ACTIVE' AND r.group.groupId IS NULL ORDER BY r.createdAt DESC")
+    Page<Route> findRouteByUserFirstId(@Param("user") User user , Pageable pageable);
+    // 유저의 루트 목록 조회 , 그룹X
+    @Query("select r from Route r where r.user = :user AND r.status = 'ACTIVE' AND r.routeId <:routeId AND r.group.groupId IS NULL ORDER BY r.createdAt DESC")
+    Page<Route> findRouteByAfterRouted(@Param("user") User user, @Param("routeId") Long routeId , Pageable pageable);
 
     // 유저= 타인
-    @Query("select r from Route r where r.user = :user AND r.user.publishRoute ='PUBLIC' AND r.status = :status AND r.publishRoute ='PUBLIC' AND r.group.groupId IS NULL ORDER BY r.createdAt DESC")
-    Page<Route> findRouteByOtherFirstId(@Param("user") User user , @Param("status") BaseEntity.Status status, Pageable pageable);
-    @Query("select r from Route r where r.user = :user AND r.status = :status  AND r.publishRoute = 'PUBLIC' AND r.routeId <:routeId AND r.group.groupId IS NULL ORDER BY r.createdAt DESC")
-    Page<Route> findRouteByOtherAfterRouted(@Param("user") User user, @Param("routeId") Long routeId , @Param("status") BaseEntity.Status status,Pageable pageable);
+    @Query("select r from Route r where r.user = :user AND r.user.publishRoute ='PUBLIC' AND r.status = 'ACTIVE' AND r.publishRoute ='PUBLIC' AND r.group.groupId IS NULL ORDER BY r.createdAt DESC")
+    Page<Route> findRouteByOtherFirstId(@Param("user") User user , Pageable pageable);
+    @Query("select r from Route r where r.user = :user AND r.status = 'ACTIVE'  AND r.publishRoute = 'PUBLIC' AND r.routeId <:routeId AND r.group.groupId IS NULL ORDER BY r.createdAt DESC")
+    Page<Route> findRouteByOtherAfterRouted(@Param("user") User user, @Param("routeId") Long routeId ,Pageable pageable);
 
 
     // 그룹의 루트 개수 조회
     int countRoutesByGroupAndStatus(Group group, BaseEntity.Status status);
 
     // 그룹의 루트 목록 조회
-    @Query("select r from Route r where r.group =:group AND r.status =:status AND r.routeId <:routeId ORDER BY r.createdAt DESC ")
-    Page<Route> findRoutesByGroup(@Param("group") Group group, @Param("routeId") Long routeId ,@Param("status") BaseEntity.Status status, Pageable pageable);
+    @Query("select r from Route r where r.group =:group AND r.status ='ACTIVE' AND r.routeId <:routeId ORDER BY r.createdAt DESC ")
+    Page<Route> findRoutesByGroup(@Param("group") Group group, @Param("routeId") Long routeId , Pageable pageable);
 
     // 그룹의 루트 첫번째 호출
-    @Query("select r from Route r where r.group =:group AND r.status =:status ORDER BY r.createdAt DESC ")
-    Page<Route> findFirstRoutesByGroup(@Param("group") Group group,@Param("status") BaseEntity.Status status, Pageable pageable);
+    @Query("select r from Route r where r.group =:group AND r.status = 'ACTIVE' ORDER BY r.createdAt DESC ")
+    Page<Route> findFirstRoutesByGroup(@Param("group") Group group, Pageable pageable);
 
 }

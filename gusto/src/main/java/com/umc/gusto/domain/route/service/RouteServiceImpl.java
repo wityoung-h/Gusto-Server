@@ -137,9 +137,9 @@ public class RouteServiceImpl implements RouteService{
 
         Page<Route> routes;
         if(routeId == null) {
-            routes = routeRepository.findRouteByUserFirstId(user, BaseEntity.Status.ACTIVE, Pageable.ofSize(ROUTE_LIST_PAGE));
+            routes = routeRepository.findRouteByUserFirstId(user, Pageable.ofSize(ROUTE_LIST_PAGE));
         }else{
-            routes = routeRepository.findRouteByAfterRouted(user,routeId, BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
+            routes = routeRepository.findRouteByAfterRouted(user,routeId,Pageable.ofSize(ROUTE_LIST_PAGE));
         }
         List<RouteResponse> list = routes.getContent().stream()
                 .map(route -> RouteResponse.builder()
@@ -164,10 +164,10 @@ public class RouteServiceImpl implements RouteService{
 
         Page<Route> routes;
         if(routeId == null) {
-            routes = routeRepository.findFirstRoutesByGroup(group, BaseEntity.Status.ACTIVE, Pageable.ofSize(ROUTE_LIST_PAGE));
+            routes = routeRepository.findFirstRoutesByGroup(group, Pageable.ofSize(ROUTE_LIST_PAGE));
         }else{
             //특정 그룹 내 루트 조회
-            routes = routeRepository.findRoutesByGroup(group, routeId, BaseEntity.Status.ACTIVE, Pageable.ofSize(ROUTE_LIST_PAGE));
+            routes = routeRepository.findRoutesByGroup(group, routeId, Pageable.ofSize(ROUTE_LIST_PAGE));
         }
         return getRoutePagingResponse(routes);
 
@@ -239,9 +239,9 @@ public class RouteServiceImpl implements RouteService{
 
         Page<Route> routes;
         if (routeId == null) {
-            routes = routeRepository.findRouteByOtherFirstId(user, BaseEntity.Status.ACTIVE, Pageable.ofSize(ROUTE_LIST_PAGE));
+            routes = routeRepository.findRouteByOtherFirstId(user, Pageable.ofSize(ROUTE_LIST_PAGE));
         } else {
-            routes = routeRepository.findRouteByOtherAfterRouted(user, routeId, BaseEntity.Status.ACTIVE, Pageable.ofSize(ROUTE_LIST_PAGE));
+            routes = routeRepository.findRouteByOtherAfterRouted(user, routeId, Pageable.ofSize(ROUTE_LIST_PAGE));
         }
 
 
