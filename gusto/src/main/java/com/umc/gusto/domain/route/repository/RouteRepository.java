@@ -17,6 +17,9 @@ public interface RouteRepository extends JpaRepository<Route,Long> {
     // 동일한 이름의 루트가 있는지 확인 -> 존재하면 TRUE를 반환하고, 그렇지 않으면 FALSE
     @Query("SELECT CASE WHEN COUNT(r) > 0 THEN TRUE ELSE FALSE END FROM Route r WHERE r.routeName = :routeName AND r.status = :status AND r.user = :user")
     Boolean existsByRouteName(@Param("routeName") String routeName, @Param("status") BaseEntity.Status status, @Param("user") User user);
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN TRUE ELSE FALSE END FROM Route r WHERE r.routeName = :routeName AND r.status = :status AND r.group = :group")
+    Boolean existsByGroupRouteName(@Param("routeName") String routeName, @Param("status") BaseEntity.Status status, @Param("group") Group group);
+
 
     // rootId PK값으로 루트 찾기
     Optional<Route> findRouteByRouteIdAndStatus(Long routeId,BaseEntity.Status status);

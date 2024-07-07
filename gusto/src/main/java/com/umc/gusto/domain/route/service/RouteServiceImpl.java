@@ -79,8 +79,14 @@ public class RouteServiceImpl implements RouteService{
     @Transactional
     @Override
     public void createRouteGroup(Long groupId, RouteRequest request,User user) {
-        // 루트명은 내 루트명 중에서 중복 불가능
-        if (routeRepository.existsByRouteName(request.getRouteName(),BaseEntity.Status.ACTIVE,user)) {
+        // 그룹,그룹 멤버 존재 확인
+        Group group = groupMemberRepository.findByGroupIdAndUserId(groupId, user);
+        if(group == null){
+            throw new GeneralException(Code.FIND_FAIL_GROUP);
+        }
+
+        // 루트명은 그룹 루트명 중에서 중복 불가능
+        if (routeRepository.existsByGroupRouteName(request.getRouteName(),BaseEntity.Status.ACTIVE,group)) {
             throw new GeneralException(Code.ROUTE_DUPLICATE_ROUTENAME);
         }
         // 루트 리스트 갯수 6개 제한 확인
@@ -88,16 +94,12 @@ public class RouteServiceImpl implements RouteService{
             throw new GeneralException(Code.ROUTELIST_TO_MANY_REQUEST);
         }
 
-        // 그룹,그룹 멤버 존재 확인
-        if(groupMemberRepository.existsByGroupIdAndUserId(groupId,user)<1){
-            throw new GeneralException(Code.FIND_FAIL_GROUP);
-        }
 
         // 루트 생성
         Route route = Route.builder()
                 .routeName(request.getRouteName())
                 .user(user)
-                .group(groupRepository.findGroupByGroupIdAndStatus(groupId,BaseEntity.Status.ACTIVE).get())
+                .group(group)
                 .build();
         Route savedRoute = routeRepository.save(route);
 

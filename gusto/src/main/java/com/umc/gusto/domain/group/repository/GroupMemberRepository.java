@@ -24,10 +24,10 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
   
     Boolean existsGroupMemberByGroupAndUser(Group group, User user);
 
-    @Query("SELECT COUNT(gm) " +
+    @Query("SELECT gm.group " +
             "FROM GroupMember gm LEFT JOIN gm.group g " +
             "WHERE g.groupId = :groupId AND gm.user = :user")
-    int existsByGroupIdAndUserId(@Param("groupId") Long groupId, @Param("user") User user);
+    Group findByGroupIdAndUserId(@Param("groupId") Long groupId, @Param("user") User user);
 
     Optional<GroupMember> findGroupMemberByGroupAndGroupMemberId(Group group, Long memberId);
     Optional<GroupMember> findGroupMemberByGroupAndUser(Group group, User user);
