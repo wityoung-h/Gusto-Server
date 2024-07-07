@@ -23,5 +23,5 @@ public interface RouteService {
     void modifyRouteList(Long routeId, ModifyRouteRequest request);
 
     // 타인의 루트 조회
-    RoutePagingResponse getRoute(String nickname, Long routeId);
+    RoutePagingResponse getOtherRoute(String nickname, Long routeId);
 }

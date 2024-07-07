@@ -117,7 +117,7 @@ public class RouteServiceImpl implements RouteService{
     @Override
     public void deleteRoute(Long routeId, User user) {
         // 그룹X, ACTIVE 한정
-        Route route = routeRepository.findRouteByRouteIdAndStatusAndGroup(routeId,BaseEntity.Status.ACTIVE)
+        Route route = routeRepository.findRouteByRouteIdAndStatus(routeId,BaseEntity.Status.ACTIVE)
                 .orElseThrow(() -> new GeneralException(Code.ROUTE_NOT_FOUND));
 
         // 루트를 생성한 유저만 삭제
@@ -139,12 +139,13 @@ public class RouteServiceImpl implements RouteService{
         if(routeId == null) {
             routes = routeRepository.findRouteByUserFirstId(user, BaseEntity.Status.ACTIVE, Pageable.ofSize(ROUTE_LIST_PAGE));
         }else{
-            routes = routeRepository.findRouteByAfterIRouted(user,routeId, BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
+            routes = routeRepository.findRouteByAfterRouted(user,routeId, BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
         }
         List<RouteResponse> list = routes.getContent().stream()
                 .map(route -> RouteResponse.builder()
                         .routeId(route.getRouteId())
                         .routeName(route.getRouteName())
+                        .publishRoute(route.getPublishRoute() == PublishStatus.PUBLIC) // public => , private =>
                         .numStore(routeListRepository.countRouteListByRoute(route))
                         .build())
                 .collect(Collectors.toList());
@@ -232,29 +233,24 @@ public class RouteServiceImpl implements RouteService{
     }
 
     @Override
-    public RoutePagingResponse getRoute(String nickname,Long routeId) {
+    public RoutePagingResponse getOtherRoute(String nickname,Long routeId) {
         User user = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
                 .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
 
         Page<Route> routes;
-        if(routeId == null) {
-            routes = routeRepository. findRouteByUserFirstId(user,BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
-        }else{
-            routes = routeRepository.findRouteByAfterIRouted(user,routeId, BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
+        if (routeId == null) {
+            routes = routeRepository.findRouteByOtherFirstId(user, BaseEntity.Status.ACTIVE, Pageable.ofSize(ROUTE_LIST_PAGE));
+        } else {
+            routes = routeRepository.findRouteByOtherAfterRouted(user, routeId, BaseEntity.Status.ACTIVE, Pageable.ofSize(ROUTE_LIST_PAGE));
         }
 
+
         List<RouteResponse> list = routes.stream()
-                .map(route -> {
-                    // 유저 활성화 설정 변경
-                    if (!route.getUser().getPublishRoute().equals(PublishStatus.PUBLIC)) {
-                        throw new GeneralException(Code.NO_PUBLIC_ROUTE);
-                    }
-                    return RouteResponse.builder()
+                .map(route -> RouteResponse.builder()
                             .routeId(route.getRouteId())
                             .routeName(route.getRouteName())
                             .numStore(routeListRepository.countRouteListByRoute(route))
-                            .build();
-                })
+                            .build())
                 .collect(Collectors.toList());
         return RoutePagingResponse.builder()
                 .hasNext(routes.hasNext())

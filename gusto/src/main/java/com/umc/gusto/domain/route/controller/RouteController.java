@@ -102,7 +102,7 @@ public class RouteController {
     (@PathVariable String nickname,
      @RequestParam(required = false, name = "routeId") Long routeId
      ){
-        RoutePagingResponse route = routeService.getRoute(nickname,routeId);
+        RoutePagingResponse route = routeService.getOtherRoute(nickname,routeId);
         return ResponseEntity.ok().body(route);
     }
 
