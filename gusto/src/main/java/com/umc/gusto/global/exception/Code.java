@@ -79,6 +79,7 @@ public enum Code {
     SOCIAL_ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, 404701, "해당 소셜 계정이 연결되어 있지 않습니다."),
     ALREADY_EXIST_SOCIAL_CONNECT(HttpStatus.CONFLICT, 409701, "해당 소셜 서비스에 연결된 계정이 이미 존재합니다."),
     OAUTH_FIND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 500701, "소셜 인증 서버에서 에러가 발생했습니다."),
+    OAUTH_NOT_FOUND_TOKEN(HttpStatus.NOT_FOUND, 404702, "유효한 소셜 서버 Access Token이 아닙니다."),
 
     FOR_TEST_ERROR(HttpStatus.BAD_REQUEST,49999, "테스트용 에러")
 

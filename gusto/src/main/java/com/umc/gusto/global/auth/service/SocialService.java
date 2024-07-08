@@ -37,7 +37,7 @@ public class SocialService {
                     .header("Authorization", header)
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                        throw new GeneralException(Code.OAUTH_NOT_FOUND_TOKEN);
                     }))
                     .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
                         throw new GeneralException(Code.OAUTH_FIND_ERROR);
@@ -52,7 +52,7 @@ public class SocialService {
                     .header("Authorization", header)
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                        throw new GeneralException(Code.OAUTH_NOT_FOUND_TOKEN);
                     }))
                     .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
                         throw new GeneralException(Code.OAUTH_FIND_ERROR);
@@ -66,7 +66,7 @@ public class SocialService {
                     .header("Authorization", header)
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                        throw new GeneralException(Code.OAUTH_NOT_FOUND_TOKEN);
                     }))
                     .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
                         throw new GeneralException(Code.OAUTH_FIND_ERROR);
@@ -95,7 +95,7 @@ public class SocialService {
                     .uri(uri.toString())
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                        throw new GeneralException(Code.OAUTH_NOT_FOUND_TOKEN);
                     }))
                     .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
                         throw new GeneralException(Code.OAUTH_FIND_ERROR);
@@ -113,7 +113,7 @@ public class SocialService {
                     .uri(uri.toString())
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                        throw new GeneralException(Code.OAUTH_NOT_FOUND_TOKEN);
                     }))
                     .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
                         throw new GeneralException(Code.OAUTH_FIND_ERROR);
@@ -129,7 +129,7 @@ public class SocialService {
                     .header("Authorization", header)
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                        throw new GeneralException(Code.OAUTH_NOT_FOUND_TOKEN);
                     }))
                     .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
                         throw new GeneralException(Code.OAUTH_FIND_ERROR);
