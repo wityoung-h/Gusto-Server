@@ -47,6 +47,7 @@ public enum Code {
     ROUTE_MYROUTE_BAD_REQUEST(HttpStatus.BAD_REQUEST,403305,"내 루트는 최소 1개 이상의 경로를 포함해야 합니다."),
     ROUTELIST_TO_MANY_REQUEST(HttpStatus.TOO_MANY_REQUESTS,403306,"루트 내 상점 항목은 최대 6개까지 가능합니다."),
     NO_PUBLIC_ROUTE(HttpStatus.FORBIDDEN,403307,"해당 루트는 비공개 상태입니다."),
+    ROUTE_ORDINAL_EMPTY_BAD_REQUEST(HttpStatus.BAD_REQUEST,403307,"루트 내 이동 경로는 비어둘 수 없습니다."),
 
     //Group 관련 에러 +4
     FIND_FAIL_GROUP(HttpStatus.NOT_FOUND, 404401, "존재하지 않는 그룹입니다."),

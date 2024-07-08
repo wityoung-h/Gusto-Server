@@ -41,7 +41,12 @@ public class RouteListServiceImpl implements RouteListService{
     public void createRouteList(Route route, List<RouteListRequest> request) {
         //루트리스트 생성
         request.forEach(dto -> {
-            if(dto.getOrdinal() >= 1 && dto.getOrdinal() <= 6){
+            Integer ordinal = dto.getOrdinal();
+            if (ordinal == null) {
+                throw new GeneralException(Code.ROUTE_ORDINAL_EMPTY_BAD_REQUEST);
+            }
+
+            if(ordinal >= 1 && ordinal <= 6){
                 RouteList routeList = RouteList.builder()
                         .route(route)
                         .store(storeRepository.findById(dto.getStoreId())
@@ -66,13 +71,14 @@ public class RouteListServiceImpl implements RouteListService{
         }
 
         //루트리스트 생성
+        Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.ROUTE_NOT_FOUND));
         request.forEach(dto -> {
             RouteList routeList = RouteList.builder()
-                    .route(routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE)
-                            .orElseThrow(()-> new GeneralException(Code.ROUTE_NOT_FOUND)))
+                    .route(route)
                     .store(storeRepository.findById(dto.getStoreId())
                             .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND)))
-                    .ordinal(dto.getOrdinal())
+                    .ordinal(dto.getOrdinal() != null ? dto.getOrdinal() : routeListRepository.findLastRouteListOrdinal(route) + 1) //자동으로 가장 끝에 추가
                     .build();
             routeListRepository.save(routeList);
         });
