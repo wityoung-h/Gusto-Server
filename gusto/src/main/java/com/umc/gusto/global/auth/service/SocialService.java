@@ -4,7 +4,7 @@ package com.umc.gusto.global.auth.service;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class SocialService {
     private final RestClient restClient = RestClient.create();
@@ -30,7 +31,7 @@ public class SocialService {
                     .header("Authorization", header)
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                        throw new GeneralException(Code.OAUTH_NOT_FOUND_TOKEN);
                     }))
                     .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
                         throw new GeneralException(Code.OAUTH_FIND_ERROR);
@@ -40,12 +41,13 @@ public class SocialService {
             Map<String, String> response = new HashMap<>((LinkedHashMap) result.get("response"));
             id = response.get("id");
         } else if(provider.equals("GOOGLE")) {
+            log.info("Google start");
             Map result = restClient.get()
                     .uri("https://www.googleapis.com/oauth2/v2/userinfo")
                     .header("Authorization", header)
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                        throw new GeneralException(Code.OAUTH_NOT_FOUND_TOKEN);
                     }))
                     .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
                         throw new GeneralException(Code.OAUTH_FIND_ERROR);
@@ -59,7 +61,7 @@ public class SocialService {
                     .header("Authorization", header)
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                        throw new GeneralException(Code.OAUTH_FIND_ERROR);
+                        throw new GeneralException(Code.OAUTH_NOT_FOUND_TOKEN);
                     }))
                     .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
                         throw new GeneralException(Code.OAUTH_FIND_ERROR);
