@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -74,11 +75,16 @@ public class RouteListServiceImpl implements RouteListService{
         Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE)
                 .orElseThrow(() -> new GeneralException(Code.ROUTE_NOT_FOUND));
         request.forEach(dto -> {
+            Integer ordinal = Optional.ofNullable(dto.getOrdinal())
+                    .orElseGet(() -> Optional.ofNullable(routeListRepository.findLastRouteListOrdinal(route))
+                            .map(lastOrdinal -> lastOrdinal + 1)
+                            .orElse(1));
+
             RouteList routeList = RouteList.builder()
                     .route(route)
                     .store(storeRepository.findById(dto.getStoreId())
                             .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND)))
-                    .ordinal(dto.getOrdinal() != null ? dto.getOrdinal() : routeListRepository.findLastRouteListOrdinal(route) + 1) //자동으로 가장 끝에 추가
+                    .ordinal(ordinal)
                     .build();
             routeListRepository.save(routeList);
         });
