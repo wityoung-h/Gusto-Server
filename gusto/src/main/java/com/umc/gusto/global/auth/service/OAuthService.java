@@ -1,4 +1,4 @@
-package com.umc.gusto.global.auth;
+package com.umc.gusto.global.auth.service;
 
 import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.domain.user.service.UserService;
@@ -6,6 +6,7 @@ import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.global.auth.model.CustomOAuth2User;
 import com.umc.gusto.global.auth.model.OAuthAttributes;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -14,20 +15,23 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class OAuthService extends DefaultOAuth2UserService {
     private final SocialRepository socialRepository;
     private final UserService userService;
     @Value("${default.img.url}")
-    private String DEFAULT_PROFILE_IMG;
+    private static String DEFAULT_PROFILE_IMG;
 
     // 유저 불러오기 - 해당 유저의 security context가 저장됨
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
+        log.info("***********************");
+        log.info(userRequest.getAccessToken().getTokenValue());
+        log.info("***********************");
 
         // provider - string to enum으로 변환
         Social.SocialType provider = Social.SocialType.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase());
@@ -36,6 +40,8 @@ public class OAuthService extends DefaultOAuth2UserService {
                 .getUserNameAttributeName();
 
         OAuthAttributes oAuthAttributes = OAuthAttributes.of(provider, userNameAttribute, oAuth2User.getAttributes());
+        log.info(oAuthAttributes.getId());
+        log.info("***********************");
 
         Optional<Social> socialInfo = socialRepository.findBySocialTypeAndProviderId(provider, oAuthAttributes.getId());
 
@@ -71,4 +77,6 @@ public class OAuthService extends DefaultOAuth2UserService {
                 .socialInfo(info)
                 .build();
     }
+
+
 }

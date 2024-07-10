@@ -14,7 +14,8 @@ import com.umc.gusto.domain.user.model.response.*;
 import com.umc.gusto.domain.user.repository.FollowRepository;
 import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.domain.user.repository.UserRepository;
-import com.umc.gusto.global.auth.JwtService;
+import com.umc.gusto.global.auth.service.JwtService;
+import com.umc.gusto.global.auth.service.SocialService;
 import com.umc.gusto.global.auth.model.Tokens;
 import com.umc.gusto.global.common.PublishStatus;
 import com.umc.gusto.global.config.secret.JwtConfig;
@@ -43,11 +44,11 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final SocialRepository socialRepository;
-    private final JwtService jwtService;
-    private final RedisService redisService;
     private final FollowRepository followRepository;
     private final S3Service s3Service;
-    private final MyCategoryService myCategoryService;
+    private final JwtService jwtService;
+    private final RedisService redisService;
+    private final SocialService socialService;
 
     private static final long NICKNAME_EXPIRED_TIME = 1000L * 60 * 15;
     private static final int MAX_NICKNAME_NUMBER = 999;
@@ -61,6 +62,8 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public Tokens createUser(MultipartFile multipartFile, SignUpRequest request) {
+        socialService.loadUserInfo(request.getProvider(), request.getProviderId(), request.getAccessToken());
+
         // 이미 가입된 계정이 존재함
         socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(request.getProvider()), request.getProviderId())
                 .ifPresent( info -> { throw new GeneralException(Code.USER_ALREADY_SIGNUP); });
@@ -154,6 +157,8 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public Tokens signIn(SignInRequest signInRequest) {
+        socialService.loadUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
+
         // social 정보 확인
         Social social = socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(signInRequest.getProvider()), signInRequest.getProviderId())
                 .orElseThrow(() -> new GeneralException(Code.USER_NOT_OUR_CLIENT));

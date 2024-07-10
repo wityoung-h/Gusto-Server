@@ -24,5 +24,5 @@ public interface MyCategoryService {
 
     void modifyMyCategory(User user,Long myCategoryId, UpdateMyCategoryRequest request);
 
-    void deleteMyCategories(User user, List<Long> myCategoryId);
+    void deleteMyCategories(User user, List<Long> myCategoryIds);
 }

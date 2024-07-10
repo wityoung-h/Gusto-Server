@@ -15,7 +15,6 @@ import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -139,29 +138,41 @@ public class StoreServiceImpl implements StoreService{
     }
 
     @Transactional(readOnly = true)
-    public List<GetStoresInMapResponse> getStoresInMap(User user, String townName, Long myCategoryId, Boolean visited) {
-        List<Pin> pins = pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName);
-        if (myCategoryId == null) {
+    public List<GetStoresInMapResponse> getStoresInMap(User user, String townName, List<Long> myCategoryIds, Boolean visited) {
+        List<Pin> pins = new ArrayList<>();
+        if (myCategoryIds == null || myCategoryIds.isEmpty()) {
             pins = pinRepository.findPinsByUserAndTownNameAndPinIdDESC(user, townName);
-        }
-
-        List<Store> visitedStatus = new ArrayList<>();
-        for (Pin pin : pins) {
-            Store store = pin.getStore();
-            boolean hasVisited = reviewRepository.existsByStoreAndUserNickname(store, user.getNickname());
-            if (visited) {
-                if (hasVisited) {
-                    visitedStatus.add(store);
-                }
-            } else {
-                if (!hasVisited) {
-                    visitedStatus.add(store);
-                }
+        } else {
+            for (Long myCategoryId : myCategoryIds) {
+                pins.addAll(pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName));
             }
-
         }
 
-        return visitedStatus.stream()
+        List<Store> pinStores = new ArrayList<>();
+
+        if (visited == null) {
+            pinStores = pins.stream()
+                    .map(Pin::getStore)
+                    .collect(Collectors.toList());
+
+        } else {
+            for (Pin pin : pins) {
+                Store store = pin.getStore();
+                boolean hasVisited = reviewRepository.existsByStoreAndUserNickname(store, user.getNickname());
+                if (visited) {
+                    if (hasVisited) {
+                        pinStores.add(store);
+                    }
+                } else {
+                    if (!hasVisited) {
+                        pinStores.add(store);
+                    }
+                }
+
+            }
+        }
+
+        return pinStores.stream()
                 .map(store -> GetStoresInMapResponse.builder()
                         .storeId(store.getStoreId())
                         .storeName(store.getStoreName())
@@ -222,6 +233,59 @@ public class StoreServiceImpl implements StoreService{
                 .build();
 
         return Collections.singletonList(pinStoreResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> getPinStoresInfo(User user, Long myCategoryId, String townName, boolean visited, Long lastStoreId, int size) {
+        List<Pin> pins = pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName);
+        if(myCategoryId == null){
+            pins = pinRepository.findPinsByUserAndTownNameAndPinIdDESC(user, townName);
+        }
+
+        List<GetPinStoreInfoResponse> pinStoresInfo = new ArrayList<>();
+        boolean hasNext = false;
+        for (Pin pin : pins) {
+            if (lastStoreId != null && pin.getStore().getStoreId() >= lastStoreId) {
+                continue;
+            }
+
+            Store store = pin.getStore();
+            boolean hasVisited = reviewRepository.existsByStoreAndUserNickname(store, user.getNickname());
+
+            if (hasVisited == visited) {
+                List<Review> top3Reviews = reviewRepository.findFirst3ByStoreOrderByLikedDesc(store);
+                List<String> reviewImg = top3Reviews.stream()
+                        .map(review -> Optional.ofNullable(review.getImg1()).orElse(""))
+                        .collect(Collectors.toList());
+
+                GetPinStoreInfoResponse pinStoreInfoResponse = GetPinStoreInfoResponse.builder()
+                        .storeName(store.getStoreName())
+                        .category(store.getCategoryString())
+                        .address(store.getAddress())
+                        .reviewImg3(reviewImg)
+                        .build();
+                pinStoresInfo.add(pinStoreInfoResponse);
+            }
+        }
+        if (pinStoresInfo.size() > size) {
+            pinStoresInfo = pinStoresInfo.subList(0, size);
+            hasNext = true;
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("pinStores", pinStoresInfo);
+        map.put("hasNext", hasNext);
+        return map;
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> getVisitedPinStores(User user, Long myCategoryId, String townName, Long lastStoreId, int size) {
+        return getPinStoresInfo(user, myCategoryId, townName, true, lastStoreId, size);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> getUnvisitedPinStores(User user, Long myCategoryId, String townName,  Long lastStoreId, int size) {
+        return getPinStoresInfo(user, myCategoryId, townName, false, lastStoreId, size);
     }
 
     @Override

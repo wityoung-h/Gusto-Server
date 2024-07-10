@@ -3,6 +3,7 @@ package com.umc.gusto.global.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umc.gusto.domain.user.model.response.FirstLogInResponse;
 import com.umc.gusto.global.auth.model.Tokens;
+import com.umc.gusto.global.auth.service.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;

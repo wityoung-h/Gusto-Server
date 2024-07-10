@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,19 +51,19 @@ public class StoreController {
     }
 
     /**
-     * 현 지역의 카테고리 별 찜한 가게 목록 조회
-     * [GET] /stores/map?townName={townName}&myCategoryId={myCategoryId}&visited={visitStatus}
+     * 현 지역의 카테고리 별 찜한 가게 목록 조회(카테고리 다중 선택 가능)
+     * [GET] /stores/map?townName={townName}&visited={visitStatus}&myCategoryId={myCategoryId}&myCategoryId={myCategoryId}...
      */
     @GetMapping("/map")
     public ResponseEntity<List<GetStoresInMapResponse>> getStoresInMap(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "townName") String townName,
-            @RequestParam(name = "myCategoryId", required = false) Long myCategoryId,
+            @RequestParam(name = "myCategoryId", required = false) List<Long> myCategoryIds,
             @RequestParam(name = "visited", required = false) Boolean visited
             ) {
 
         User user = authUser.getUser();
-        List<GetStoresInMapResponse> getStoresInMaps = storeService.getStoresInMap(user, townName, myCategoryId, visited);
+        List<GetStoresInMapResponse> getStoresInMaps = storeService.getStoresInMap(user, townName, myCategoryIds, visited);
         return  ResponseEntity.status(HttpStatus.OK).body(getStoresInMaps);
     }
 
@@ -78,6 +79,38 @@ public class StoreController {
         User user = authUser.getUser();
         List<GetPinStoreResponse> storeList = storeService.getPinStoresByCategoryAndLocation(user, myCategoryId, townName);
         return ResponseEntity.status(HttpStatus.OK).body(storeList);
+    }
+
+    /**
+     * 현재 지역의 찜한 방문 식당 조회
+     * [GET] /stores/pins/visited?myCategoryId={categoryId}&townName={townName}
+     */
+    @GetMapping("/pins/visited")
+    public ResponseEntity<Map<String, Object>> getVisitedPinStoresByCategoryAndLocation(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam(name = "myCategoryId", required = false) Long myCategoryId,
+            @RequestParam(name = "townName") String townName,
+            @RequestParam(name = "lastStoreId", required = false) Long lastStoreId,
+            @RequestParam(name = "size", defaultValue = "5") int size){
+        User user = authUser.getUser();
+        Map<String, Object> visitedStoreList = storeService.getVisitedPinStores(user, myCategoryId, townName, lastStoreId, size);
+        return ResponseEntity.status(HttpStatus.OK).body(visitedStoreList);
+    }
+
+    /**
+     * 현재 지역의 찜한 미방문 식당 조회
+     * [GET] /stores/pins/unvisited?myCategoryId={categoryId}&townName={townName}
+     */
+    @GetMapping("/pins/unvisited")
+    public ResponseEntity<Map<String, Object>> getUnvisitedPinStoresByCategoryAndLocation(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam(name = "myCategoryId", required = false) Long myCategoryId,
+            @RequestParam(name = "townName") String townName,
+            @RequestParam(name = "lastStoreId", required = false) Long lastStoreId,
+            @RequestParam(name = "size", defaultValue = "5") int size) {
+        User user = authUser.getUser();
+        Map<String, Object> unvisitedStoreList = storeService.getUnvisitedPinStores(user, myCategoryId, townName, lastStoreId, size);
+        return ResponseEntity.status(HttpStatus.OK).body(unvisitedStoreList);
     }
 
     /**
