@@ -9,10 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("routes")
 @RequiredArgsConstructor
 public class RouteController {
@@ -29,6 +28,21 @@ public class RouteController {
             @AuthenticationPrincipal AuthUser authUSer)
     {
         routeService.createRoute(request,authUSer.getUser());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /**
+     * 그룹 내 루트 추가
+     * [POST] /routes/{groupId}
+     */
+    // 루트 생성
+    @PostMapping("{groupId}")
+    public ResponseEntity<?> createRoute(
+            @PathVariable Long groupId,
+            @RequestBody RouteRequest request,
+            @AuthenticationPrincipal AuthUser authUSer)
+    {
+        routeService.createRouteGroup(groupId,request,authUSer.getUser());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -88,9 +102,22 @@ public class RouteController {
     (@PathVariable String nickname,
      @RequestParam(required = false, name = "routeId") Long routeId
      ){
-        RoutePagingResponse route = routeService.getRoute(nickname,routeId);
+        RoutePagingResponse route = routeService.getOtherRoute(nickname,routeId);
         return ResponseEntity.ok().body(route);
     }
 
+    /**
+     * 루트별 공개/비공개 설정
+     * [PATCH] /routes/{routeId}/publishing/{publishStatus}
+     */
+    @PatchMapping("/{routeId}/publishing/{publishStatus}")
+    public ResponseEntity modifyPublishingRoute(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long routeId,
+            @PathVariable boolean publishStatus)
+    {
+        routeService.modifyPublishingInfo(authUser.getUser(),routeId,publishStatus);
+        return ResponseEntity.ok().build();
+    }
 
 }
