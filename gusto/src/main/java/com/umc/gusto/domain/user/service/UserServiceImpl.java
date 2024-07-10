@@ -1,5 +1,7 @@
 package com.umc.gusto.domain.user.service;
 
+import com.umc.gusto.domain.myCategory.repository.MyCategoryRepository;
+import com.umc.gusto.domain.myCategory.service.MyCategoryService;
 import com.umc.gusto.domain.user.entity.Follow;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
@@ -264,11 +266,11 @@ public class UserServiceImpl implements UserService{
     @Override
     public void updatePublishingInfo(User user, PublishingInfoRequest request) {
         PublishStatus reviewStatus = (request.getPublishReview()) ?PublishStatus.PUBLIC : PublishStatus.PRIVATE;
-        PublishStatus pinStatus = (request.getPublishPin()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
+        PublishStatus categoryStatus = (request.getPublishCategory()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
         PublishStatus routeStatus = (request.getPublishRoute()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
 
         user.updatePublishReview(reviewStatus);
-        user.updatePublishPin(pinStatus);
+        user.updatePublishCategory(categoryStatus);
         user.updatePublishRoute(routeStatus);
 
         userRepository.save(user);
