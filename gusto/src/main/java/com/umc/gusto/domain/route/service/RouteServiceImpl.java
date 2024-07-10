@@ -89,12 +89,8 @@ public class RouteServiceImpl implements RouteService{
         if (routeRepository.existsByGroupRouteName(request.getRouteName(),BaseEntity.Status.ACTIVE,group)) {
             throw new GeneralException(Code.ROUTE_DUPLICATE_ROUTENAME);
         }
-        // 루트 리스트 갯수 6개 제한 확인
-        if(request.getRouteList().size()>=7){
-            throw new GeneralException(Code.ROUTELIST_TO_MANY_REQUEST);
-        }
 
-
+        // 그룹 루트는 루트명만 생성 가능
         // 루트 생성
         Route route = Route.builder()
                 .routeName(request.getRouteName())
@@ -105,11 +101,12 @@ public class RouteServiceImpl implements RouteService{
 
 
         if(request.getRouteList() != null){
+            // 루트 리스트 갯수 6개 제한 확인
+            if(request.getRouteList().size()>=7){
+                throw new GeneralException(Code.ROUTELIST_TO_MANY_REQUEST);
+            }
             // 루트리스트 생성 비지니스 로직 호출
             routeListService.createRouteList(savedRoute, request.getRouteList());
-        }else if(request.getGroupId() == null ){
-            // 내 루트 생성시에는 최소 1개 이상의 경로가 포함되어야 함
-            throw new GeneralException(Code.ROUTE_MYROUTE_BAD_REQUEST);
         }
     }
 
