@@ -117,7 +117,7 @@ public class StoreController {
      * 맛집 검색 엔진
      */
     @GetMapping("/search")
-    public ResponseEntity<List<GetStoreInfoResponse>> searchStore(@RequestParam(name = "keyword") String keyword){
-        return ResponseEntity.status(HttpStatus.OK).body(storeService.searchStore(keyword));
+    public ResponseEntity<List<GetStoreInfoResponse>> searchStore(@AuthenticationPrincipal AuthUser authUser,@RequestParam(name = "keyword") String keyword){
+        return ResponseEntity.status(HttpStatus.OK).body(storeService.searchStore(authUser.getUser(),keyword));
     }
 }
