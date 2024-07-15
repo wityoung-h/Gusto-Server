@@ -16,5 +16,5 @@ public interface StoreService {
     List<GetPinStoreResponse> getPinStoresByCategoryAndLocation(User user, Long myCategoryId, String townName);
     Map<String, Object> getVisitedPinStores(User user, Long myCategoryId, String townName, Long lastStoreId, int size);
     Map<String, Object> getUnvisitedPinStores(User user, Long myCategoryId, String townName, Long lastStoreId, int size);
-    List<GetStoreInfoResponse> searchStore(String keyword);
+    List<GetStoreInfoResponse> searchStore(User user,String keyword);
 }
