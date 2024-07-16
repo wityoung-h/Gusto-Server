@@ -27,7 +27,7 @@ public interface GroupService {
     void deleteGroupList(List<Long> groupListId, User user);
 
     // 그룹리스트 조회
-    PagingResponse getAllGroupList(Long groupId, Long groupListId);
+    PagingResponse getAllGroupList(Long groupId, Long groupListId,User user);
 
     // 그룹 초대 코드 조회
     GetInvitationCodeResponse getInvitationCode(Long groupId);
