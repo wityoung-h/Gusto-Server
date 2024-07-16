@@ -14,6 +14,9 @@ public class PinByMyCategoryResponse{
     Long storeId;
     String storeName;
     String address;
-    String reviewImg;
+    String img1;
+    String img2;
+    String img3;
+
     Integer reviewCnt;
 }
