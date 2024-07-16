@@ -13,6 +13,7 @@ public class MyCategoryResponse{
     String myCategoryScript;
     Integer myCategoryIcon;
     PublishStatus publishCategory;
+    PublishStatus userPublishCategory;
     Integer pinCnt;
 }
 

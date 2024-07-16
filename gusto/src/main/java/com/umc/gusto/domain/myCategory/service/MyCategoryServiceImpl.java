@@ -64,6 +64,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
         }
 
+        User finalUser = user;
         List<MyCategoryResponse> result = myCategoryList.stream()
                 .map(myCategory -> {
                     List<Pin> pinList;
@@ -78,6 +79,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                             .myCategoryScript(myCategory.getMyCategoryScript())
                             .myCategoryIcon(myCategory.getMyCategoryIcon())
                             .publishCategory(myCategory.getPublishCategory())
+                            .userPublishCategory(finalUser.getPublishCategory())
                             .pinCnt(pinList.size())
                             .build();
                 })
@@ -180,6 +182,8 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
         return PagingResponse.builder()
                 .hasNext(pinList.hasNext())
+                .userPublishCategory(user.getPublishCategory())
+                .publishCategory(myCategory.get().getPublishCategory())
                 .result(result)
                 .build();
     }
