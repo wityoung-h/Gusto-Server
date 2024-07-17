@@ -112,10 +112,10 @@ public class StoreServiceImpl implements StoreService{
                         .nickname(reviewer.getNickname())
                         .liked(review.getLiked())
                         .comment(review.getComment())
-                        .img1(review.getImg1())
-                        .img2(review.getImg2())
-                        .img3(review.getImg3())
-                        .img4(review.getImg4())
+                        .img1(review.getImg1() != null ? review.getImg1(): "")
+                        .img2(review.getImg2() != null ? review.getImg2(): "")
+                        .img3(review.getImg3() != null ? review.getImg3(): "")
+                        .img4(review.getImg4() != null ? review.getImg4(): "")
                         .build();
                 })
                 .toList();
