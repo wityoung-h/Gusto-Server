@@ -1,5 +1,15 @@
 package com.umc.gusto.global.common;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public enum PublishStatus {
-    PUBLIC, PRIVATE
+    PUBLIC(true),
+    PRIVATE(false);
+
+    private final boolean check;
+
+    public static PublishStatus of(boolean check){
+        return check ? PUBLIC : PRIVATE;
+    }
 }

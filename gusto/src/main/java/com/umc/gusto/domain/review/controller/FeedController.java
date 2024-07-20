@@ -24,8 +24,9 @@ public class FeedController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchFeed(@RequestParam(name = "keyword", required = false) String keyword, @RequestParam(name = "hashTags", required = false) List<Long> hashTags){
-        return ResponseEntity.status(HttpStatus.OK).body(feedService.searchFeed(keyword, hashTags));
+    public ResponseEntity<?> searchFeed(@RequestParam(name = "keyword", required = false) String keyword, @RequestParam(name = "hashTags", required = false) List<Long> hashTags,
+                                        @RequestParam(name = "cursorId", required = false) Long cursorId){
+        return ResponseEntity.status(HttpStatus.OK).body(feedService.searchFeed(keyword, hashTags, cursorId));
     }
 
     @GetMapping("{reviewId}")
