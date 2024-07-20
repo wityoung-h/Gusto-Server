@@ -9,6 +9,10 @@ public enum PublishStatus {
 
     private final boolean check;
 
+    public boolean isCheck() {
+        return check;
+    }
+
     public static PublishStatus of(boolean check){
         return check ? PUBLIC : PRIVATE;
     }
