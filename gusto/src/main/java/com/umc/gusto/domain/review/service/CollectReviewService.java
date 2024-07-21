@@ -8,6 +8,7 @@ import java.time.LocalDate;
 
 public interface CollectReviewService {
 //    CollectReviewsOfInstaResponse getReviewOfInstaView(User user, ReviewViewRequest reviewViewRequest);
+    CollectReviewsResponse getMyReviewOfInstaView(User user, Long reviewId, int size);
     CollectReviewsResponse getReviewOfInstaView(User user, Long reviewId, int size);
     CollectReviewsOfCalResponse getReviewOfCalView(User user, Long reviewId, int size, LocalDate date);
     CollectReviewsResponse getReviewOfTimeView(User user, Long reviewId, int size);

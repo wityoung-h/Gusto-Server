@@ -32,7 +32,7 @@ public class FeedServiceImpl implements FeedService{
     }
 
     @Override
-    public SearchFeedResponse searchFeed(String keyword, List<Long> hashTags, Long cursor) { //TODO: 검색 결과가 랜덤으로 다시 정렬되야 할듯
+    public SearchFeedResponse searchFeed(String keyword, List<Long> hashTags, Long cursor) { //TODO: 검색 결과가 랜덤으로 다시 정렬되야 할듯 & 자기 리뷰가 아니여야함
         Page<Review> searchResult = null;
         PageRequest pageRequest = PageRequest.of(0,33);
 
@@ -61,6 +61,7 @@ public class FeedServiceImpl implements FeedService{
         boolean checkNext = searchResult.hasNext();
         List<BasicViewResponse> basicViewResponse = searchResult.stream().map(BasicViewResponse::of).toList();
         Long cursorId = basicViewResponse.isEmpty() ? null : basicViewResponse.get(basicViewResponse.size()-1).getReviewId();
+
         return SearchFeedResponse.of(basicViewResponse, checkNext, cursorId);
     }
 
