@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Slf4j
 public class SocialService {
@@ -47,6 +48,7 @@ public class SocialService {
             Map<String, String> response = new HashMap<>((LinkedHashMap) result.get("response"));
             id = response.get("id");
         } else if(provider.equals("GOOGLE")) {
+            log.info("Google start");
             Map result = restClient.get()
                     .uri("https://www.googleapis.com/oauth2/v2/userinfo")
                     .header("Authorization", header)

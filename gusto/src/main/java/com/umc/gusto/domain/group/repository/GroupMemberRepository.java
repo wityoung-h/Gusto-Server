@@ -3,11 +3,12 @@ package com.umc.gusto.domain.group.repository;
 import com.umc.gusto.domain.group.entity.Group;
 import com.umc.gusto.domain.group.entity.GroupMember;
 import com.umc.gusto.domain.user.entity.User;
-import com.umc.gusto.global.common.BaseEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -23,11 +24,18 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
   
     Boolean existsGroupMemberByGroupAndUser(Group group, User user);
 
+    @Query("SELECT gm.group " +
+            "FROM GroupMember gm LEFT JOIN gm.group g " +
+            "WHERE g.groupId = :groupId AND gm.user = :user")
+    Group findByGroupIdAndUserId(@Param("groupId") Long groupId, @Param("user") User user);
+
     Optional<GroupMember> findGroupMemberByGroupAndGroupMemberId(Group group, Long memberId);
     Optional<GroupMember> findGroupMemberByGroupAndUser(Group group, User user);
   
     @Query("SELECT gm.group.groupId FROM GroupMember gm WHERE gm.user = :user")
     List<Long> findGroupIdsByUser(User user);
     int countGroupMembersByGroup(Group group);
+
+
 
 }
