@@ -34,13 +34,8 @@ public class MyCategoryController {
             @RequestParam(name = "townName", required = false) String townName,
             @RequestParam(name = "myCategoryId", required = false) Long myCategoryId) {     // paging 처리를 위해 마지막 리턴 myCategoryId 사용
 
-        PagingResponse pagingResponse;
-        if (nickname == null) {
-            User user = authUser.getUser();
-            pagingResponse = myCategoryService.getAllMyCategory(user, null, townName, myCategoryId);
-        } else {
-            pagingResponse = myCategoryService.getAllMyCategory(null, nickname, townName, myCategoryId);
-        }
+        User user = (nickname == null) ? authUser.getUser() : null;
+        PagingResponse pagingResponse = myCategoryService.getAllMyCategory(user, nickname, townName, myCategoryId);
 
         return ResponseEntity.status(HttpStatus.OK).body(pagingResponse);
     }
@@ -59,21 +54,12 @@ public class MyCategoryController {
             @RequestParam(name = "storeName", required = false) String storeName,
             @RequestParam(name = "sort", required = false) String sort  // paging 처리를 위해 마지막 리턴 pinId 사용
             ) {
-        PagingResponse pagingResponse;
-        if (nickname == null) {
-            User user = authUser.getUser();
-            pagingResponse = myCategoryService.getAllPinByMyCategory(user, null, myCategoryId, townName, pinId, storeName, sort);
-        } else {
-            pagingResponse = myCategoryService.getAllPinByMyCategory(null, nickname, myCategoryId, townName, pinId, storeName, sort);
-        }
+
+        User user = (nickname == null) ? authUser.getUser() : null;
+        PagingResponse pagingResponse = myCategoryService.getAllPinByMyCategory(user, nickname, myCategoryId, townName, pinId, storeName, sort);
 
         return ResponseEntity.status(HttpStatus.OK).body(pagingResponse);
     }
-
-    /**
-     * 내 카테고리 공개 상태 업데이트
-     * [
-     */
 
     /**
      * 내 카테고리 생성

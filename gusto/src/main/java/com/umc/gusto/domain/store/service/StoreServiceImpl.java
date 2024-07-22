@@ -38,7 +38,15 @@ public class StoreServiceImpl implements StoreService{
         for (Long storeId : storeIds) {
             Store store = storeRepository.findById(storeId)
                     .orElseThrow(() -> new GeneralException(Code.STORE_NOT_FOUND));
-            Long pinId = pinRepository.findByUserAndStoreStoreId(user, storeId);
+
+            Long pinId = null;
+            boolean isPinned = false;
+            if (user != null) {
+                pinId = pinRepository.findByUserAndStoreStoreId(user, storeId);
+                isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
+            }
+
+
             List<OpeningHours> openingHoursList = openingHoursRepository.findByStoreStoreId(storeId);
 
             Map<OpeningHours.BusinessDay, GetStoreResponse.Timing> businessDays = new LinkedHashMap<>();
@@ -55,7 +63,6 @@ public class StoreServiceImpl implements StoreService{
             List<String> reviewImg = top3Reviews.stream()
                     .map(review -> Optional.ofNullable(review.getImg1()).orElse(""))
                     .collect(Collectors.toList());
-            boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
 
             responses.add(GetStoreResponse.builder()
