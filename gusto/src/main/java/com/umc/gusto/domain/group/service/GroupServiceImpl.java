@@ -308,6 +308,22 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Override
+    public void deleteRoute(Long routeId, User user, Long groupId) {
+        // 그룹 구성원인지 확인
+        Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(()->new GeneralException(Code.FIND_FAIL_GROUP));
+        if(!groupMemberRepository.existsGroupMemberByGroupAndUser(group,user)){
+            throw new GeneralException(Code.USER_NOT_IN_GROUP);
+        }
+
+        Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.ROUTE_NOT_FOUND));
+        //루트 삭제 : soft delete
+        route.updateStatus(BaseEntity.Status.INACTIVE);
+
+    }
+
+    @Override
     public void createGroupList(Long groupId,GroupListRequest request,User user) {
         // 그룹 존재 여부 확인
         Group group = groupRepository.findGroupByGroupIdAndStatus(groupId, BaseEntity.Status.ACTIVE)

@@ -6,6 +6,7 @@ import com.umc.gusto.domain.store.entity.Store;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -21,6 +22,7 @@ public interface GroupListRepository extends JpaRepository<GroupList,Long> {
     int countGroupListsByGroup(Group group);
     Boolean existsGroupListByGroupAndStore(Group group, Store store);
 
+    @Modifying //DELETE 쿼리임을 명시
     @Query("DELETE FROM GroupList gl WHERE gl.group.groupId = :groupId")
     void deleteByGroupId(@Param("groupId") Long groupId);
 }

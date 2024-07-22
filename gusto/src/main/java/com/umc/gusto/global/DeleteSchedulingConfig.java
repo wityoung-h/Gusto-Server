@@ -24,16 +24,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DeleteSchedulingConfig {
 // 삭제 시 상호 참조 주의!
-    private RouteService routeService;
-    private GroupService groupService;
-
+    private final RouteService routeService;
+    private final GroupService groupService;
 
     // 일정 시간마다 실행
     @Transactional
     @Async
-    @Scheduled(cron = "0 0 0 1 * ?") // 30일
+    @Scheduled(fixedRate = 10000)
+    //@Scheduled(cron = "0 0 0 1 * ?") // 한 달 주기
     public void autoDelete() {
-        // 각 수정 시점병 기간 필요성?
         routeService.hardDeleteAllSoftDeleted();
         groupService.hardDeleteAllSoftDeleted();
 

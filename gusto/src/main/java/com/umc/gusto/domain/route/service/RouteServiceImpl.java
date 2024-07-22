@@ -272,8 +272,7 @@ public class RouteServiceImpl implements RouteService{
 
     @Transactional
     public void hardDeleteAllSoftDeleted() {
-        List<Route> deletedRoutes = routeRepository.findAllInActive().stream()
-                .collect(Collectors.toList());
+        List<Route> deletedRoutes = routeRepository.findAllInActive();
 
         for (Route route : deletedRoutes) {
             // Hard delete associated RouteList entities
