@@ -15,5 +15,8 @@ public class RouteResponse {
     private int numStore;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private boolean publishRoute;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long groupId;
 }
