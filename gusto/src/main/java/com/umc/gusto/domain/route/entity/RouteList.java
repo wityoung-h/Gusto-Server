@@ -23,7 +23,7 @@ public class RouteList {
     @Column(nullable = false, updatable = false)
     private Long routeListId;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "routeId", nullable = false)
     private Route route;
 

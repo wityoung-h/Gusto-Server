@@ -9,6 +9,9 @@ import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -38,6 +41,9 @@ public class Route extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "publishRoute", nullable = false, length = 10)
     private PublishStatus publishRoute = PublishStatus.PUBLIC;
+
+    @OneToMany(mappedBy = "route", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<RouteList> routeLists = new ArrayList<>();
 
 
     public void updateStatus(BaseEntity.Status status) {this.status = status;}

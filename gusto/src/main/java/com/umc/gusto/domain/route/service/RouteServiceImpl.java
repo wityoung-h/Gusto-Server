@@ -274,12 +274,12 @@ public class RouteServiceImpl implements RouteService{
     public void hardDeleteAllSoftDeleted() {
         List<Route> deletedRoutes = routeRepository.findAllInActive();
 
-        for (Route route : deletedRoutes) {
-            // Hard delete associated RouteList entities
-            routeListRepository.deleteByRouteId(route.getRouteId());
-        }
+//        for (Route route : deletedRoutes) {
+//            // Hard delete RouteList
+//            routeListRepository.deleteByRouteId(route.getRouteId());
+//        }
 
-        // Hard delete Route entities
+        // Hard delete Route
         routeRepository.deleteAll(deletedRoutes);
     }
 }

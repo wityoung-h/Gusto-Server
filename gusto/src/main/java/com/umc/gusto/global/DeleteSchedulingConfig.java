@@ -1,6 +1,7 @@
 package com.umc.gusto.global;
 
 import com.umc.gusto.domain.group.service.GroupService;
+import com.umc.gusto.domain.myCategory.service.MyCategoryService;
 import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.route.repository.RouteListRepository;
 import com.umc.gusto.domain.route.repository.RouteRepository;
@@ -26,6 +27,7 @@ public class DeleteSchedulingConfig {
 // 삭제 시 상호 참조 주의!
     private final RouteService routeService;
     private final GroupService groupService;
+    private final MyCategoryService myCategoryService;
 
     // 일정 시간마다 실행
     @Transactional
@@ -35,6 +37,7 @@ public class DeleteSchedulingConfig {
     public void autoDelete() {
         routeService.hardDeleteAllSoftDeleted();
         groupService.hardDeleteAllSoftDeleted();
+        myCategoryService.hardDeleteAllSoftDeleted();
 
     }
 

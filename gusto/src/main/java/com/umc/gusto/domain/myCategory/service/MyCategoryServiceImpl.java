@@ -265,4 +265,17 @@ public class MyCategoryServiceImpl implements MyCategoryService {
         }
     }
 
+    @Transactional
+    public void hardDeleteAllSoftDeleted() {
+        List<MyCategory> deletedMyCategories = myCategoryRepository.findAllInActive();
+
+//        for (MyCategory category : deletedMyCategories) {
+//            // Hard delete pin
+//            pinRepository.deleteByMyCategoryId(category.getMyCategoryId());
+//        }
+
+        // Hard delete myCategory
+        myCategoryRepository.deleteAll(deletedMyCategories);
+    }
+
 }

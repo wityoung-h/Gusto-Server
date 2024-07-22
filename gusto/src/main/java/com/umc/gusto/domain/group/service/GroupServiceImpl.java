@@ -408,15 +408,15 @@ public class GroupServiceImpl implements GroupService{
         List<Group> deletedGroups = groupRepository.findAllInactiveGroups();
 
         for (Group group : deletedGroups) {
-            // Hard delete associated GroupList entities
+            // Hard delete  GroupList
             groupListRepository.deleteByGroupId(group.getGroupId());
-            // Hard delete associated GroupMember entities
+            // Hard delete GroupMember
             groupMemberRepository.deleteByGroupId(group.getGroupId());
-            // Hard delete associated InvitationCode entity
+            // Hard delete InvitationCode
             invitationCodeRepository.deleteByGroupId(group.getGroupId());
         }
 
-        // Hard delete Group entities
+        // Hard delete Group
         groupRepository.deleteAll(deletedGroups);
     }
 
