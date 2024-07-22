@@ -360,7 +360,7 @@ public class GroupServiceImpl implements GroupService{
 
         // 그룹 리스트에 해당하는 각 상점 정보 조회
         List<GroupListResponse> list = groupLists.stream().map(gl -> {
-            Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(user,gl.getStore()); // 가장 좋아요가 많은 review
+            Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(gl.getStore()); // 가장 좋아요가 많은 review
             String reviewImg = topReviewOptional.map(Review::getImg1).orElse("");
             return GroupListResponse.builder()
                     .groupListId(gl.getGroupListId())

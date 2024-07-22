@@ -50,7 +50,7 @@ public class StoreServiceImpl implements StoreService{
                 businessDays.put(openingHours.getBusinessDay(), timing);
             }
 
-            List<Review> top3Reviews = reviewRepository.findFirst3ByStoreOrderByLikedDesc(user,store);
+            List<Review> top3Reviews = reviewRepository.findFirst3ByStoreOrderByLikedDesc(store);
 
             List<String> reviewImg = top3Reviews.stream()
                     .map(review -> Optional.ofNullable(review.getImg1()).orElse(""))
@@ -84,7 +84,7 @@ public class StoreServiceImpl implements StoreService{
 //                .orElseThrow(() -> new GeneralException(Code.CATEGORY_NOT_FOUND));
         Long pinId = pinRepository.findByUserAndStoreStoreId(user, storeId);
 
-        List<Review> top4Reviews = reviewRepository.findFirst4ByStoreOrderByLikedDesc(store,user);
+        List<Review> top4Reviews = reviewRepository.findFirst4ByStoreOrderByLikedDesc(store);
 
         List<String> reviewImg = top4Reviews.stream()
                 .map(review -> Optional.ofNullable(review.getImg1()).orElse(""))
@@ -96,10 +96,10 @@ public class StoreServiceImpl implements StoreService{
 
         if (reviewId != null && visitedAt != null) {
             pageSize = PAGE_SIZE;
-            reviews = reviewRepository.findReviewsAfterIdByStore(user,store, visitedAt, reviewId, Pageable.ofSize(pageSize));
+            reviews = reviewRepository.findReviewsAfterIdByStore(store, visitedAt, reviewId, Pageable.ofSize(pageSize));
         } else {
             pageSize = PAGE_SIZE_FIRST;
-            reviews = reviewRepository.findFirstReviewsByStore(user,store, Pageable.ofSize(pageSize));
+            reviews = reviewRepository.findFirstReviewsByStore(store, Pageable.ofSize(pageSize));
         }
 
         List<GetReviewsResponse> getReviews = reviews.stream()
@@ -194,7 +194,7 @@ public class StoreServiceImpl implements StoreService{
 
         for (Pin pin : pins){
             Store store = pin.getStore();
-            Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(user,store);
+            Optional<Review> topReviewOptional = reviewRepository.findFirstByStoreOrderByLikedDesc(store);
             String reviewImg = topReviewOptional.map(Review::getImg1).orElse("");
             boolean hasVisited = reviewRepository.existsByStoreAndUserNickname(store, user.getNickname());
 
@@ -253,7 +253,7 @@ public class StoreServiceImpl implements StoreService{
             boolean hasVisited = reviewRepository.existsByStoreAndUserNickname(store, user.getNickname());
 
             if (hasVisited == visited) {
-                List<Review> top3Reviews = reviewRepository.findFirst3ByStoreOrderByLikedDesc(user,store);
+                List<Review> top3Reviews = reviewRepository.findFirst3ByStoreOrderByLikedDesc(store);
                 List<String> reviewImg = top3Reviews.stream()
                         .map(review -> Optional.ofNullable(review.getImg1()).orElse(""))
                         .collect(Collectors.toList());
@@ -289,12 +289,12 @@ public class StoreServiceImpl implements StoreService{
     }
 
     @Override
-    public List<GetStoreInfoResponse> searchStore(User user,String keyword) {
+    public List<GetStoreInfoResponse> searchStore(String keyword) {
         List<Store> searchResult = storeRepository.findTop5ByStoreNameContains(keyword);
 
         return searchResult.stream()
                 .map(result -> {
-                    Optional<Review> review = reviewRepository.findFirstByStoreOrderByLikedDesc(user,result);
+                    Optional<Review> review = reviewRepository.findFirstByStoreOrderByLikedDesc(result);
                     String reviewImg = review.map(Review::getImg1).orElse("");
                     return GetStoreInfoResponse.builder()
                             .storeId(result.getStoreId())
