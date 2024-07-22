@@ -14,6 +14,7 @@ public enum Code {
     //User 관련 에러 +0
     USER_FOLLOW_SELF(HttpStatus.FORBIDDEN, 403001, "자신을 팔로우할 수 없습니다."),
     USER_NOT_FOUND_SELF(HttpStatus.FORBIDDEN, 403002, "자신의 닉네임을 사용해 접근할 수 없습니다."),
+    USER_PUBLISH_CATEGORY_PRIVATE(HttpStatus.FORBIDDEN, 403003, "마이페이지의 publishCategory가 PRIVATE 상태입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 404001, "존재하지 않는 유저입니다."),
     USER_FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, 404002, "팔로우한 유저가 아닙니다."),
     USER_FOLLOW_NO_MORE_CONTENT(HttpStatus.NOT_FOUND, 404003, "리스트가 더이상 존재하지 않습니다."),
@@ -47,6 +48,7 @@ public enum Code {
     ROUTE_MYROUTE_BAD_REQUEST(HttpStatus.BAD_REQUEST,403305,"내 루트는 최소 1개 이상의 경로를 포함해야 합니다."),
     ROUTELIST_TO_MANY_REQUEST(HttpStatus.TOO_MANY_REQUESTS,403306,"루트 내 상점 항목은 최대 6개까지 가능합니다."),
     NO_PUBLIC_ROUTE(HttpStatus.FORBIDDEN,403307,"해당 루트는 비공개 상태입니다."),
+    ROUTE_ORDINAL_EMPTY_BAD_REQUEST(HttpStatus.BAD_REQUEST,403307,"루트 내 이동 경로는 필수 입력사항입니다."),
 
     //Group 관련 에러 +4
     FIND_FAIL_GROUP(HttpStatus.NOT_FOUND, 404401, "존재하지 않는 그룹입니다."),
@@ -69,9 +71,15 @@ public enum Code {
 
     // token 관련 에러 +6
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, 401601, "유효하지 않은 토큰입니다."),
+    NO_MATCH_TOKENS(HttpStatus.UNAUTHORIZED, 401602, "X-AUTH-TOKEN 정보와 refresh-token 정보가 일치하지 않습니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, 401603, "refresh-token이 유효하지 않습니다."),
     EXPIRED_ACCESS_TOKEN(HttpStatus.FORBIDDEN, 403601, "X-AUTH-TOKEN이 만료되었습니다. 토큰 재발급을 실행해주세요."),
-    EXPIRED_REFRESH_TOKEN(HttpStatus.FORBIDDEN, 403602, "refresh-token이 만료되었습니다. 재로그인이 필요합니다"),
+    EXPIRED_REFRESH_TOKEN(HttpStatus.FORBIDDEN, 403602, "refresh-token이 만료되었습니다. 재로그인이 필요합니다."),
+
+    // AUTH 관련 에러 +7
+    UNMATCHED_AUTH_INFO(HttpStatus.FORBIDDEN, 403701, "AccessToken과 providerId가 일치하지 않습니다."),
+    OAUTH_FIND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 500701, "소셜 인증 서버에서 에러가 발생했습니다."),
+    OAUTH_NOT_FOUND_TOKEN(HttpStatus.NOT_FOUND, 404702, "유효한 소셜 서버 Access Token이 아닙니다."),
 
     FOR_TEST_ERROR(HttpStatus.BAD_REQUEST,49999, "테스트용 에러")
 

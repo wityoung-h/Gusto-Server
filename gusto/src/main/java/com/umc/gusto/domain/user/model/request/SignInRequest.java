@@ -8,4 +8,5 @@ import lombok.Setter;
 public class SignInRequest {
     String provider;
     String providerId;
+    String accessToken;
 }

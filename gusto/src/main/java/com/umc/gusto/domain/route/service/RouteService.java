@@ -8,6 +8,7 @@ import com.umc.gusto.domain.user.entity.User;
 public interface RouteService {
     // 루트 생성
     void createRoute(RouteRequest request,User user);
+    void createRouteGroup(Long groupId,RouteRequest request,User user);
 
     // 루트 삭제
     void deleteRoute(Long routeId,User user);
@@ -22,5 +23,8 @@ public interface RouteService {
     void modifyRouteList(Long routeId, ModifyRouteRequest request);
 
     // 타인의 루트 조회
-    RoutePagingResponse getRoute(String nickname, Long routeId);
+    RoutePagingResponse getOtherRoute(String nickname, Long routeId);
+
+    // 루트 공개/비공개 수정
+    void  modifyPublishingInfo(User user, Long routeId,boolean publishStatus);
 }

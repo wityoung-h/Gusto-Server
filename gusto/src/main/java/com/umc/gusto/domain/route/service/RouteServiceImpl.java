@@ -1,6 +1,7 @@
 package com.umc.gusto.domain.route.service;
 
 import com.umc.gusto.domain.group.entity.Group;
+import com.umc.gusto.domain.group.repository.GroupMemberRepository;
 import com.umc.gusto.domain.group.repository.GroupRepository;
 import com.umc.gusto.domain.route.entity.Route;
 import com.umc.gusto.domain.route.entity.RouteList;
@@ -41,6 +42,8 @@ public class RouteServiceImpl implements RouteService{
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
 
+    private final GroupMemberRepository groupMemberRepository;
+
     private static final int ROUTE_LIST_PAGE = 6;
 
     @Transactional
@@ -59,7 +62,7 @@ public class RouteServiceImpl implements RouteService{
         Route route = Route.builder()
                 .routeName(request.getRouteName())
                 .user(user)
-                .group(groupRepository.findGroupByGroupIdAndStatus(request.getGroupId(), BaseEntity.Status.ACTIVE).orElse(null))
+                .publishRoute(request.getPublishRoute())
                 .build();
         Route savedRoute = routeRepository.save(route);
 
@@ -75,9 +78,43 @@ public class RouteServiceImpl implements RouteService{
 
     @Transactional
     @Override
+    public void createRouteGroup(Long groupId, RouteRequest request,User user) {
+        // 그룹,그룹 멤버 존재 확인
+        Group group = groupMemberRepository.findByGroupIdAndUserId(groupId, user);
+        if(group == null){
+            throw new GeneralException(Code.FIND_FAIL_GROUP);
+        }
+
+        // 루트명은 그룹 루트명 중에서 중복 불가능
+        if (routeRepository.existsByGroupRouteName(request.getRouteName(),BaseEntity.Status.ACTIVE,group)) {
+            throw new GeneralException(Code.ROUTE_DUPLICATE_ROUTENAME);
+        }
+
+        // 그룹 루트는 루트명만 생성 가능
+        // 루트 생성
+        Route route = Route.builder()
+                .routeName(request.getRouteName())
+                .user(user)
+                .group(group)
+                .build();
+        Route savedRoute = routeRepository.save(route);
+
+
+        if(request.getRouteList() != null){
+            // 루트 리스트 갯수 6개 제한 확인
+            if(request.getRouteList().size()>=7){
+                throw new GeneralException(Code.ROUTELIST_TO_MANY_REQUEST);
+            }
+            // 루트리스트 생성 비지니스 로직 호출
+            routeListService.createRouteList(savedRoute, request.getRouteList());
+        }
+    }
+
+    @Transactional
+    @Override
     public void deleteRoute(Long routeId, User user) {
         // 그룹X, ACTIVE 한정
-        Route route = routeRepository.findRouteByRouteIdAndStatusAndGroup(routeId,BaseEntity.Status.ACTIVE)
+        Route route = routeRepository.findRouteByRouteIdAndStatus(routeId,BaseEntity.Status.ACTIVE)
                 .orElseThrow(() -> new GeneralException(Code.ROUTE_NOT_FOUND));
 
         // 루트를 생성한 유저만 삭제
@@ -99,14 +136,15 @@ public class RouteServiceImpl implements RouteService{
 
         Page<Route> routes;
         if(routeId == null) {
-            routes = routeRepository.findRouteByUserFirstId(user, BaseEntity.Status.ACTIVE, Pageable.ofSize(ROUTE_LIST_PAGE));
+            routes = routeRepository.findRouteByUserFirstId(user, Pageable.ofSize(ROUTE_LIST_PAGE));
         }else{
-            routes = routeRepository.findRouteByAfterIRouted(user,routeId, BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
+            routes = routeRepository.findRouteByAfterRouted(user,routeId,Pageable.ofSize(ROUTE_LIST_PAGE));
         }
         List<RouteResponse> list = routes.getContent().stream()
                 .map(route -> RouteResponse.builder()
                         .routeId(route.getRouteId())
                         .routeName(route.getRouteName())
+                        .publishRoute(route.getPublishRoute() == PublishStatus.PUBLIC)
                         .numStore(routeListRepository.countRouteListByRoute(route))
                         .build())
                 .collect(Collectors.toList());
@@ -125,10 +163,10 @@ public class RouteServiceImpl implements RouteService{
 
         Page<Route> routes;
         if(routeId == null) {
-            routes = routeRepository.findFirstRoutesByGroup(group, BaseEntity.Status.ACTIVE, Pageable.ofSize(ROUTE_LIST_PAGE));
+            routes = routeRepository.findFirstRoutesByGroup(group, Pageable.ofSize(ROUTE_LIST_PAGE));
         }else{
             //특정 그룹 내 루트 조회
-            routes = routeRepository.findRoutesByGroup(group, routeId, BaseEntity.Status.ACTIVE, Pageable.ofSize(ROUTE_LIST_PAGE));
+            routes = routeRepository.findRoutesByGroup(group, routeId, Pageable.ofSize(ROUTE_LIST_PAGE));
         }
         return getRoutePagingResponse(routes);
 
@@ -194,34 +232,41 @@ public class RouteServiceImpl implements RouteService{
     }
 
     @Override
-    public RoutePagingResponse getRoute(String nickname,Long routeId) {
+    public RoutePagingResponse getOtherRoute(String nickname,Long routeId) {
         User user = userRepository.findByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)
                 .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
 
         Page<Route> routes;
-        if(routeId == null) {
-            routes = routeRepository. findRouteByUserFirstId(user,BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
-        }else{
-            routes = routeRepository.findRouteByAfterIRouted(user,routeId, BaseEntity.Status.ACTIVE,Pageable.ofSize(ROUTE_LIST_PAGE));
+        if (routeId == null) {
+            routes = routeRepository.findRouteByOtherFirstId(user, Pageable.ofSize(ROUTE_LIST_PAGE));
+        } else {
+            routes = routeRepository.findRouteByOtherAfterRouted(user, routeId, Pageable.ofSize(ROUTE_LIST_PAGE));
         }
 
+
         List<RouteResponse> list = routes.stream()
-                .map(route -> {
-                    // 유저 활성화 설정 변경
-                    if (!route.getUser().getPublishRoute().equals(PublishStatus.PUBLIC)) {
-                        throw new GeneralException(Code.NO_PUBLIC_ROUTE);
-                    }
-                    return RouteResponse.builder()
+                .map(route -> RouteResponse.builder()
                             .routeId(route.getRouteId())
                             .routeName(route.getRouteName())
                             .numStore(routeListRepository.countRouteListByRoute(route))
-                            .build();
-                })
+                            .build())
                 .collect(Collectors.toList());
         return RoutePagingResponse.builder()
                 .hasNext(routes.hasNext())
                 .result(list)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void modifyPublishingInfo(User user, Long routeId, boolean publishStatus) {
+        Route route = routeRepository.findRouteByRouteIdAndStatus(routeId, BaseEntity.Status.ACTIVE)
+                .orElseThrow(() -> new GeneralException(Code.ROUTE_NOT_FOUND));
+        // 루트를 생성한 유저만 변경 가능
+        if(!route.getUser().getNickname().equals(user.getNickname())){
+            throw new GeneralException(Code.USER_NO_PERMISSION_FOR_ROUTE);
+        }
+        route.updatePublishRoute(publishStatus? PublishStatus.PUBLIC: PublishStatus.PRIVATE);
     }
 
 }
