@@ -20,4 +20,7 @@ public interface GroupListRepository extends JpaRepository<GroupList,Long> {
     Page<GroupList> findGroupListByGroupOrderByCreatedAtDesc(@Param("group") Group group, @Param("groupListId") Long groupListId , Pageable pageable);
     int countGroupListsByGroup(Group group);
     Boolean existsGroupListByGroupAndStore(Group group, Store store);
+
+    @Query("DELETE FROM GroupList gl WHERE gl.group.groupId = :groupId")
+    void deleteByGroupId(@Param("groupId") Long groupId);
 }

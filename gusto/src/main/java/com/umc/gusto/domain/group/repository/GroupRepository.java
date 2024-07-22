@@ -21,4 +21,7 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     @Query("SELECT g FROM Group g WHERE g.groupId IN :groupIds AND g.status = :status AND g.groupId < :lastGroupId ORDER BY g.groupId DESC")
     Page<Group> findGroupsByStatusAndGroupIdInLessThan(List<Long> groupIds, BaseEntity.Status status, Long lastGroupId, Pageable pageable);
 
+    @Query("SELECT g FROM Group g WHERE g.status = 'INACTIVE'")
+    List<Group> findAllInactiveGroups();
+
 }

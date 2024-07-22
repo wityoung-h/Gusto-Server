@@ -269,4 +269,18 @@ public class RouteServiceImpl implements RouteService{
         route.updatePublishRoute(publishStatus? PublishStatus.PUBLIC: PublishStatus.PRIVATE);
     }
 
+
+    @Transactional
+    public void hardDeleteAllSoftDeleted() {
+        List<Route> deletedRoutes = routeRepository.findAllInActive().stream()
+                .collect(Collectors.toList());
+
+        for (Route route : deletedRoutes) {
+            // Hard delete associated RouteList entities
+            routeListRepository.deleteByRouteId(route.getRouteId());
+        }
+
+        // Hard delete Route entities
+        routeRepository.deleteAll(deletedRoutes);
+    }
 }

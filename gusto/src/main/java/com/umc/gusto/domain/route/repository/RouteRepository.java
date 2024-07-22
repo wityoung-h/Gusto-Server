@@ -44,7 +44,7 @@ public interface RouteRepository extends JpaRepository<Route,Long> {
 
 
     // 그룹의 루트 개수 조회
-    int countRoutesByGroupAndStatus(Group group, BaseEntity.Status status);
+    List<Route> findRoutesByGroupAndStatus(Group group, BaseEntity.Status status);
 
     // 그룹의 루트 목록 조회
     @Query("select r from Route r where r.group =:group AND r.status ='ACTIVE' AND r.routeId <:routeId ORDER BY r.createdAt DESC ")
@@ -55,5 +55,7 @@ public interface RouteRepository extends JpaRepository<Route,Long> {
     Page<Route> findFirstRoutesByGroup(@Param("group") Group group, Pageable pageable);
 
     // 삭제요소 파악
-    List<Route> findRouteByStatusAndUpdatedAtBefore(BaseEntity.Status status, LocalDateTime dateTime);
+    @Query("SELECT r FROM Route r WHERE r.status = 'INACTIVE'")
+    List<Route> findAllInActive();
+
 }

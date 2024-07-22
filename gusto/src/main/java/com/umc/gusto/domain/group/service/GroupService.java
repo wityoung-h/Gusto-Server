@@ -50,7 +50,7 @@ public interface GroupService {
     // 초대 코드로 그룹 정보 조회
     GetPreJoinGroupInfoResponse getPreJoinGroupInfo(JoinGroupRequest joinGroupRequest);
 
-    //그룹 루트 삭제
-    void deleteRoute(Long routeId, User user, Long groupId);
+    //
+    void hardDeleteAllSoftDeleted();
 
 }
