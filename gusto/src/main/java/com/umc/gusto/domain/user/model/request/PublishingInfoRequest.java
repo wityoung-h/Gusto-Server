@@ -1,5 +1,8 @@
 package com.umc.gusto.domain.user.model.request;
 
+import lombok.Getter;
+
+@Getter
 public class PublishingInfoRequest {
     private boolean publishReview;
     private boolean publishPin;
