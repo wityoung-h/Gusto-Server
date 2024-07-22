@@ -4,12 +4,12 @@ import com.umc.gusto.domain.review.entity.Review;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import io.lettuce.core.dynamic.annotation.Param;
-import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -50,4 +50,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> searchByStoreAndHashTagContains(String keyword, Long hashTagId, PageRequest pageRequest);
     @Query("SELECT t.review FROM Tagging t WHERE t.review.status = 'ACTIVE' AND t.review.skipCheck=false AND t.hashTag.hasTagId = :hashTagId")
     List<Review> searchByHashTagContains(Long hashTagId, PageRequest pageRequest);
+
+    @Query("SELECT r FROM Review r WHERE r.status = 'INACTIVE'")
+    List<Review> findAllInActive();
 }

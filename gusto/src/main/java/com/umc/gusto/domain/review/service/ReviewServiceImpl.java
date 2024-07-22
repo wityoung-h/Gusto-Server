@@ -216,4 +216,21 @@ public class ReviewServiceImpl implements ReviewService{
         if(imageUrls.size()>3) review.updateImg4(imageUrls.get(3));
     }
 
+    @Transactional
+    public void hardDeleteAllSoftDeleted() {
+        // 비활성 상태의 리뷰를 찾기
+        List<Review> deletedReviews = reviewRepository.findAllInActive();
+
+        for (Review review : deletedReviews) {
+            // Review와 관련된 Tagging 삭제
+            // taggingRepository.deleteByReviewId(review.getReviewId());
+
+            // Review와 관련된 Liked 삭제
+            likedRepository.deleteByReviewId(review.getReviewId());
+        }
+
+        // 비활성 상태의 리뷰 삭제
+        reviewRepository.deleteAll(deletedReviews);
+    }
+
 }
