@@ -44,10 +44,6 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     public PagingResponse getAllMyCategory(User user, String nickname, String townName, Long myCategoryId) {
         Page<MyCategory> myCategoryList;
         if (nickname != null) {
-            if (nickname.equals(user.getNickname())) {
-                throw new GeneralException(Code.USER_NOT_FOUND_SELF);
-            }
-
             user = userRepository.findByNickname(nickname)      // 타 닉네임 조회
                     .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
             if (myCategoryId != null) {
