@@ -74,8 +74,8 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                             .myCategoryName(myCategory.getMyCategoryName())
                             .myCategoryScript(myCategory.getMyCategoryScript())
                             .myCategoryIcon(myCategory.getMyCategoryIcon())
-                            .publishCategory(myCategory.getPublishCategory())
-                            .userPublishCategory(finalUser.getPublishCategory())
+                            .publishCategory(myCategory.getPublishCategory() == PublishStatus.PUBLIC)           // PublishCategory가 PUBLIC이면 true 반환
+                            .userPublishCategory(finalUser.getPublishCategory() == PublishStatus.PUBLIC)
                             .pinCnt(pinList.size())
                             .build();
                 })
