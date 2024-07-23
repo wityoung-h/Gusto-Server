@@ -89,7 +89,13 @@ public class StoreServiceImpl implements StoreService{
         // 가게별 기본 카테고리 값
 //        Category category = storeRepository.findCategoryByStoreId(storeId)
 //                .orElseThrow(() -> new GeneralException(Code.CATEGORY_NOT_FOUND));
-        Long pinId = pinRepository.findByUserAndStoreStoreId(user, storeId);
+
+        Long pinId = null;
+        boolean isPinned = false;
+        if (user != null) {
+            pinId = pinRepository.findByUserAndStoreStoreId(user, storeId);
+            isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
+        }
 
         List<Review> top4Reviews = reviewRepository.findFirst4ByStoreOrderByLikedDesc(store);
 
@@ -126,8 +132,6 @@ public class StoreServiceImpl implements StoreService{
                         .build();
                 })
                 .toList();
-
-        boolean isPinned = pinRepository.existsByUserAndStoreStoreId(user, storeId);
 
         return GetStoreDetailResponse.builder()
                 .pinId(pinId)
