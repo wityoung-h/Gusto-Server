@@ -184,8 +184,6 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
         return PagingResponse.builder()
                 .hasNext(pinList.hasNext())
-                .userPublishCategory(user.getPublishCategory())
-                .publishCategory(myCategory.get().getPublishCategory())
                 .result(result)
                 .build();
     }
