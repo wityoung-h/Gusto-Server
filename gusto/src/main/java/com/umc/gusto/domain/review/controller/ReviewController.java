@@ -67,14 +67,8 @@ public class ReviewController {
      * 리뷰 모아보기 - 인스타 뷰
      */
     @GetMapping("/instaView")
-    public ResponseEntity<?> getReviewOfInstaView(@AuthenticationPrincipal AuthUser authUser, @RequestParam(name = "mineCheck") boolean mineCheck,@RequestParam(name = "reviewId", required = false) Long reviewId, @RequestParam(name = "size") int size){
+    public ResponseEntity<?> getReviewOfInstaView(@AuthenticationPrincipal AuthUser authUser, @RequestParam(name = "reviewId", required = false) Long reviewId, @RequestParam(name = "size") int size){
         User user = authUser.getUser();
-
-        //내 인스타 뷰라면
-        if(mineCheck){
-            return ResponseEntity.ok().body(collectReviewService.getMyReviewOfInstaView(user, reviewId, size));
-        }
-
         return ResponseEntity.ok().body(collectReviewService.getReviewOfInstaView(user, reviewId, size));
     }
 
