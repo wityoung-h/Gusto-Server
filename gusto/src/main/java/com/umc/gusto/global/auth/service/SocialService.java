@@ -17,7 +17,6 @@ import java.util.Map;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Slf4j
 public class SocialService {
     private final RestClient restClient = RestClient.create();
     private static final String AUTH_TYPE = "Bearer ";
