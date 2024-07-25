@@ -21,18 +21,8 @@ public class CreateReviewRequest {
     @DecimalMin(value = "0", message = "점수가 0보다 작을 수 없습니다.")
     @DecimalMax(value = "5", message = "점수가 5보다 클 수 없습니다.")
     Integer taste;
-    @DecimalMin(value = "0", message = "점수가 0보다 작을 수 없습니다.")
-    @DecimalMax(value = "5", message = "점수가 5보다 클 수 없습니다.")
-    Integer spiciness;
-    @DecimalMin(value = "0", message = "점수가 0보다 작을 수 없습니다.")
-    @DecimalMax(value = "5", message = "점수가 5보다 클 수 없습니다.")
-    Integer mood;
-    @DecimalMin(value = "0", message = "점수가 0보다 작을 수 없습니다.")
-    @DecimalMax(value = "5", message = "점수가 5보다 클 수 없습니다.")
-    Integer toilet;
-    @DecimalMin(value = "0", message = "점수가 0보다 작을 수 없습니다.")
-    @DecimalMax(value = "5", message = "점수가 5보다 클 수 없습니다.")
-    Integer parking;
     @Size(max=200, message = "내용은 200자를 초과할 수 없습니다.")
     String comment;
+    @NotNull(message = "전체공개, 나만보기 둘 중 하나는 선택해야 합니다.")
+    boolean publicCheck;
 }

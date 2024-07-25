@@ -65,11 +65,8 @@ public class ReviewServiceImpl implements ReviewService{
                 .visitedAt(visitedAt)
                 .menuName(createReviewRequest.getMenuName())
                 .taste(createReviewRequest.getTaste())
-                .spiciness(createReviewRequest.getSpiciness())
-                .mood(createReviewRequest.getMood())
-                .toilet(createReviewRequest.getToilet())
-                .parking(createReviewRequest.getParking())
                 .comment(createReviewRequest.getComment())
+                .publishReview(PublishStatus.of(createReviewRequest.isPublicCheck()))
                 .build();
 
         //TODO: review 엔티티에서 이미지를 분리하거나 monogoDB를 쓰는게 나을 듯, 나머지 기능 개발 후 바꿀 예정
@@ -117,24 +114,16 @@ public class ReviewServiceImpl implements ReviewService{
         if(updateReviewRequest.getTaste()!=null){
             review.updateTaste(updateReviewRequest.getTaste());
         }
-        if(updateReviewRequest.getSpiciness()!=null){
-            review.updateSpiciness(updateReviewRequest.getSpiciness());
-        }
-        if(updateReviewRequest.getMood()!=null){
-            review.updateMood(updateReviewRequest.getMood());
-        }
-        if(updateReviewRequest.getToilet()!=null){
-            review.updateToilet(updateReviewRequest.getToilet());
-        }
-        if(updateReviewRequest.getParking()!=null){
-            review.updateParking(updateReviewRequest.getParking());
-        }
         if(updateReviewRequest.getComment()!=null){
             review.updateComment(updateReviewRequest.getComment());
         }
         if(images!=null){
             //TODO: review 엔티티에서 이미지를 분리하거나 monogoDB를 쓰는게 나을 듯, 나머지 기능 개발 후 바꿀 예정
             updateImages(images, review);
+        }
+
+        if(updateReviewRequest.getPublicCheck() != null){
+            review.updatePublishReview(updateReviewRequest.getPublicCheck());
         }
 
         reviewRepository.save(review);
@@ -153,6 +142,7 @@ public class ReviewServiceImpl implements ReviewService{
     public ReviewDetailResponse getReview(Long reviewId) {
         Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
         //TODO: 후에 각 리뷰마다의 공개, 비공개를 확인해서 주는거로 수정하기
+        //TODO: 해당 함수는 사용자의 공개를 체크하면 안 될 것 같은데?? 리뷰 하나를 조회하는 것으로 분명 앞에서 리뷰가 보였으니까 해당 함수를 사용할 것임
         if(!review.getUser().getPublishReview().equals(PublishStatus.PUBLIC)){
             throw new PrivateItemException(Code.NO_PUBLIC_REVIEW);
         }

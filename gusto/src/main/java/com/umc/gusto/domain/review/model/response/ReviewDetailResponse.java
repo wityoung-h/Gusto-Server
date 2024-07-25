@@ -21,16 +21,9 @@ public class ReviewDetailResponse {
     List<Long> hashTags;
     Integer taste;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    Integer spiciness;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    Integer mood;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    Integer toilet;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    Integer parking;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     String comment;
     Integer likeCnt;
+    boolean publicCheck;
 
     public static ReviewDetailResponse of(Review review, List<Long> hashTags){
         return ReviewDetailResponse.builder()
@@ -41,12 +34,9 @@ public class ReviewDetailResponse {
                 .menuName(review.getMenuName())
                 .hashTags(hashTags)
                 .taste(review.getTaste())
-                .spiciness(review.getSpiciness())
-                .mood(review.getMood())
-                .toilet(review.getToilet())
-                .parking(review.getParking())
                 .comment(review.getComment())
                 .likeCnt(review.getLiked())
+                .publicCheck(review.getPublishReview().isCheck())
                 .build();
     }
 }

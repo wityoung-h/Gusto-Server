@@ -99,22 +99,6 @@ public class Review extends BaseEntity {
         this.taste = taste;
     }
 
-    public void updateSpiciness(Integer spiciness) {
-        this.spiciness = spiciness;
-    }
-
-    public void updateMood(Integer mood){
-        this.mood = mood;
-    }
-
-    public void updateToilet(Integer toilet){
-        this.toilet = toilet;
-    }
-
-    public void updateParking(Integer parking){
-        this.parking = parking;
-    }
-
     public void updateComment(String comment){
         this.comment = comment;
     }
@@ -143,5 +127,9 @@ public class Review extends BaseEntity {
     public void updateLiked(String type){
         if(type.equals("like")) this.liked += 1;
         else if(type.equals("unlike")) this.liked -= 1;
+    }
+
+    public void updatePublishReview(boolean check){
+        this.publishReview = PublishStatus.of(check);
     }
 }
