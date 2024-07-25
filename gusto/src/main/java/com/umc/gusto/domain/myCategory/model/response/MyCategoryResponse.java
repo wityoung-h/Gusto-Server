@@ -1,6 +1,6 @@
 package com.umc.gusto.domain.myCategory.model.response;
 
-import com.umc.gusto.global.common.PublishStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 @Builder
@@ -12,8 +12,9 @@ public class MyCategoryResponse{
     String myCategoryName;
     String myCategoryScript;
     Integer myCategoryIcon;
-    PublishStatus publishCategory;
-    PublishStatus userPublishCategory;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    Boolean publishCategory;
+    Boolean userPublishCategory;
     Integer pinCnt;
 }
 

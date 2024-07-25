@@ -163,6 +163,7 @@ public class RouteListServiceImpl implements RouteListService{
         return RouteRouteListResponse.builder()
                 .routeId(route.getRouteId())
                 .routeName(route.getRouteName())
+                .publishRoute(route.getPublishRoute() == PublishStatus.PUBLIC ? true : false)
                 .routes(routeLists)
                 .build();
 
