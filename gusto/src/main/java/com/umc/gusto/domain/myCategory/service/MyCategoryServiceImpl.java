@@ -44,10 +44,6 @@ public class MyCategoryServiceImpl implements MyCategoryService {
     public PagingResponse getAllMyCategory(User user, String nickname, String townName, Long myCategoryId) {
         Page<MyCategory> myCategoryList;
         if (nickname != null) {
-            if (nickname.equals(user.getNickname())) {
-                throw new GeneralException(Code.USER_NOT_FOUND_SELF);
-            }
-
             user = userRepository.findByNickname(nickname)      // 타 닉네임 조회
                     .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
             if (myCategoryId != null) {
@@ -78,8 +74,8 @@ public class MyCategoryServiceImpl implements MyCategoryService {
                             .myCategoryName(myCategory.getMyCategoryName())
                             .myCategoryScript(myCategory.getMyCategoryScript())
                             .myCategoryIcon(myCategory.getMyCategoryIcon())
-                            .publishCategory(myCategory.getPublishCategory())
-                            .userPublishCategory(finalUser.getPublishCategory())
+                            .publishCategory(myCategory.getPublishCategory() == PublishStatus.PUBLIC)           // PublishCategory가 PUBLIC이면 true 반환
+                            .userPublishCategory(finalUser.getPublishCategory() == PublishStatus.PUBLIC)
                             .pinCnt(pinList.size())
                             .build();
                 })
@@ -165,7 +161,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
         List<PinByMyCategoryResponse> result = pinList.stream()                                     // townName을 기준으로 보일 수 있는 store가 포함된 pin만 보이기
                 .map(pin -> {
                     Store store = pin.getStore();
-                    List<Review> topReviews = reviewRepository.findFirst4ByStoreOrderByLikedDesc(store, finalUser);               // 가장 좋아요가 많은 review                     // 가장 좋아요가 많은 review 이미지(TO DO: 3개 출력으로 변경)
+                    List<Review> topReviews = reviewRepository.findFirst4ByStoreOrderByLikedDesc(store);               // 가장 좋아요가 많은 review                     // 가장 좋아요가 많은 review 이미지(TO DO: 3개 출력으로 변경)
                     Integer reviewCnt = reviewRepository.countByStoreAndUserNickname(store, finalUser.getNickname());             // 내가 작성한 리뷰의 개수 == 방문 횟수
 
                     String img1 = !topReviews.isEmpty() ? topReviews.get(0).getImg1() : "";
@@ -188,8 +184,6 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
         return PagingResponse.builder()
                 .hasNext(pinList.hasNext())
-                .userPublishCategory(user.getPublishCategory())
-                .publishCategory(myCategory.get().getPublishCategory())
                 .result(result)
                 .build();
     }

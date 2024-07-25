@@ -29,7 +29,7 @@ public class StoreController {
     public ResponseEntity<List<GetStoreResponse>> getStores(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "storeId") List<Long> storeIds) {
-        User user = authUser.getUser();
+        User user = authUser != null ? authUser.getUser() : null;
         List<GetStoreResponse> getStores = storeService.getStores(user, storeIds);
         return ResponseEntity.status(HttpStatus.OK).body(getStores);
     }
@@ -44,7 +44,7 @@ public class StoreController {
             @PathVariable Long storeId,
             @RequestParam(name = "visitedAt", required = false) LocalDate visitedAt,
             @RequestParam(name = "reviewId", required = false) Long reviewId){
-        User user = authUser.getUser();
+        User user = authUser != null ? authUser.getUser() : null;
         // 상점 세부 정보 가져오기
         GetStoreDetailResponse getStoreDetail = storeService.getStoreDetail(user, storeId, visitedAt, reviewId);
         return ResponseEntity.status(HttpStatus.OK).body(getStoreDetail);
@@ -117,7 +117,7 @@ public class StoreController {
      * 맛집 검색 엔진
      */
     @GetMapping("/search")
-    public ResponseEntity<List<GetStoreInfoResponse>> searchStore(@AuthenticationPrincipal AuthUser authUser,@RequestParam(name = "keyword") String keyword){
-        return ResponseEntity.status(HttpStatus.OK).body(storeService.searchStore(authUser.getUser(),keyword));
+    public ResponseEntity<List<GetStoreInfoResponse>> searchStore(@RequestParam(name = "keyword") String keyword){
+        return ResponseEntity.status(HttpStatus.OK).body(storeService.searchStore(keyword));
     }
 }

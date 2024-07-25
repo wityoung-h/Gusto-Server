@@ -17,16 +17,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    @Query("SELECT r FROM Review r WHERE r.user.memberStatus = 'ACTIVE' AND r.status = 'ACTIVE' AND (r.user.publishReview = 'PUBLIC' AND r.publishReview = 'PUBLIC' OR r.user = :user) AND r.store = :store ORDER BY r.liked DESC LIMIT 1")
-    Optional<Review> findFirstByStoreOrderByLikedDesc(@Param("user") User user, @Param("store") Store store);
-    @Query("SELECT r FROM Review r WHERE r.user.memberStatus = 'ACTIVE' AND  r.status = 'ACTIVE' AND (r.user.publishReview = 'PUBLIC' AND r.publishReview = 'PUBLIC' OR r.user = :user) AND r.store = :store ORDER BY r.liked DESC, r.reviewId DESC LIMIT 3") //
-    List<Review> findFirst3ByStoreOrderByLikedDesc(@Param("user") User user, @Param("store") Store store);
-    @Query("SELECT r FROM Review r WHERE r.user.memberStatus = 'ACTIVE' AND r.status = 'ACTIVE' AND (r.user.publishReview = 'PUBLIC' AND r.publishReview = 'PUBLIC' OR r.user = :user) AND r.store = :store ORDER BY r.liked DESC, r.reviewId DESC LIMIT 4") //
-    List<Review> findFirst4ByStoreOrderByLikedDesc(@Param("store") Store store , @Param("user")  User user);
-    @Query("SELECT r FROM Review r WHERE r.user.memberStatus = 'ACTIVE' AND  r.status = 'ACTIVE' AND (r.user.publishReview = 'PUBLIC' AND r.publishReview = 'PUBLIC' OR r.user = :user) AND r.store = :store ORDER BY r.visitedAt DESC, r.reviewId DESC")
-    Page<Review> findFirstReviewsByStore(@Param("user") User user, @Param("store") Store store, Pageable pageable);
-    @Query("SELECT r FROM Review r WHERE r.user.memberStatus = 'ACTIVE' AND r.status = 'ACTIVE' AND (r.user.publishReview = 'PUBLIC' AND r.publishReview = 'PUBLIC' OR r.user = :user) AND r.store = :store AND r.visitedAt <= :visitedAt AND r.reviewId < :reviewId ORDER BY r.visitedAt DESC, r.reviewId DESC")
-    Page<Review> findReviewsAfterIdByStore(@Param("user") User user, @Param("store") Store store, @Param("visitedAt") LocalDate visitedAt, @Param("reviewId") Long reviewId, Pageable pageable);
+    @Query("SELECT r FROM Review r WHERE r.user.memberStatus = 'ACTIVE' AND r.status = 'ACTIVE' AND r.user.publishReview = 'PUBLIC' AND r.publishReview = 'PUBLIC' AND r.store = :store ORDER BY r.liked DESC LIMIT 1")
+    Optional<Review> findFirstByStoreOrderByLikedDesc(@Param("store") Store store);
+    @Query("SELECT r FROM Review r WHERE r.user.memberStatus = 'ACTIVE' AND  r.status = 'ACTIVE' AND r.user.publishReview = 'PUBLIC' AND r.publishReview = 'PUBLIC' AND r.store = :store ORDER BY r.liked DESC, r.reviewId DESC LIMIT 3") //
+    List<Review> findFirst3ByStoreOrderByLikedDesc(@Param("store") Store store);
+    @Query("SELECT r FROM Review r WHERE r.user.memberStatus = 'ACTIVE' AND r.status = 'ACTIVE' AND r.user.publishReview = 'PUBLIC' AND r.publishReview = 'PUBLIC' AND r.store = :store ORDER BY r.liked DESC, r.reviewId DESC LIMIT 4") //
+    List<Review> findFirst4ByStoreOrderByLikedDesc(@Param("store") Store store);
+    @Query("SELECT r FROM Review r WHERE r.user.memberStatus = 'ACTIVE' AND  r.status = 'ACTIVE' AND r.user.publishReview = 'PUBLIC' AND r.publishReview = 'PUBLIC' AND r.store = :store ORDER BY r.visitedAt DESC, r.reviewId DESC")
+    Page<Review> findFirstReviewsByStore(@Param("store") Store store, Pageable pageable);
+    @Query("SELECT r FROM Review r WHERE r.user.memberStatus = 'ACTIVE' AND r.status = 'ACTIVE' AND r.user.publishReview = 'PUBLIC' AND r.publishReview = 'PUBLIC'AND r.store = :store AND r.visitedAt <= :visitedAt AND r.reviewId < :reviewId ORDER BY r.visitedAt DESC, r.reviewId DESC")
+    Page<Review> findReviewsAfterIdByStore(@Param("store") Store store, @Param("visitedAt") LocalDate visitedAt, @Param("reviewId") Long reviewId, Pageable pageable);
     boolean existsByReviewIdAndUser(Long reviewId, User user);
     @Query("SELECT count(r.reviewId) FROM Review r WHERE r.user.memberStatus = 'ACTIVE' AND r.status = 'ACTIVE' AND r.store = :store AND r.user.nickname = :nickname")
     Integer countByStoreAndUserNickname(Store store, String nickname);      // 방문횟수는 리뷰 공개여부과 상관 X

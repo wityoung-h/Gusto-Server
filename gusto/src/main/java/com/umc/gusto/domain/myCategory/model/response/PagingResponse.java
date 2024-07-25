@@ -12,7 +12,5 @@ import java.util.List;
 @Builder
 public class PagingResponse {
     private boolean hasNext;
-    private PublishStatus userPublishCategory;
-    private PublishStatus publishCategory;
     private List<?> result;
 }
