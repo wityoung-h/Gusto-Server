@@ -142,7 +142,7 @@ public class RouteServiceImpl implements RouteService{
                 .map(route -> RouteResponse.builder()
                         .routeId(route.getRouteId())
                         .routeName(route.getRouteName())
-                        .publishRoute(route.getPublishRoute() == PublishStatus.PUBLIC)
+                        .publishRoute(route.getPublishRoute() == PublishStatus.PUBLIC ? true : false)
                         .numStore(routeListRepository.countRouteListByRoute(route))
                         .build())
                 .collect(Collectors.toList());
