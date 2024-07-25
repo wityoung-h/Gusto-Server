@@ -17,6 +17,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -270,5 +272,63 @@ public class UserController {
 
         return ResponseEntity.ok()
                 .body(pagingResponse);
+    }
+
+    /**
+     * 소셜 연동 해제
+     * [DELETE] /users/auth/social-account
+     * @param -
+     * @return -
+     */
+    @DeleteMapping("/auth/social-account")
+    public ResponseEntity disconnectSocialAccount(@AuthenticationPrincipal AuthUser authUser,
+                                                  @RequestBody SignInRequest signInRequest) {
+
+        userService.disconnectSocialAccount(authUser.getUser(), signInRequest);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .build();
+    }
+
+    /**
+     * 소셜 연동 추가
+     * [POST] /users/auth/social-account
+     * @param -
+     * @return -
+     */
+    @PostMapping("/auth/social-account")
+    public ResponseEntity connectSocialAccount(@AuthenticationPrincipal AuthUser authUser,
+                                                  @RequestBody SignInRequest signInRequest) {
+        userService.connectSocialAccount(authUser.getUser(), signInRequest);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .build();
+    }
+
+    /**
+     * 연결된 소셜 계정 목록
+     * [POST] /users/social-accounts
+     * @param -
+     * @return -
+     */
+    @GetMapping("/social-accounts")
+    public ResponseEntity<Map> socialAccountList(@AuthenticationPrincipal AuthUser authUser) {
+        Map<String, Boolean> accountList = userService.getAccountList(authUser.getUser());
+
+        return ResponseEntity.ok()
+                .body(accountList);
+    }
+
+    /**
+     * 회원 탈퇴
+     * [DELETE] /users/my
+     * @param -
+     * @return -
+     */
+    @DeleteMapping("/my")
+    public ResponseEntity disconnectSocialAccount(@AuthenticationPrincipal AuthUser authUser) {
+        userService.withdrawalUser(authUser.getUser());
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .build();
     }
 }
