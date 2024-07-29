@@ -42,9 +42,6 @@ public class Route extends BaseEntity {
     @Column(name = "publishRoute", nullable = false, length = 10)
     private PublishStatus publishRoute = PublishStatus.PUBLIC;
 
-    @OneToMany(mappedBy = "route", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<RouteList> routeLists = new ArrayList<>();
-
 
     public void updateStatus(BaseEntity.Status status) {this.status = status;}
     public void updateRouteName(String routeName){this.routeName = routeName;}
