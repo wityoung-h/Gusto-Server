@@ -115,7 +115,7 @@ public class UserServiceImpl implements UserService{
         });
 
         // DB 내 검색
-        if(userRepository.countUsersByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE) > 0) {
+        if(userRepository.existsByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)) {
             throw new GeneralException(Code.USER_DUPLICATE_NICKNAME);
         }
     }
