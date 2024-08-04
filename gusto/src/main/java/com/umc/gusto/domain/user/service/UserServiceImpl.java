@@ -1,7 +1,5 @@
 package com.umc.gusto.domain.user.service;
 
-import com.umc.gusto.domain.myCategory.repository.MyCategoryRepository;
-import com.umc.gusto.domain.myCategory.service.MyCategoryService;
 import com.umc.gusto.domain.user.entity.Follow;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
@@ -117,7 +115,7 @@ public class UserServiceImpl implements UserService{
         });
 
         // DB 내 검색
-        if(userRepository.countUsersByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE) > 0) {
+        if(userRepository.existsByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)) {
             throw new GeneralException(Code.USER_DUPLICATE_NICKNAME);
         }
     }
@@ -155,6 +153,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public Tokens signIn(SignInRequest signInRequest) {
         socialService.checkUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
 
@@ -179,6 +178,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public FeedProfileResponse getProfile(User user, String nickname) {
         User target;
 
@@ -248,6 +248,10 @@ public class UserServiceImpl implements UserService{
             if(request.getNickname() != null) {
                 updateNickname(user, request.getNickname());
             }
+
+            if(Optional.ofNullable(request.getUseDefaultImg()).orElse(false)) {
+                user.updateProfile(DEFAULT_PROFILE_IMG);
+            }
         }
 
         userRepository.save(user);
@@ -263,9 +267,10 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void updatePublishingInfo(User user, PublishingInfoRequest request) {
         PublishStatus reviewStatus = (request.getPublishReview()) ?PublishStatus.PUBLIC : PublishStatus.PRIVATE;
-        PublishStatus categoryStatus = (request.getPublishCategory()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
+        PublishStatus categoryStatus = (request.getPublishPin()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
         PublishStatus routeStatus = (request.getPublishRoute()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
 
         user.updatePublishReview(reviewStatus);
@@ -325,7 +330,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public PagingResponse getFollowList(User user, Long followId) {
         Page<Follow> followList;
 
@@ -360,7 +365,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public PagingResponse getFollwerList(User user, Long followId) {
         Page<Follow> followList;
 
