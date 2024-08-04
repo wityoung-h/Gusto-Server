@@ -155,6 +155,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public Tokens signIn(SignInRequest signInRequest) {
         socialService.checkUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
 
@@ -179,6 +180,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public FeedProfileResponse getProfile(User user, String nickname) {
         User target;
 
@@ -263,6 +265,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void updatePublishingInfo(User user, PublishingInfoRequest request) {
         PublishStatus reviewStatus = (request.getPublishReview()) ?PublishStatus.PUBLIC : PublishStatus.PRIVATE;
         PublishStatus categoryStatus = (request.getPublishCategory()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
@@ -325,7 +328,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public PagingResponse getFollowList(User user, Long followId) {
         Page<Follow> followList;
 
@@ -360,7 +363,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public PagingResponse getFollwerList(User user, Long followId) {
         Page<Follow> followList;
 
