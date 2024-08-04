@@ -11,4 +11,5 @@ public class UpdateProfileRequest {
     String nickname;
     String age;
     String gender;
+    Boolean useDefaultImg;
 }

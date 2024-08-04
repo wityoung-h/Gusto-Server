@@ -248,6 +248,10 @@ public class UserServiceImpl implements UserService{
             if(request.getNickname() != null) {
                 updateNickname(user, request.getNickname());
             }
+
+            if(Optional.ofNullable(request.getUseDefaultImg()).orElse(false)) {
+                user.updateProfile(DEFAULT_PROFILE_IMG);
+            }
         }
 
         userRepository.save(user);
