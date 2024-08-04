@@ -13,5 +13,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByNicknameAndMemberStatusIs(String nickname, User.MemberStatus status);
 
-    Long countUsersByNicknameAndMemberStatusIs(String nickname, User.MemberStatus status);
+    Boolean existsByNicknameAndMemberStatusIs(String nickname, User.MemberStatus status);
 }

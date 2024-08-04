@@ -5,15 +5,15 @@ import lombok.Getter;
 @Getter
 public class PublishingInfoRequest {
     private boolean publishReview;
-    private boolean publishCategory;
+    private boolean publishPin;
     private boolean publishRoute;
 
     public boolean getPublishReview() {
         return this.publishReview;
     }
 
-    public boolean getPublishCategory() {
-        return this.publishCategory;
+    public boolean getPublishPin() {
+        return this.publishPin;
     }
 
     public boolean getPublishRoute() { return this.publishRoute; }
