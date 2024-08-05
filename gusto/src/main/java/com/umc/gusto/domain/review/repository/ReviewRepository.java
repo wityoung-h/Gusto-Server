@@ -51,6 +51,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT t.review FROM Tagging t WHERE t.review.status = 'ACTIVE' AND t.review.skipCheck=false AND t.hashTag.hasTagId = :hashTagId")
     List<Review> searchByHashTagContains(Long hashTagId, PageRequest pageRequest);
 
+    // 삭제
     @Query("SELECT r FROM Review r WHERE r.status = 'INACTIVE'")
     List<Review> findAllInActive();
 }

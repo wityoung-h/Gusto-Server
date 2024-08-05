@@ -405,19 +405,8 @@ public class GroupServiceImpl implements GroupService{
 
     @Transactional
     public void hardDeleteAllSoftDeleted() {
-        List<Group> deletedGroups = groupRepository.findAllInactiveGroups();
+        groupRepository.deleteAllInActive();
 
-        for (Group group : deletedGroups) {
-            // Hard delete  GroupList
-            groupListRepository.deleteByGroupId(group.getGroupId());
-            // Hard delete GroupMember
-            groupMemberRepository.deleteByGroupId(group.getGroupId());
-            // Hard delete InvitationCode
-            invitationCodeRepository.deleteByGroupId(group.getGroupId());
-        }
-
-        // Hard delete Group
-        groupRepository.deleteAll(deletedGroups);
     }
 
 }

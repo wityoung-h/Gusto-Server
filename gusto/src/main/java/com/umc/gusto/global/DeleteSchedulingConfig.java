@@ -26,6 +26,7 @@ public class DeleteSchedulingConfig {
     // 일정 시간마다 실행
     @Transactional
     @Async
+    //@Scheduled(fixedRate = 60000)
     @Scheduled(cron = "0 0 0 1 * ?") // 한 달 주기
     public void autoDelete() {
         routeService.hardDeleteAllSoftDeleted();

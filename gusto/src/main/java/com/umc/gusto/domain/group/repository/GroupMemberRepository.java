@@ -6,7 +6,6 @@ import com.umc.gusto.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -36,10 +35,5 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
     @Query("SELECT gm.group.groupId FROM GroupMember gm WHERE gm.user = :user")
     List<Long> findGroupIdsByUser(User user);
     int countGroupMembersByGroup(Group group);
-
-    @Modifying //DELETE 쿼리임을 명시
-    @Query("DELETE FROM GroupMember gm WHERE gm.group.groupId = :groupId")
-    void deleteByGroupId(@Param("groupId") Long groupId);
-
 
 }

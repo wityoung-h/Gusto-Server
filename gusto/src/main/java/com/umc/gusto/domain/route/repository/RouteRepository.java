@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,7 +55,7 @@ public interface RouteRepository extends JpaRepository<Route,Long> {
     @Query("select r from Route r where r.group =:group AND r.status = 'ACTIVE' ORDER BY r.createdAt DESC ")
     Page<Route> findFirstRoutesByGroup(@Param("group") Group group, Pageable pageable);
 
-    // 삭제요소 파악
+    // 삭제
     @Modifying
     @Transactional
     @Query("DELETE FROM Route r WHERE r.status = 'INACTIVE'")
