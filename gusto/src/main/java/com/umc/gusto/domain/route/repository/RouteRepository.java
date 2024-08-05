@@ -55,9 +55,9 @@ public interface RouteRepository extends JpaRepository<Route,Long> {
     @Query("select r from Route r where r.group =:group AND r.status = 'ACTIVE' ORDER BY r.createdAt DESC ")
     Page<Route> findFirstRoutesByGroup(@Param("group") Group group, Pageable pageable);
 
-    // 삭제
-    @Modifying
+    // Hard delete
     @Transactional
+    @Modifying(clearAutomatically = true)
     @Query("DELETE FROM Route r WHERE r.status = 'INACTIVE'")
     int deleteAllInActive();
 

@@ -218,10 +218,7 @@ public class ReviewServiceImpl implements ReviewService{
 
     @Transactional
     public void hardDeleteAllSoftDeleted() {
-        // 비활성 상태의 리뷰를 찾기
-        List<Review> deletedReviews = reviewRepository.findAllInActive();
-        // 비활성 상태의 리뷰 삭제
-        reviewRepository.deleteAllInBatch(deletedReviews);
+        reviewRepository.deleteAllInActive();
     }
 
 }

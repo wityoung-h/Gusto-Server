@@ -24,9 +24,9 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     Page<Group> findGroupsByStatusAndGroupIdInLessThan(List<Long> groupIds, BaseEntity.Status status, Long lastGroupId, Pageable pageable);
 
 
-    // 삭제
-    @Modifying
+    // Hard delete
     @Transactional
+    @Modifying(clearAutomatically = true)
     @Query("DELETE FROM Group g WHERE g.status = 'INACTIVE'")
     int deleteAllInActive();
 

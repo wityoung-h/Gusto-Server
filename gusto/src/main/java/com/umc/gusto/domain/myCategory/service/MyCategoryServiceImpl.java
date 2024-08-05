@@ -267,9 +267,7 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
     @Transactional
     public void hardDeleteAllSoftDeleted() {
-        List<MyCategory> deletedMyCategories = myCategoryRepository.findAllInActive();
-        // Hard delete myCategory
-        myCategoryRepository.deleteAll(deletedMyCategories);
+        myCategoryRepository.deleteAllInActive();
     }
 
 }
