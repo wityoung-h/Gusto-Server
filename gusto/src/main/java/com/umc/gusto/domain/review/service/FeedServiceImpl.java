@@ -11,6 +11,7 @@ import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.customException.NotFoundException;
 import com.umc.gusto.global.exception.customException.PrivateItemException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -31,26 +32,40 @@ public class FeedServiceImpl implements FeedService{
     }
 
     @Override
-    public SearchFeedResponse searchFeed(String keyword, List<Long> hashTags) {
-        List<Review> searchResult = new ArrayList<>();
+    public SearchFeedResponse searchFeed(String keyword, List<Long> hashTags, Long cursor) { //TODO: 검색 결과가 랜덤으로 다시 정렬되야 할듯 & 자기 리뷰가 아니여야함
+        Page<Review> searchResult = null;
         PageRequest pageRequest = PageRequest.of(0,33);
+
+        if(cursor == null){
+            cursor = Long.MAX_VALUE;
+        }
+
         //맛집과 해시태그를 함께 검색하는 경우
         if(keyword!=null && hashTags!=null){
             for(Long hashTagId: hashTags){
-                searchResult.addAll(reviewRepository.searchByStoreAndHashTagContains(keyword, hashTagId, pageRequest));
+//                searchResult.addAll(reviewRepository.searchByStoreAndHashTagContains(keyword, hashTagId, pageRequest));
+                searchResult = reviewRepository.searchByStoreAndHashTagContains(keyword, hashTagId, cursor, pageRequest);
             }
         } else if(keyword!=null){ //맛집을 검색하는 경우
-            searchResult = reviewRepository.searchByStoreContains(keyword, pageRequest);
+            searchResult = reviewRepository.searchByStoreContains(keyword, cursor, pageRequest);
         } else if(hashTags!=null){
             for(Long hashTagId: hashTags){
-                searchResult.addAll(reviewRepository.searchByHashTagContains(hashTagId, pageRequest));
+                searchResult = reviewRepository.searchByHashTagContains(hashTagId, cursor, pageRequest);
             }
         }
 
+        if(searchResult == null){
+            return SearchFeedResponse.builder().build();
+        }
+
+        boolean checkNext = searchResult.hasNext();
         List<BasicViewResponse> basicViewResponse = searchResult.stream().map(BasicViewResponse::of).toList();
-        return SearchFeedResponse.of(basicViewResponse);
+        Long cursorId = basicViewResponse.isEmpty() ? null : basicViewResponse.get(basicViewResponse.size()-1).getReviewId();
+
+        return SearchFeedResponse.of(basicViewResponse, checkNext, cursorId);
     }
 
+    //TODO: 해당 함수도 이미 피드에서 보인 리뷰임. 그래서 디테일이 안보이면 안됨 사용자 공개 체크를 할 필요가 없음
     @Override
     public FeedDetailResponse getFeedDetail(User user, Long reviewId) {
         //TOOD: reviewServiceImpl와 중복되는 코드 분리하기

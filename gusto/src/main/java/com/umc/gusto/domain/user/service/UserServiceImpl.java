@@ -1,7 +1,5 @@
 package com.umc.gusto.domain.user.service;
 
-import com.umc.gusto.domain.myCategory.repository.MyCategoryRepository;
-import com.umc.gusto.domain.myCategory.service.MyCategoryService;
 import com.umc.gusto.domain.user.entity.Follow;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.domain.user.entity.User;
@@ -33,8 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -54,7 +51,7 @@ public class UserServiceImpl implements UserService{
     private static final int MAX_NICKNAME_NUMBER = 999;
     private static final int MIN_NICKNAME_NUMBER = 1;
     private static final int FOLLOW_LIST_PAGE = 30;
-
+    private static final Social.SocialType[] AUTH_SERVERS = Social.SocialType.values();
 
     @Value("${default.img.url}")
     private String DEFAULT_PROFILE_IMG;
@@ -62,7 +59,7 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public Tokens createUser(MultipartFile multipartFile, SignUpRequest request) {
-        socialService.loadUserInfo(request.getProvider(), request.getProviderId(), request.getAccessToken());
+        socialService.checkUserInfo(request.getProvider(), request.getProviderId(), request.getAccessToken());
 
         // 이미 가입된 계정이 존재함
         socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(request.getProvider()), request.getProviderId())
@@ -118,7 +115,7 @@ public class UserServiceImpl implements UserService{
         });
 
         // DB 내 검색
-        if(userRepository.countUsersByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE) > 0) {
+        if(userRepository.existsByNicknameAndMemberStatusIs(nickname, User.MemberStatus.ACTIVE)) {
             throw new GeneralException(Code.USER_DUPLICATE_NICKNAME);
         }
     }
@@ -156,8 +153,9 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public Tokens signIn(SignInRequest signInRequest) {
-        socialService.loadUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
+        socialService.checkUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
 
         // social 정보 확인
         Social social = socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(signInRequest.getProvider()), signInRequest.getProviderId())
@@ -180,6 +178,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public FeedProfileResponse getProfile(User user, String nickname) {
         User target;
 
@@ -249,6 +248,10 @@ public class UserServiceImpl implements UserService{
             if(request.getNickname() != null) {
                 updateNickname(user, request.getNickname());
             }
+
+            if(Optional.ofNullable(request.getUseDefaultImg()).orElse(false)) {
+                user.updateProfile(DEFAULT_PROFILE_IMG);
+            }
         }
 
         userRepository.save(user);
@@ -264,9 +267,10 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void updatePublishingInfo(User user, PublishingInfoRequest request) {
         PublishStatus reviewStatus = (request.getPublishReview()) ?PublishStatus.PUBLIC : PublishStatus.PRIVATE;
-        PublishStatus categoryStatus = (request.getPublishCategory()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
+        PublishStatus categoryStatus = (request.getPublishPin()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
         PublishStatus routeStatus = (request.getPublishRoute()) ? PublishStatus.PUBLIC : PublishStatus.PRIVATE;
 
         user.updatePublishReview(reviewStatus);
@@ -326,7 +330,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public PagingResponse getFollowList(User user, Long followId) {
         Page<Follow> followList;
 
@@ -361,7 +365,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public PagingResponse getFollwerList(User user, Long followId) {
         Page<Follow> followList;
 
@@ -393,5 +397,76 @@ public class UserServiceImpl implements UserService{
                 .hasNext(followList.hasNext())
                 .result(result)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void disconnectSocialAccount(User user, SignInRequest signInRequest) {
+        socialService.checkUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
+
+        Social social = socialRepository.findBySocialTypeAndProviderId(Social.SocialType.valueOf(signInRequest.getProvider()), signInRequest.getProviderId())
+                .orElseThrow(() -> new GeneralException(Code.SOCIAL_ACCOUNT_NOT_FOUND));
+
+        Integer num = socialRepository.countSocialsByUser(user);
+        if(num == 1) {
+            throw new GeneralException(Code.NEED_LEAST_ONE_SOCIAL_ACCOUNT);
+        }
+
+        socialService.disconnectAccount(signInRequest.getProvider(), signInRequest.getAccessToken());
+        socialRepository.delete(social);
+    }
+
+    @Override
+    @Transactional
+    public void connectSocialAccount(User user, SignInRequest signInRequest) {
+        socialService.checkUserInfo(signInRequest.getProvider(), signInRequest.getProviderId(), signInRequest.getAccessToken());
+
+        if(socialRepository.existsByUserAndSocialType(user, Social.SocialType.valueOf(signInRequest.getProvider()))) {
+            throw new GeneralException(Code.ALREADY_EXIST_SOCIAL_CONNECT);
+        }
+
+        Social social = Social.builder()
+                .user(user)
+                .socialType(Social.SocialType.valueOf(signInRequest.getProvider()))
+                .providerId(signInRequest.getProviderId())
+                .build();
+
+        socialRepository.save(social);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Boolean> getAccountList(User user) {
+        List<Social> socials = socialRepository.findByUser(user);
+
+        Set<String> servers = socials.stream()
+                .map(social -> String.valueOf(social.getSocialType()))
+                .collect(Collectors.toSet());
+
+        Map<String, Boolean> result = new HashMap<>();
+
+        for(int i = 0; i < AUTH_SERVERS.length; i++) {
+            if(servers.contains(AUTH_SERVERS[i].name())) {
+                result.put(AUTH_SERVERS[i].name(), true);
+            } else {
+                result.put(AUTH_SERVERS[i].name(), false);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public void withdrawalUser(User user) {
+        user.updateMemberStatus(User.MemberStatus.INACTIVE);
+
+        List<Social> socials = socialRepository.findByUser(user);
+
+        for(Social social : socials) {
+            socialRepository.delete(social);
+        }
+
+        userRepository.save(user);
     }
 }
