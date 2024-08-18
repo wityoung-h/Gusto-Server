@@ -19,7 +19,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class OAuthService extends DefaultOAuth2UserService {
+public class AuthService extends DefaultOAuth2UserService {
     private final SocialRepository socialRepository;
     private final UserService userService;
     @Value("${default.img.url}")
@@ -78,5 +78,9 @@ public class OAuthService extends DefaultOAuth2UserService {
                 .build();
     }
 
+    public String decode(String cryptogram) {
+        String result = "";
 
+        return result;
+    }
 }
