@@ -270,6 +270,7 @@ public class StoreServiceImpl implements StoreService{
                         .collect(Collectors.toList());
 
                 GetPinStoreInfoResponse pinStoreInfoResponse = GetPinStoreInfoResponse.builder()
+                        .storeId(store.getStoreId())
                         .storeName(store.getStoreName())
                         .category(store.getCategoryString())
                         .address(store.getAddress())
