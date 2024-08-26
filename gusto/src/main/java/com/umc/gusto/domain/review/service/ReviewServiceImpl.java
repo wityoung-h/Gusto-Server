@@ -144,11 +144,6 @@ public class ReviewServiceImpl implements ReviewService{
     @Transactional(readOnly = true)
     public ReviewDetailResponse getReview(Long reviewId) {
         Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
-        //TODO: 후에 각 리뷰마다의 공개, 비공개를 확인해서 주는거로 수정하기
-        //TODO: 해당 함수는 사용자의 공개를 체크하면 안 될 것 같은데?? 리뷰 하나를 조회하는 것으로 분명 앞에서 리뷰가 보였으니까 해당 함수를 사용할 것임
-        if(!review.getUser().getPublishReview().equals(PublishStatus.PUBLIC)){
-            throw new PrivateItemException(Code.NO_PUBLIC_REVIEW);
-        }
 
         List<Long> hashTags = new ArrayList<>();
         review.getTaggingSet().stream().map(r-> r.getHashTag().getHasTagId()).forEach(hashTags::add);
