@@ -1,6 +1,7 @@
 package com.umc.gusto.domain.review.service;
 
 import com.umc.gusto.domain.review.entity.Review;
+import com.umc.gusto.domain.review.model.FeedVO;
 import com.umc.gusto.domain.review.model.response.*;
 import com.umc.gusto.domain.review.repository.LikedRepository;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
@@ -29,7 +30,8 @@ public class FeedServiceImpl implements FeedService{
     @Override
     @Transactional(readOnly = true)
     public List<RandomFeedResponse> getRandomFeed(User user) {
-        List<Review> feedList = reviewRepository.findRandomFeedByUser(user.getUserId());
+//        List<Review> feedList = reviewRepository.findRandomFeedByUser(user.getUserId());
+        List<FeedVO> feedList = reviewRepository.findRandomFeedByUser(user.getUserId());
         return feedList.stream().map(RandomFeedResponse::of).collect(Collectors.toList());
     }
 
