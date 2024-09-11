@@ -1,6 +1,7 @@
 package com.umc.gusto.domain.review.repository;
 
 import com.umc.gusto.domain.review.entity.Review;
+import com.umc.gusto.domain.review.model.FeedVO;
 import com.umc.gusto.domain.store.entity.Store;
 import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.global.common.BaseEntity;
@@ -37,8 +38,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Optional<Page<Review>> findAllByUserAndStatus(User user, BaseEntity.Status status, PageRequest pageRequest);
     List<Review> findByUserAndStatusAndVisitedAtBetween(User user, BaseEntity.Status status, LocalDate startDate, LocalDate lastDate);
 
-    @Query(value = "SELECT * FROM review r join user u on r.user_id = u.user_id  WHERE r.user_id <> :user AND u.publish_review = 'PUBLIC' AND r.status = 'ACTIVE' AND r.publish_review = 'PUBLIC' AND r.skip_check=false ORDER BY RAND() limit 33", nativeQuery = true)
-    List<Review> findRandomFeedByUser(@Param("user") UUID user); //WHERE r.user_id <> :userZ
+    @Query(value = "SELECT r.review_id as reviewId, r.img1 as image FROM review r join user u on r.user_id = u.user_id  WHERE r.user_id <> :user AND u.publish_review = 'PUBLIC' AND r.status = 'ACTIVE' AND r.publish_review = 'PUBLIC' AND r.skip_check=false ORDER BY RAND() limit 33", nativeQuery = true)
+    List<FeedVO> findRandomFeedByUser(@Param("user") UUID user); //WHERE r.user_id <> :userZ
 
     boolean existsByStoreAndUserNickname(Store store, String nickname);
 
