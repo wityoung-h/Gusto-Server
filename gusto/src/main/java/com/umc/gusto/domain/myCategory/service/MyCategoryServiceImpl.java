@@ -95,9 +95,6 @@ public class MyCategoryServiceImpl implements MyCategoryService {
 
         Page<Pin> pinList;
         if (nickname != null) {
-            if (nickname.equals(user.getNickname())) {
-                throw new GeneralException(Code.USER_NOT_FOUND_SELF);
-                }
             user = userRepository.findByNickname(nickname)
                     .orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
             myCategory = myCategoryRepository.findByMyCategoryPublicIdAndUserNickname(nickname, myCategoryId);          // PUBLIC 값에 따라 보이는 CATEGORY 처리, PIN에서까지 하지않아도 됨
