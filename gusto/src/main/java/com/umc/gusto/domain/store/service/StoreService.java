@@ -12,9 +12,9 @@ public interface StoreService {
 
     List<GetStoreResponse> getStores(User user, List<Long> storeIds);
     GetStoreDetailResponse getStoreDetail(User user, Long storeId, LocalDate visitedAt, Long reviewId);
-    List<GetStoresInMapResponse> getStoresInMap(User user, String townName, List<Long> myCategoryIds, Boolean visited);
-    List<GetPinStoreResponse> getPinStoresByCategoryAndLocation(User user, Long myCategoryId, String townName);
-    Map<String, Object> getVisitedPinStores(User user, Long myCategoryId, String townName, Long lastStoreId, int size);
-    Map<String, Object> getUnvisitedPinStores(User user, Long myCategoryId, String townName, Long lastStoreId, int size);
+    List<GetStoresInMapResponse> getStoresInMap(User user, String townCode, List<Long> myCategoryIds, Boolean visited);
+    List<GetPinStoreResponse> getPinStoresByCategoryAndLocation(User user, Long myCategoryId, String townCode);
+    Map<String, Object> getVisitedPinStores(User user, Long myCategoryId, String townCode, Long lastStoreId, int size);
+    Map<String, Object> getUnvisitedPinStores(User user, Long myCategoryId, String townCode, Long lastStoreId, int size);
     List<GetStoreInfoResponse> searchStore(String keyword);
 }

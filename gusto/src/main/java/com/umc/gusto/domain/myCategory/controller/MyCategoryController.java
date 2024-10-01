@@ -25,38 +25,38 @@ public class MyCategoryController {
 
     /**
      * 카테고리 전체 조회
-     * [GET] /myCategories?nickname={nickname}&townName={townName}&myCategoryId={myCategoryId}
+     * [GET] /myCategories?nickname={nickname}&townCode={townCode}&myCategoryId={myCategoryId}
      */
     @GetMapping
     public ResponseEntity<PagingResponse> allMyCategory(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "nickname", required = false) String nickname,
-            @RequestParam(name = "townName", required = false) String townName,
+            @RequestParam(name = "townCode", required = false) String townCode,
             @RequestParam(name = "myCategoryId", required = false) Long myCategoryId) {     // paging 처리를 위해 마지막 리턴 myCategoryId 사용
 
         User user = (nickname == null) ? authUser.getUser() : null;
-        PagingResponse pagingResponse = myCategoryService.getAllMyCategory(user, nickname, townName, myCategoryId);
+        PagingResponse pagingResponse = myCategoryService.getAllMyCategory(user, nickname, townCode, myCategoryId);
 
         return ResponseEntity.status(HttpStatus.OK).body(pagingResponse);
     }
 
     /**
      * 카테고리 별 가게 목록 조회
-     * [GET] /myCategories/pins?nickname={nickname}&myCategoryId={myCategoryId}&townName={townName}&pinId={pinId}&storeName={storeName}&sort={sort}
+     * [GET] /myCategories/pins?nickname={nickname}&myCategoryId={myCategoryId}&townCode={townCode}&pinId={pinId}&storeName={storeName}&sort={sort}
      */
-    @GetMapping("/pins")             // 나의 찜을 조회 할 시 nickname 값을 받지 않고, nickname이 조회될 경우 townName을 받지 않음
+    @GetMapping("/pins")             // 나의 찜을 조회 할 시 nickname 값을 받지 않고, nickname이 조회될 경우 townCode 받지 않음
     public ResponseEntity<PagingResponse> allPinByMyCategory(
             @AuthenticationPrincipal AuthUser authUser,
             @RequestParam(name = "nickname", required = false) String nickname,
             @RequestParam(name = "myCategoryId") Long myCategoryId,
-            @RequestParam(name = "townName", required = false) String townName,
+            @RequestParam(name = "townCode", required = false) String townCode,
             @RequestParam(name = "pinId", required = false) Long pinId,
             @RequestParam(name = "storeName", required = false) String storeName,
             @RequestParam(name = "sort", required = false) String sort  // paging 처리를 위해 마지막 리턴 pinId 사용
             ) {
 
         User user = (nickname == null) ? authUser.getUser() : null;
-        PagingResponse pagingResponse = myCategoryService.getAllPinByMyCategory(user, nickname, myCategoryId, townName, pinId, storeName, sort);
+        PagingResponse pagingResponse = myCategoryService.getAllPinByMyCategory(user, nickname, myCategoryId, townCode, pinId, storeName, sort);
 
         return ResponseEntity.status(HttpStatus.OK).body(pagingResponse);
     }

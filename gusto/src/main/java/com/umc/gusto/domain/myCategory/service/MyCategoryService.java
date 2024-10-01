@@ -13,12 +13,12 @@ import java.util.List;
 
 public interface MyCategoryService {
 
-    PagingResponse getAllMyCategory(User user, String nickname, String townName, Long myCategoryId);
-//    List<MyCategoryResponse> getAllMyCategoryWithLocation(User user, String townName);
+    PagingResponse getAllMyCategory(User user, String nickname, String townCode, Long myCategoryId);
+//    List<MyCategoryResponse> getAllMyCategoryWithLocation(User user, String townCode);
 
-    PagingResponse getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townName, Long pinId, String storeName, String sort);
+    PagingResponse getAllPinByMyCategory(User user, String nickname, Long myCategoryId, String townCode, Long pinId, String storeName, String sort);
 
-//    List<PinByMyCategoryResponse> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townName);
+//    List<PinByMyCategoryResponse> getAllPinByMyCategoryWithLocation(User user, Long myCategoryId, String townCode);
 
     void createMyCategory(User user, CreateMyCategoryRequest request);
 
