@@ -21,9 +21,9 @@ public class SocialService {
     private final RestClient restClient = RestClient.create();
     private static final String AUTH_TYPE = "Bearer ";
     @Value("${spring.security.oauth2.client.registration.naver.client-id}")
-    private static String NAVER_CLIENT_ID;
+    private String NAVER_CLIENT_ID;
     @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
-    private static String NAVER_CLIENT_SECRET;
+    private String NAVER_CLIENT_SECRET;
 
     public void checkUserInfo(String provider, String providerId, String accessToken) {
         // TODO: ACCESS TOKEN 복호화
@@ -91,8 +91,8 @@ public class SocialService {
             uri.append("client_id=").append(NAVER_CLIENT_ID).append("&")
                     .append("client_secret=").append(NAVER_CLIENT_SECRET).append("&")
                     .append("access_token=").append(accessToken);
-
-            Map result = restClient.get()
+            System.out.println(uri);
+            Map result = restClient.post()
                     .uri(uri.toString())
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
