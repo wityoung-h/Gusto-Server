@@ -286,7 +286,7 @@ public class UserController {
      * @param -
      * @return -
      */
-    @DeleteMapping("/auth/social-account")
+    @DeleteMapping("/auth/disconnect-social-account")
     public ResponseEntity disconnectSocialAccount(@AuthenticationPrincipal AuthUser authUser,
                                                   @RequestBody @Valid SignInRequest signInRequest) {
 
@@ -301,7 +301,7 @@ public class UserController {
      * @param -
      * @return -
      */
-    @PostMapping("/auth/social-account")
+    @PostMapping("/auth/connect-social-account")
     public ResponseEntity connectSocialAccount(@AuthenticationPrincipal AuthUser authUser,
                                                @RequestBody @Valid SignInRequest signInRequest) {
         userService.connectSocialAccount(authUser.getUser(), signInRequest);
