@@ -13,7 +13,6 @@ public enum Code {
 
     //User 관련 에러 +0
     USER_FOLLOW_SELF(HttpStatus.FORBIDDEN, 403001, "자신을 팔로우할 수 없습니다."),
-    USER_NOT_FOUND_SELF(HttpStatus.FORBIDDEN, 403002, "자신의 닉네임을 사용해 접근할 수 없습니다."),
     USER_PUBLISH_CATEGORY_PRIVATE(HttpStatus.FORBIDDEN, 403003, "마이페이지의 publishCategory가 PRIVATE 상태입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 404001, "존재하지 않는 유저입니다."),
     USER_FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, 404002, "팔로우한 유저가 아닙니다."),
