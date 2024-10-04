@@ -14,59 +14,59 @@ import java.util.Optional;
 public interface PinRepository extends JpaRepository<Pin, Long> {
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
-            "AND p.store.town.townName = :townName " +
+            "AND p.store.town.townCode = :townCode " +
             "ORDER BY p.pinId DESC")
-    Page<Pin> findPinsByMyCategoryAndTownNameAndPinIdDESCFirstPaging(MyCategory myCategory, String townName, Pageable pageable);
+    Page<Pin> findPinsByMyCategoryAndTownCodeAndPinIdDESCFirstPaging(MyCategory myCategory, String townCode, Pageable pageable);
 
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
-            "AND p.store.town.townName = :townName " +
+            "AND p.store.town.townCode = :townCode " +
             "ORDER BY p.pinId ASC")
-    Page<Pin> findPinsByMyCategoryAndTownNameAndPinIdASCFirstPaging(MyCategory myCategory, String townName, Pageable pageable);
+    Page<Pin> findPinsByMyCategoryAndTownCodeAndPinIdASCFirstPaging(MyCategory myCategory, String townCode, Pageable pageable);
 
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
-            "AND p.store.town.townName = :townName " +
+            "AND p.store.town.townCode = :townCode " +
             "ORDER BY p.store.storeName DESC, p.pinId DESC")
-    Page<Pin> findPinsByMyCategoryAndTownNameAndStoreNameDESCFirstPaging(MyCategory myCategory, String townName, Pageable pageable);
+    Page<Pin> findPinsByMyCategoryAndTownCodeAndStoreNameDESCFirstPaging(MyCategory myCategory, String townCode, Pageable pageable);
 
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
-            "AND p.store.town.townName = :townName " +
+            "AND p.store.town.townCode = :townCode " +
             "ORDER BY p.store.storeName ASC, p.pinId DESC")
-    Page<Pin> findPinsByMyCategoryAndTownNameAndStoreNameASCFirstPaging(MyCategory myCategory, String townName, Pageable pageable);
+    Page<Pin> findPinsByMyCategoryAndTownCodeAndStoreNameASCFirstPaging(MyCategory myCategory, String townCode, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
-            "AND p.store.town.townName = :townName " +
+            "AND p.store.town.townCode = :townCode " +
             "ORDER BY p.pinId DESC")
-    List<Pin> findPinsByMyCategoryAndTownNameAndPinIdDESC(MyCategory myCategory, String townName);
+    List<Pin> findPinsByMyCategoryAndTownCodeAndPinIdDESC(MyCategory myCategory, String townCode);
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
-            "AND p.store.town.townName = :townName " +
+            "AND p.store.town.townCode = :townCode " +
             "AND p.pinId < :pinId " +
             "ORDER BY p.pinId DESC")
-    Page<Pin> findPinsByMyCategoryAndTownNameAndPinIdDESCPaging(MyCategory myCategory, String townName, Long pinId, Pageable pageable);
+    Page<Pin> findPinsByMyCategoryAndTownCodeAndPinIdDESCPaging(MyCategory myCategory, String townCode, Long pinId, Pageable pageable);
 
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
-            "AND p.store.town.townName = :townName " +
+            "AND p.store.town.townCode = :townCode " +
             "AND p.pinId > :pinId " +
             "ORDER BY p.pinId ASC")
-    Page<Pin> findPinsByMyCategoryAndTownNameAndPinIdASCPaging(MyCategory myCategory, String townName, Long pinId, Pageable pageable);
+    Page<Pin> findPinsByMyCategoryAndTownCodeAndPinIdASCPaging(MyCategory myCategory, String townCode, Long pinId, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
-            "AND p.store.town.townName = :townName " +
+            "AND p.store.town.townCode = :townCode " +
             "AND (p.store.storeName < :storeName " +
             "OR (p.store.storeName = :storeName AND p.pinId < :pinId)) " +
             "ORDER BY p.store.storeName DESC, p.pinId DESC")
-    Page<Pin> findPinsByMyCategoryAndTownNameAndStoreNameDESCPaging(MyCategory myCategory, String townName, Long pinId, String storeName, Pageable pageable);
+    Page<Pin> findPinsByMyCategoryAndTownCodeAndStoreNameDESCPaging(MyCategory myCategory, String townCode, Long pinId, String storeName, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
-            "AND p.store.town.townName = :townName " +
+            "AND p.store.town.townCode = :townCode " +
             "AND (p.store.storeName > :storeName " +
             "OR (p.store.storeName = :storeName AND p.pinId < :pinId)) " +
             "ORDER BY p.store.storeName ASC, p.pinId DESC")
-    Page<Pin> findPinsByMyCategoryAndTownNameAndStoreNameASCPaging(MyCategory myCategory, String townName, Long pinId, String storeName, Pageable pageable);
+    Page<Pin> findPinsByMyCategoryAndTownCodeAndStoreNameASCPaging(MyCategory myCategory, String townCode, Long pinId, String storeName, Pageable pageable);
     @Query("SELECT p FROM Pin p " +
             "WHERE p.myCategory = :myCategory " +
             "ORDER BY p.pinId DESC")
@@ -113,9 +113,9 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
     @Query("SELECT p FROM Pin p " +
             "WHERE p.user = :user " +
             "AND p.myCategory.myCategoryId = :myCategoryId " +
-            "AND p.store.town.townName = :townName " +
+            "AND p.store.town.townCode = :townCode " +
             "ORDER BY p.pinId DESC")
-    List<Pin> findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(User user, Long myCategoryId, String townName);
+    List<Pin> findPinsByUserAndMyCategoryIdAndTownCodeAndPinIdDESC(User user, Long myCategoryId, String townCode);
     Optional<Pin> findByUserAndPinId(User user, Long pinId);
     boolean existsByUserAndStoreStoreId(User user, Long storeId);       // 존재 여부
     @Query("SELECT p.store.storeId FROM Pin p WHERE p.user = :user AND p.myCategory.myCategoryId = :myCategoryId AND p.user.publishCategory = 'PUBLIC'")
@@ -129,7 +129,7 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
             "JOIN s.town t " +
             "JOIN p.user u " +
             "WHERE p.user = :user " +
-            "AND t.townName = :townName " +
+            "AND t.townCode = :townCode " +
             "ORDER BY p.pinId DESC")
-    List<Pin> findPinsByUserAndTownNameAndPinIdDESC(User user, String townName);
+    List<Pin> findPinsByUserAndTownCodeAndPinIdDESC(User user, String townCode);
 }
