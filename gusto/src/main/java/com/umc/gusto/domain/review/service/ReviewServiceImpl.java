@@ -20,7 +20,6 @@ import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import com.umc.gusto.global.exception.customException.NoPermission;
 import com.umc.gusto.global.exception.customException.NotFoundException;
-import com.umc.gusto.global.exception.customException.PrivateItemException;
 import com.umc.gusto.global.util.S3Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;

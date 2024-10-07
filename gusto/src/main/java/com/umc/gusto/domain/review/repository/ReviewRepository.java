@@ -47,12 +47,17 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         검색 관련
      */
     @Query("SELECT r FROM Review r WHERE r.status = 'ACTIVE' AND r.publishReview = 'PUBLIC' AND r.skipCheck = false " +
-            "AND r.reviewId < :cursorId AND r.store.storeName like concat('%', :keyword, '%') OR r.comment like concat('%', :keyword, '%')" +
+            "AND r.reviewId < :cursorId " +
+            "AND (REPLACE(r.store.storeName, ' ', '') LIKE LOWER(CONCAT('%', REPLACE(:keyword, ' ', ''), '%'))" +
+            " OR REPLACE(r.comment, ' ', '') LIKE LOWER(CONCAT('%', REPLACE(:keyword, ' ', ''), '%')))" +
             "ORDER BY r.reviewId desc")
     Page<Review> searchByStoreContains(String keyword, Long cursorId, PageRequest pageRequest); //TODO: 후에 페이징 처리 하기
     @Query("SELECT t.review FROM Tagging t WHERE t.review.status = 'ACTIVE' AND t.review.publishReview = 'PUBLIC' AND t.review.skipCheck=false " +
-            "AND t.review.reviewId < :cursorId AND t.review.store.storeName like concat('%', :keyword, '%') AND t.hashTag.hasTagId = :hashTagId" +
-            " ORDER BY t.review.reviewId desc")
+            "AND t.review.reviewId < :cursorId " +
+            "AND t.hashTag.hasTagId = :hashTagId " +
+            "AND (REPLACE(t.review.store.storeName, ' ', '') LIKE LOWER(CONCAT('%', REPLACE(:keyword, ' ', ''), '%'))" +
+            " OR REPLACE(t.review.comment, ' ', '') LIKE LOWER(CONCAT('%', REPLACE(:keyword, ' ', ''), '%'))) " +
+            "ORDER BY t.review.reviewId desc")
     Page<Review> searchByStoreAndHashTagContains(String keyword, Long hashTagId, Long cursorId, PageRequest pageRequest);
     @Query("SELECT t.review FROM Tagging t WHERE t.review.status = 'ACTIVE' AND t.review.publishReview = 'PUBLIC' AND t.review.skipCheck=false " +
             "AND t.review.reviewId < :cursorId AND t.hashTag.hasTagId = :hashTagId ORDER BY t.review.reviewId desc")
