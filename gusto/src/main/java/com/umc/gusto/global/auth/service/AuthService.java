@@ -5,6 +5,8 @@ import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.entity.Social;
 import com.umc.gusto.global.auth.model.CustomOAuth2User;
 import com.umc.gusto.global.auth.model.OAuthAttributes;
+import com.umc.gusto.global.exception.Code;
+import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,16 +16,34 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Optional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class OAuthService extends DefaultOAuth2UserService {
+public class AuthService extends DefaultOAuth2UserService {
     private final SocialRepository socialRepository;
     private final UserService userService;
     @Value("${default.img.url}")
-    private static String DEFAULT_PROFILE_IMG;
+    private String DEFAULT_PROFILE_IMG;
+    @Value("${gusto.security.private-key}")
+    private String ENCODING_PRIVATE_KEY;
+    @Value("${gusto.security.initialize-vector}")
+    private String INITIALIZE_VECTOR;
+    @Value("${gusto.security.encoding-type}")
+    private String ENCODING_TYPE;
+
 
     // 유저 불러오기 - 해당 유저의 security context가 저장됨
     @Override
@@ -48,27 +68,9 @@ public class OAuthService extends DefaultOAuth2UserService {
         Social info;
 
         if(socialInfo.isEmpty()) {
-             info = socialRepository.save(Social.builder()
-                     .socialType(provider)
-                     .providerId(oAuthAttributes.getId())
-                     .socialStatus(Social.SocialStatus.WAITING_SIGN_UP)
-//                     .temporalToken(UUID.randomUUID())
-                     .build());
-
-             if(oAuthAttributes.getNickname() == null) {
-                 oAuthAttributes.updateNickname(userService.generateRandomNickname().getNickname());
-             }
-
-             if(oAuthAttributes.getProfileImg() == null) {
-                 oAuthAttributes.updateProfileImg(DEFAULT_PROFILE_IMG);
-             }
-
+             info = null;
         } else {
             info = socialInfo.get();
-        }
-
-        if(info.getSocialStatus() == Social.SocialStatus.DISCONNECTED) {
-            // TODO: error throw
         }
 
         return CustomOAuth2User.builder()
@@ -78,5 +80,23 @@ public class OAuthService extends DefaultOAuth2UserService {
                 .build();
     }
 
+    public String decode(String cryptogram) {
+        try {
+            SecretKeySpec secretKey = new SecretKeySpec(ENCODING_PRIVATE_KEY.getBytes("UTF-8"), "AES");
+            IvParameterSpec IV = new IvParameterSpec(INITIALIZE_VECTOR.substring(0, 16).getBytes());
 
+            Cipher c = Cipher.getInstance(ENCODING_TYPE);
+
+            c.init(Cipher.DECRYPT_MODE, secretKey, IV);
+
+            byte[] decodeByte = Base64.getDecoder().decode(cryptogram.getBytes());
+
+            return new String(c.doFinal(decodeByte), "UTF-8");
+        } catch (InvalidAlgorithmParameterException | UnsupportedEncodingException |
+                NoSuchPaddingException | IllegalBlockSizeException |
+                NoSuchAlgorithmException | InvalidKeyException |
+                BadPaddingException e) {
+            throw new GeneralException(Code.INTERNAL_SEVER_ERROR);
+        }
+    }
 }

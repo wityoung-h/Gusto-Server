@@ -1,6 +1,5 @@
 package com.umc.gusto.domain.store.entity;
 
-import com.umc.gusto.domain.myCategory.entity.MyCategory;
 import com.umc.gusto.global.common.BaseTime;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,7 +20,7 @@ public class Store extends BaseTime {
     @Column(nullable = false, updatable = false)
     private Long storeId;
 
-    @Column(columnDefinition = "VARCHAR(30)")
+    @Column(columnDefinition = "VARCHAR(40)")
     private String storeName;
 
     @Column(columnDefinition = "DOUBLE(17,14)")
@@ -30,23 +29,19 @@ public class Store extends BaseTime {
     @Column(columnDefinition = "DOUBLE(17,15)")
     private Double latitude;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "categoryId")
-    private Category category;
-
     @Column(columnDefinition = "VARCHAR(20)")
     private String categoryString;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "stateId", nullable = false)
+    @JoinColumn(name = "stateCode", nullable = false)
     private State state;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "cityId", nullable = false)
+    @JoinColumn(name = "cityCode", nullable = false)
     private City city;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "townId", nullable = false)
+    @JoinColumn(name = "townCode", nullable = false)
     private Town town;
 
     @Column(nullable = false, columnDefinition = "VARCHAR(60)")

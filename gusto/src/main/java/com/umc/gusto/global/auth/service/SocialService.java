@@ -18,6 +18,7 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class SocialService {
+    private final AuthService authService;
     private final RestClient restClient = RestClient.create();
     private static final String AUTH_TYPE = "Bearer ";
     @Value("${spring.security.oauth2.client.registration.naver.client-id}")
@@ -25,8 +26,10 @@ public class SocialService {
     @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
     private String NAVER_CLIENT_SECRET;
 
-    public void checkUserInfo(String provider, String providerId, String accessToken) {
+    public void checkUserInfo(String provider, String encodedId, String encodedToken) {
         // TODO: ACCESS TOKEN 복호화
+        String providerId = authService.decode(encodedId);
+        String accessToken = authService.decode(encodedToken);
 
         String header = AUTH_TYPE + accessToken;
         String id = "";
