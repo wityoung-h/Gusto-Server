@@ -34,15 +34,15 @@ public class Store extends BaseTime {
     private String categoryString;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "stateId", nullable = false)
+    @JoinColumn(name = "stateCode", nullable = false)
     private State state;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "cityId", nullable = false)
+    @JoinColumn(name = "cityCode", nullable = false)
     private City city;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "townId", nullable = false)
+    @JoinColumn(name = "townCode", nullable = false)
     private Town town;
 
     @Column(nullable = false, columnDefinition = "VARCHAR(60)")
