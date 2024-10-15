@@ -1,6 +1,5 @@
 package com.umc.gusto.domain.store.entity;
 
-import com.umc.gusto.domain.myCategory.entity.MyCategory;
 import com.umc.gusto.global.common.BaseTime;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,7 +20,7 @@ public class Store extends BaseTime {
     @Column(nullable = false, updatable = false)
     private Long storeId;
 
-    @Column(columnDefinition = "VARCHAR(30)")
+    @Column(columnDefinition = "VARCHAR(40)")
     private String storeName;
 
     @Column(columnDefinition = "DOUBLE(17,14)")
