@@ -30,10 +30,6 @@ public class Store extends BaseTime {
     @Column(columnDefinition = "DOUBLE(17,15)")
     private Double latitude;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "categoryId")
-    private Category category;
-
     @Column(columnDefinition = "VARCHAR(20)")
     private String categoryString;
 
