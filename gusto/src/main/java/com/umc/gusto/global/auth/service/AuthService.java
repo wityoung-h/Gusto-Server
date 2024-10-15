@@ -68,27 +68,9 @@ public class AuthService extends DefaultOAuth2UserService {
         Social info;
 
         if(socialInfo.isEmpty()) {
-             info = socialRepository.save(Social.builder()
-                     .socialType(provider)
-                     .providerId(oAuthAttributes.getId())
-                     .socialStatus(Social.SocialStatus.WAITING_SIGN_UP)
-//                     .temporalToken(UUID.randomUUID())
-                     .build());
-
-             if(oAuthAttributes.getNickname() == null) {
-                 oAuthAttributes.updateNickname(userService.generateRandomNickname().getNickname());
-             }
-
-             if(oAuthAttributes.getProfileImg() == null) {
-                 oAuthAttributes.updateProfileImg(DEFAULT_PROFILE_IMG);
-             }
-
+             info = null;
         } else {
             info = socialInfo.get();
-        }
-
-        if(info.getSocialStatus() == Social.SocialStatus.DISCONNECTED) {
-            // TODO: error throw
         }
 
         return CustomOAuth2User.builder()
