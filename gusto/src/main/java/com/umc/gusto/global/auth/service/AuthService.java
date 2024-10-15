@@ -1,8 +1,7 @@
 package com.umc.gusto.global.auth.service;
 
-import com.umc.gusto.domain.user.repository.SocialRepository;
-import com.umc.gusto.domain.user.service.UserService;
 import com.umc.gusto.domain.user.entity.Social;
+import com.umc.gusto.domain.user.repository.SocialRepository;
 import com.umc.gusto.global.auth.model.CustomOAuth2User;
 import com.umc.gusto.global.auth.model.OAuthAttributes;
 import com.umc.gusto.global.exception.Code;
@@ -34,7 +33,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthService extends DefaultOAuth2UserService {
     private final SocialRepository socialRepository;
-    private final UserService userService;
     @Value("${default.img.url}")
     private String DEFAULT_PROFILE_IMG;
     @Value("${gusto.security.private-key}")
