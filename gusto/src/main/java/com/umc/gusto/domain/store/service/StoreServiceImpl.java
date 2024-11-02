@@ -3,6 +3,8 @@ package com.umc.gusto.domain.store.service;
 import com.umc.gusto.domain.myCategory.entity.Pin;
 import com.umc.gusto.domain.myCategory.repository.PinRepository;
 import com.umc.gusto.domain.review.entity.Review;
+import com.umc.gusto.domain.review.model.response.BasicViewResponse;
+import com.umc.gusto.domain.review.model.response.SearchFeedResponse;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
 import com.umc.gusto.domain.store.entity.OpeningHours;
 import com.umc.gusto.domain.store.entity.Store;
@@ -14,6 +16,7 @@ import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -149,13 +152,13 @@ public class StoreServiceImpl implements StoreService{
     }
 
     @Transactional(readOnly = true)
-    public List<GetStoresInMapResponse> getStoresInMap(User user, String townName, List<Long> myCategoryIds, Boolean visited) {
+    public List<GetStoresInMapResponse> getStoresInMap(User user, String townCode, List<Long> myCategoryIds, Boolean visited) {
         List<Pin> pins = new ArrayList<>();
         if (myCategoryIds == null || myCategoryIds.isEmpty()) {
-            pins = pinRepository.findPinsByUserAndTownNameAndPinIdDESC(user, townName);
+            pins = pinRepository.findPinsByUserAndTownCodeAndPinIdDESC(user, townCode);
         } else {
             for (Long myCategoryId : myCategoryIds) {
-                pins.addAll(pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName));
+                pins.addAll(pinRepository.findPinsByUserAndMyCategoryIdAndTownCodeAndPinIdDESC(user, myCategoryId, townCode));
             }
         }
 
@@ -194,11 +197,11 @@ public class StoreServiceImpl implements StoreService{
     }
 
     @Transactional(readOnly = true)
-    public List<GetPinStoreResponse> getPinStoresByCategoryAndLocation(User user, Long myCategoryId, String townName) {
+    public List<GetPinStoreResponse> getPinStoresByCategoryAndLocation(User user, Long myCategoryId, String townCode) {
 
-        List<Pin> pins = pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName);
+        List<Pin> pins = pinRepository.findPinsByUserAndMyCategoryIdAndTownCodeAndPinIdDESC(user, myCategoryId, townCode);
         if(myCategoryId == null){
-            pins = pinRepository.findPinsByUserAndTownNameAndPinIdDESC(user, townName);
+            pins = pinRepository.findPinsByUserAndTownCodeAndPinIdDESC(user, townCode);
         }
         List<GetStoreInfoResponse> visitedStoresInfo = new ArrayList<>();
         List<GetStoreInfoResponse> unvisitedStoresInfo = new ArrayList<>();
@@ -247,10 +250,10 @@ public class StoreServiceImpl implements StoreService{
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Object> getPinStoresInfo(User user, Long myCategoryId, String townName, boolean visited, Long lastStoreId, int size) {
-        List<Pin> pins = pinRepository.findPinsByUserAndMyCategoryIdAndTownNameAndPinIdDESC(user, myCategoryId, townName);
+    public Map<String, Object> getPinStoresInfo(User user, Long myCategoryId, String townCode, boolean visited, Long lastStoreId, int size) {
+        List<Pin> pins = pinRepository.findPinsByUserAndMyCategoryIdAndTownCodeAndPinIdDESC(user, myCategoryId, townCode);
         if(myCategoryId == null){
-            pins = pinRepository.findPinsByUserAndTownNameAndPinIdDESC(user, townName);
+            pins = pinRepository.findPinsByUserAndTownCodeAndPinIdDESC(user, townCode);
         }
 
         List<GetPinStoreInfoResponse> pinStoresInfo = new ArrayList<>();
@@ -270,6 +273,7 @@ public class StoreServiceImpl implements StoreService{
                         .collect(Collectors.toList());
 
                 GetPinStoreInfoResponse pinStoreInfoResponse = GetPinStoreInfoResponse.builder()
+                        .storeId(store.getStoreId())
                         .storeName(store.getStoreName())
                         .category(store.getCategoryString())
                         .address(store.getAddress())
@@ -290,20 +294,27 @@ public class StoreServiceImpl implements StoreService{
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Object> getVisitedPinStores(User user, Long myCategoryId, String townName, Long lastStoreId, int size) {
-        return getPinStoresInfo(user, myCategoryId, townName, true, lastStoreId, size);
+    public Map<String, Object> getVisitedPinStores(User user, Long myCategoryId, String townCode, Long lastStoreId, int size) {
+        return getPinStoresInfo(user, myCategoryId, townCode, true, lastStoreId, size);
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Object> getUnvisitedPinStores(User user, Long myCategoryId, String townName,  Long lastStoreId, int size) {
-        return getPinStoresInfo(user, myCategoryId, townName, false, lastStoreId, size);
+    public Map<String, Object> getUnvisitedPinStores(User user, Long myCategoryId, String townCode,  Long lastStoreId, int size) {
+        return getPinStoresInfo(user, myCategoryId, townCode, false, lastStoreId, size);
     }
 
     @Override
-    public List<GetStoreInfoResponse> searchStore(String keyword) {
-        List<Store> searchResult = storeRepository.findTop5ByStoreNameContains(keyword);
+    public SearchStoreResponse searchStore(String keyword, Long cursor) {
+        PageRequest pageRequest = PageRequest.of(0,15);
 
-        return searchResult.stream()
+        if(cursor == null){
+            cursor = Long.MAX_VALUE;
+        }
+
+//        List<Store> searchResult = storeRepository.findTop5ByStoreNameContains(keyword);
+        Page<Store> searchResult = storeRepository.searchByStoreNameContains(keyword, cursor, pageRequest);
+
+        List<GetStoreInfoResponse> searchStoreList = searchResult.stream()
                 .map(result -> {
                     Optional<Review> review = reviewRepository.findFirstByStoreOrderByLikedDesc(result);
                     String reviewImg = review.map(Review::getImg1).orElse("");
@@ -315,6 +326,15 @@ public class StoreServiceImpl implements StoreService{
                             .reviewImg(reviewImg)
                             .build();
                 })
-                .collect(Collectors.toList());
+                .toList();
+
+        if(searchResult.isEmpty()){
+            return SearchStoreResponse.builder().build();
+        }
+
+        boolean checkNext = searchResult.hasNext();
+        Long cursorId = searchResult.isEmpty() || !checkNext ? null : searchStoreList.get(searchStoreList.size()-1).getStoreId();
+
+        return SearchStoreResponse.of(searchStoreList, checkNext, cursorId);
     }
 }

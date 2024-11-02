@@ -1,6 +1,7 @@
 package com.umc.gusto.domain.review.service;
 
 import com.umc.gusto.domain.review.entity.Review;
+import com.umc.gusto.domain.review.model.FeedVO;
 import com.umc.gusto.domain.review.model.response.*;
 import com.umc.gusto.domain.review.repository.LikedRepository;
 import com.umc.gusto.domain.review.repository.ReviewRepository;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +28,15 @@ public class FeedServiceImpl implements FeedService{
     private final LikedRepository likedRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<RandomFeedResponse> getRandomFeed(User user) {
-        List<Review> feedList = reviewRepository.findRandomFeedByUser(user.getUserId());
+//        List<Review> feedList = reviewRepository.findRandomFeedByUser(user.getUserId());
+        List<FeedVO> feedList = reviewRepository.findRandomFeedByUser(user.getUserId());
         return feedList.stream().map(RandomFeedResponse::of).collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public SearchFeedResponse searchFeed(String keyword, List<Long> hashTags, Long cursor) { //TODO: 검색 결과가 랜덤으로 다시 정렬되야 할듯 & 자기 리뷰가 아니여야함
         Page<Review> searchResult = null;
         PageRequest pageRequest = PageRequest.of(0,33);
@@ -60,13 +65,14 @@ public class FeedServiceImpl implements FeedService{
 
         boolean checkNext = searchResult.hasNext();
         List<BasicViewResponse> basicViewResponse = searchResult.stream().map(BasicViewResponse::of).toList();
-        Long cursorId = basicViewResponse.isEmpty() ? null : basicViewResponse.get(basicViewResponse.size()-1).getReviewId();
+        Long cursorId = basicViewResponse.isEmpty() || !checkNext ? null : basicViewResponse.get(basicViewResponse.size()-1).getReviewId();
 
         return SearchFeedResponse.of(basicViewResponse, checkNext, cursorId);
     }
 
     //TODO: 해당 함수도 이미 피드에서 보인 리뷰임. 그래서 디테일이 안보이면 안됨 사용자 공개 체크를 할 필요가 없음
     @Override
+    @Transactional(readOnly = true)
     public FeedDetailResponse getFeedDetail(User user, Long reviewId) {
         //TOOD: reviewServiceImpl와 중복되는 코드 분리하기
         Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));

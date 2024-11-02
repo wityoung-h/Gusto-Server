@@ -20,9 +20,8 @@ import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
 import com.umc.gusto.global.exception.customException.NoPermission;
 import com.umc.gusto.global.exception.customException.NotFoundException;
-import com.umc.gusto.global.exception.customException.PrivateItemException;
 import com.umc.gusto.global.util.S3Service;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -51,6 +50,7 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
+    @Transactional
     public void createReview(User user, List<MultipartFile> images, CreateReviewRequest createReviewRequest) {
         Store store= storeRepository.findById(createReviewRequest.getStoreId()).orElseThrow(()-> new NotFoundException(Code.STORE_NOT_FOUND));
         LocalDate visitedAt = createReviewRequest.getVisitedAt();
@@ -130,6 +130,7 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
+    @Transactional
     public void deleteReview(User user, Long reviewId) {
         Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
         review.updateStatus(BaseEntity.Status.INACTIVE);
@@ -139,13 +140,9 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ReviewDetailResponse getReview(Long reviewId) {
         Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
-        //TODO: 후에 각 리뷰마다의 공개, 비공개를 확인해서 주는거로 수정하기
-        //TODO: 해당 함수는 사용자의 공개를 체크하면 안 될 것 같은데?? 리뷰 하나를 조회하는 것으로 분명 앞에서 리뷰가 보였으니까 해당 함수를 사용할 것임
-        if(!review.getUser().getPublishReview().equals(PublishStatus.PUBLIC)){
-            throw new PrivateItemException(Code.NO_PUBLIC_REVIEW);
-        }
 
         List<Long> hashTags = new ArrayList<>();
         review.getTaggingSet().stream().map(r-> r.getHashTag().getHasTagId()).forEach(hashTags::add);
@@ -178,6 +175,7 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
+    @Transactional
     public void unlikeReview(User user, Long reviewId) {
         Review review = reviewRepository.findByReviewIdAndStatus(reviewId, BaseEntity.Status.ACTIVE).orElseThrow(()->new NotFoundException(Code.REVIEW_NOT_FOUND));
 

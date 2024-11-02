@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetPinStoreInfoResponse {
+    Long storeId;
     String storeName;
     String address;
     String category;
