@@ -131,5 +131,7 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
             "WHERE p.user = :user " +
             "AND t.townCode = :townCode " +
             "ORDER BY p.pinId DESC")
-    List<Pin> findPinsByUserAndTownCodeAndPinIdDESC(User user, String townCode);
+  
+    List<Pin> findPinsByUserAndTownNameAndPinIdDESC(User user, String townName);
+
 }
