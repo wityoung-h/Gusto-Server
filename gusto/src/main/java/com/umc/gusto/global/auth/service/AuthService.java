@@ -97,4 +97,8 @@ public class AuthService extends DefaultOAuth2UserService {
             throw new GeneralException(Code.INTERNAL_SEVER_ERROR);
         }
     }
+
+    public String getTestToken(String backToken, String nickname) {
+        return new String("");
+    }
 }
