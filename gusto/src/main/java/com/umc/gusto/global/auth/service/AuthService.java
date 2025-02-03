@@ -1,11 +1,16 @@
 package com.umc.gusto.global.auth.service;
 
 import com.umc.gusto.domain.user.entity.Social;
+import com.umc.gusto.domain.user.entity.User;
 import com.umc.gusto.domain.user.repository.SocialRepository;
+import com.umc.gusto.domain.user.repository.UserRepository;
 import com.umc.gusto.global.auth.model.CustomOAuth2User;
 import com.umc.gusto.global.auth.model.OAuthAttributes;
+import com.umc.gusto.global.auth.model.Tokens;
+import com.umc.gusto.global.config.secret.JwtConfig;
 import com.umc.gusto.global.exception.Code;
 import com.umc.gusto.global.exception.GeneralException;
+import com.umc.gusto.global.util.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +37,10 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class AuthService extends DefaultOAuth2UserService {
+    private final UserRepository userRepository;
     private final SocialRepository socialRepository;
+    private final JwtService jwtService;
+    private final RedisService redisService;
     @Value("${default.img.url}")
     private String DEFAULT_PROFILE_IMG;
     @Value("${gusto.security.private-key}")
@@ -41,6 +49,8 @@ public class AuthService extends DefaultOAuth2UserService {
     private String INITIALIZE_VECTOR;
     @Value("${gusto.security.encoding-type}")
     private String ENCODING_TYPE;
+    @Value("${gusto.security.back-token}")
+    private String BACK_TOKEN;
 
 
     // 유저 불러오기 - 해당 유저의 security context가 저장됨
@@ -99,6 +109,16 @@ public class AuthService extends DefaultOAuth2UserService {
     }
 
     public String getTestToken(String backToken, String nickname) {
-        return new String("");
+        if(!backToken.equals(BACK_TOKEN)) {
+            throw new GeneralException(Code.INVALID_BACK_TOKEN);
+        }
+
+        User user = userRepository.findByNickname(nickname).orElseThrow(() -> new GeneralException(Code.USER_NOT_FOUND));
+
+        // access-token 및 refresh-token 생성
+        Tokens tokens = jwtService.createToken(String.valueOf(user.getUserId()));
+        redisService.setValuesWithTimeout(tokens.getRefreshToken(), String.valueOf(user.getUserId()), JwtConfig.REFRESH_TOKEN_VALID_TIME);
+
+        return tokens.getAccessToken();
     }
 }

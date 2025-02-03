@@ -76,9 +76,15 @@ public class AuthController {
     * 테스트 시 필요한 토큰 발급을 위한 API
     *
     * */
-    @PostMapping("/{nickname}/token")
-    public ResponseEntity getTestToken(@RequestHeader("back-token") String backToken, @PathVariable("nickname") String nickname) {
+    @PostMapping("/token")
+    public ResponseEntity getTestToken(@RequestHeader("back-token") String backToken, @RequestParam("nickname") String nickname) {
+        String result = authService.getTestToken(backToken, nickname);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-AUTH-TOKEN", result);
+
         return ResponseEntity.ok()
+                .headers(headers)
                 .build();
     }
 }

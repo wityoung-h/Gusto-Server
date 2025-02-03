@@ -84,6 +84,7 @@ public enum Code {
     OAUTH_FIND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 500701, "소셜 인증 서버에서 에러가 발생했습니다."),
     OAUTH_NOT_FOUND_TOKEN(HttpStatus.NOT_FOUND, 404702, "유효한 소셜 서버 Access Token이 아닙니다."),
     INVALID_CRYPTOGRAM(HttpStatus.BAD_REQUEST, 400701, "유효하지 않은 암호문입니다."),
+    INVALID_BACK_TOKEN(HttpStatus.BAD_REQUEST, 400702, "유효하지 않은 back-token 입니다."),
 
     FOR_TEST_ERROR(HttpStatus.BAD_REQUEST,49999, "테스트용 에러")
 
